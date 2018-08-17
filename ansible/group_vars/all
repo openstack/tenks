@@ -1,0 +1,41 @@
+---
+# Map physical network names to their source device. This can be either an
+# existing interface or an existing bridge.
+physnet_mappings: {}
+
+virtualisation_provider: libvirt
+
+system_requirements:
+  - python-pip
+  - python-virtualenv
+
+# Path to virtualenv used to install Python requirements. If a virtualenv does
+# not exist at this location, one will be created.
+virtualenv_path: ~/tenks-venv
+
+python_requirements:
+  - virtualbmc
+
+# Naming scheme for bridges created by tenks for physical networks is
+# {{ bridge_prefix + i }}, where `i` is the index of the physical network in
+# physnet_mappings (sorted alphabetically by key).
+bridge_prefix: brtenks
+# Naming scheme for veth pairs connected to the Tenks OVS bridge.
+veth_prefix: p-
+# Used for the port on the Tenks OVS bridge.
+veth_tenks_suffix: "-ovs"
+# Used for the port on the existing bridge.
+veth_source_suffix: "-phy"
+
+libvirt_pool_name: tenks
+libvirt_pool_path: /var/lib/libvirt/tenks_pool/
+libvirt_pool_type: dir
+# Capacity is irrelevant for directory-based pools.
+libvirt_pool_capacity:
+libvirt_pool_mode: 755
+libvirt_pool_owner: "{ remote_user }}"
+libvirt_pool_group: "{ remote_user }}"
+
+# By default, allow QEMU without hardware virtualisation since this is a
+# development tool.
+libvirt_require_vt: false

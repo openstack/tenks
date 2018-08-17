@@ -1,0 +1,103 @@
+---
+- name: Fail if source interface does not exist
+  fail:
+    msg: >
+      The interface {{ source_interface }} specified for the physical network
+      {{ network_name }} does not exist.
+  when: source_interface not in ansible_interfaces
+
+### Firstly, some fact gathering.
+# Start off by assuming the source interface is direct, unless proven
+# otherwise.
+- set_fact:
+    source_type: 'direct'
+
+- name: Get source interface details
+  command: ip -details link show {{ source_interface }}
+  register: if_details
+  changed_when: false
+
+- name: Register source interface as a Linux bridge
+  set_fact:
+    source_type: linux_bridge
+  when: if_details.stdout_lines[-1].split()[0] == 'bridge'
+
+- block:
+    - name: Get list of OVS bridges
+      command: ovs-vsctl list-br
+      register: ovs_bridges
+      changed_when: false
+
+    - name: Register source interface as an Open vSwitch bridge
+      set_fact:
+        source_type: ovs_bridge
+      when: source_interface in ovs_bridges.stdout_lines
+
+  when: if_details.stdout_lines[-1].split()[0] == 'openvswitch'
+
+
+### Actual configuration starts here.
+- name: Ensure Open vSwitch bridge exists
+  openvswitch_bridge:
+    bridge: "{{ tenks_bridge }}"
+
+- name: Connect to existing Linux bridge
+  when: source_type == 'linux_bridge'
+  block:
+    - name: Create veth pair
+      command: >
+        ip link add dev {{ veth_prefix + tenks_bridge + veth_tenks_suffix }}
+        type veth
+        peer name {{ veth_prefix +  tenks_bridge + veth_source_suffix }}
+      register: res
+      changed_when: res.rc == 0
+      # Return code 2 means the veth pair already exists
+      failed_when: res.rc not in [0, 2]
+      become: true
+
+    - name: Plug veth into Tenks bridge
+      openvswitch_port:
+        bridge: "{{ tenks_bridge }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_tenks_suffix }}"
+
+    - name: Plug veth into source interface
+      command: >
+        brctl addif {{ source_interface }}
+        {{ veth_prefix + tenks_bridge + veth_source_suffix }}
+      register: res
+      failed_when:
+        - res.rc != 0
+        - "'already a member of a bridge' not in res.stderr"
+      changed_when: "'already a member of a bridge' not in res.stderr"
+      become: true
+
+- name: Connect to existing Open vSwitch bridge
+  when: source_type == 'ovs_bridge'
+  block:
+    - name: Create patch port on Tenks bridge
+      openvswitch_port:
+        bridge: "{{ tenks_bridge }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_tenks_suffix }}"
+        # Despite the module documentation, `set` will happily take multiple
+        # properties.
+        set: >
+          Interface {{ veth_prefix + tenks_bridge + veth_tenks_suffix }}
+            type=patch
+            options:peer={{ veth_prefix + tenks_bridge + veth_source_suffix }}
+
+    - name: Create patch port on source bridge
+      openvswitch_port:
+        bridge: "{{ source_interface }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_source_suffix }}"
+        set: >
+          Interface {{ veth_prefix + tenks_bridge + veth_source_suffix }}
+            type=patch
+            options:peer={{ veth_prefix + tenks_bridge + veth_tenks_suffix }}
+
+  when: if_details.stdout_lines[-1].split()[0] == 'openvswitch'
+
+- name: Plug source interface into Tenks bridge
+  when: source_type == 'direct'
+  openvswitch_port:
+    bridge: "{{ tenks_bridge }}"
+    port: "{{ source_interface }}"

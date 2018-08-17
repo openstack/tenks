@@ -1,0 +1,44 @@
+---
+- name: Ensure general system requirements are installed
+  yum:
+    name: "{{ system_requirements }}"
+  become: true
+
+- name: Check if ovs-vsctl command is present
+  shell: ovs-vsctl --version
+  register: ovs_vsctl_check
+  failed_when: false
+  changed_when: false
+
+- block:
+    - name: Ensure Open vSwitch package is installed
+      yum:
+        name: openvswitch
+      become: true
+
+    - name: Ensure Open vSwitch is started and enabled
+      service:
+        name: openvswitch
+        state: running
+        enabled: true
+      become: true
+  # Return code 127 means the command does not exist. Do this check to avoid
+  # installing Open vSwitch system-wide if the command already exists as a link
+  # to a containerised version of OVS.
+  when: ovs_vsctl_check.rc == 127
+
+- name: Configure physical network
+  include_tasks: physical_network.yml
+  vars:
+    network_name: "{{ item.0 }}"
+    tenks_bridge: "{{ bridge_prefix ~ idx }}"
+    source_interface: "{{ item.1 }}"
+  # Sort to ensure we always enumerate in the same order.
+  loop: "{{ physnet_mappings | dictsort }}"
+  loop_control:
+    index_var: idx
+
+- name: Ensure Python requirements are installed
+  pip:
+    name: "{{ python_requirements }}"
+    virtualenv: "{{ virtualenv_path }}"
