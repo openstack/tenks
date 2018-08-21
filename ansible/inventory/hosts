@@ -1,0 +1,5 @@
+[controllers]
+localhost ansible_connection=local
+
+[libvirt]
+localhost ansible_connection=local

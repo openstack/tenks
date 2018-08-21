@@ -4,6 +4,12 @@
     name: "{{ system_requirements }}"
   become: true
 
+- name: Ensure console log directory exists
+  file:
+    path: "{{ console_log_directory }}"
+    state: directory
+  become: true
+
 - name: Check if ovs-vsctl command is present
   shell: ovs-vsctl --version
   register: ovs_vsctl_check

@@ -1,0 +1,8 @@
+[controllers]
+# Empty group to provide delaration of controllers group.
+
+[hypervisors:children]
+libvirt
+
+[libvirt]
+# Empty group to provide declaration of libvirt group.

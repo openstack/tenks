@@ -1,7 +1,12 @@
 ---
-- hosts: all
+- hosts: hypervisors
   tasks:
     - include_tasks: host_setup.yml
+
+- hosts: controllers
+  tasks:
+    - include_tasks: schedule.yml
+      vars:
 
 - hosts: libvirt
   tasks:
@@ -18,3 +23,9 @@
             owner: "{{ libvirt_pool_owner }}"
             group: "{{ libvirt_pool_group }}"
         libvirt_host_require_vt: "{{ libvirt_require_vt }}"
+
+    - name: Create Libvirt VMs
+      include_tasks: create_libvirt_vms.yml
+      vars:
+        flavour: flav0
+        name: "{{ item }}"

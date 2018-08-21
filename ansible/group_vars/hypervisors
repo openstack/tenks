@@ -27,15 +27,4 @@ veth_tenks_suffix: "-ovs"
 # Used for the port on the existing bridge.
 veth_source_suffix: "-phy"
 
-libvirt_pool_name: tenks
-libvirt_pool_path: /var/lib/libvirt/tenks_pool/
-libvirt_pool_type: dir
-# Capacity is irrelevant for directory-based pools.
-libvirt_pool_capacity:
-libvirt_pool_mode: 755
-libvirt_pool_owner: "{ remote_user }}"
-libvirt_pool_group: "{ remote_user }}"
-
-# By default, allow QEMU without hardware virtualisation since this is a
-# development tool.
-libvirt_require_vt: false
+console_log_directory: /var/log/tenks/console_logs/

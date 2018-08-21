@@ -1,0 +1,15 @@
+---
+# FIXME(w-miller): set this more cleverly?
+base_path: "~/tenks/"
+
+flavours:
+  flav0:
+    memory_mb: 4096
+    vcpus: 4
+    volumes:
+      - capacity: 10GB
+    physical_networks:
+      - physnet1
+
+specs:
+  flav0: 4
