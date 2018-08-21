@@ -1,0 +1,29 @@
+---
+# Ensure we have facts about all hypervisors before scheduling begins.
+- name: Gather facts from hypervisors
+  setup:
+  delegate_to: "{{ item }}"
+  delegate_facts: true
+  loop: "{{ groups['hypervisors'] }}"
+
+# Creates a dict mapping each hypervisor's hostname to its hostvars, to be used
+# during scheduling.
+- name: Collect hypervisor hostvars
+  set_fact:
+    hypervisor_vars: >
+      {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
+  with_items: "{{ groups['controllers'] }}"
+
+- name: Schedule VMs to hypervisors
+  tenks_schedule:
+    hypervisor_vars: "{{ hypervisor_vars }}"
+    flavours: "{{ flavours }}"
+    specs: "{{ specs }}"
+  register: allocations
+
+- name: Write VM allocations to file
+  copy:
+    # tenks_schedule lookup plugin outputs a dict. Pretty-print this to persist
+    # it in a YAML file.
+    content: "{{ allocations.result | to_nice_yaml }}"
+    dest: "{{ base_path }}/allocations.yml"
