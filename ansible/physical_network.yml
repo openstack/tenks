@@ -43,33 +43,16 @@
 
 - name: Connect to existing Linux bridge
   when: source_type == 'linux_bridge'
-  block:
-    - name: Create veth pair
-      command: >
-        ip link add dev {{ veth_prefix + tenks_bridge + veth_tenks_suffix }}
-        type veth
-        peer name {{ veth_prefix +  tenks_bridge + veth_source_suffix }}
-      register: res
-      changed_when: res.rc == 0
-      # Return code 2 means the veth pair already exists
-      failed_when: res.rc not in [0, 2]
-      become: true
-
-    - name: Plug veth into Tenks bridge
-      openvswitch_port:
-        bridge: "{{ tenks_bridge }}"
-        port: "{{ veth_prefix + tenks_bridge + veth_tenks_suffix }}"
-
-    - name: Plug veth into source interface
-      command: >
-        brctl addif {{ source_interface }}
-        {{ veth_prefix + tenks_bridge + veth_source_suffix }}
-      register: res
-      failed_when:
-        - res.rc != 0
-        - "'already a member of a bridge' not in res.stderr"
-      changed_when: "'already a member of a bridge' not in res.stderr"
-      become: true
+  include_role:
+    name: veth-pair
+  vars:
+    veth_pair_ovs_bridge: "{{ tenks_bridge }}"
+    veth_pair_ovs_link_name: >
+      {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
+    veth_pair_source_bridge: "{{ source_interface }}"
+    veth_pair_source_link_name: >
+      {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
+    plug_into_source: true
 
 - name: Connect to existing Open vSwitch bridge
   when: source_type == 'ovs_bridge'

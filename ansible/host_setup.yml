@@ -33,7 +33,7 @@
   # to a containerised version of OVS.
   when: ovs_vsctl_check.rc == 127
 
-- name: Configure physical network
+- name: Configure physical networks
   include_tasks: physical_network.yml
   vars:
     network_name: "{{ item.0 }}"

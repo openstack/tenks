@@ -6,12 +6,25 @@
 - hosts: controllers
   tasks:
     - include_tasks: schedule.yml
+
+    - name: Load allocations from file
+      include_vars:
+        file: "{{ allocations_file_path }}"
+        name: allocations
+
+- hosts: hypervisors
+  tasks:
+    - include_tasks: vm_networking.yml
       vars:
+        vm: "{{ item }}"
+      # Allocations are stored in the controller node's vars.
+      loop: >
+        {{ hostvars[groups.controllers.0].allocations.result[
+           inventory_hostname] | default([]) }}
 
 - hosts: libvirt
   tasks:
-    - name: Configure host as a Libvirt/QEMU/KVM hypervisor
-      include_role:
+    - include_role:
         name: stackhpc.libvirt-host
       vars:
         libvirt_host_pools:
@@ -24,8 +37,9 @@
             group: "{{ libvirt_pool_group }}"
         libvirt_host_require_vt: "{{ libvirt_require_vt }}"
 
-    - name: Create Libvirt VMs
-      include_tasks: create_libvirt_vms.yml
+    - include_tasks: create_libvirt_vms.yml
       vars:
-        flavour: flav0
-        name: "{{ item }}"
+        # Allocations are stored in the controller node's vars.
+        vms: >
+          {{ hostvars[groups.controllers.0].allocations.result[
+               inventory_hostname] | default([]) }}

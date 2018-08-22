@@ -20,11 +20,19 @@ python_requirements:
 # {{ bridge_prefix + i }}, where `i` is the index of the physical network in
 # physnet_mappings (sorted alphabetically by key).
 bridge_prefix: brtenks
-# Naming scheme for veth pairs connected to the Tenks OVS bridge.
-veth_prefix: p-
-# Used for the port on the Tenks OVS bridge.
-veth_tenks_suffix: "-ovs"
-# Used for the port on the existing bridge.
-veth_source_suffix: "-phy"
+
+# Prefix for all veth links.
+veth_prefix: 'p-'
+
+# Suffix for veth links attached to a Tenks OVS bridge.
+veth_bridge_ovs_suffix: '-ovs'
+# Suffix for veth links attached to a source Linux bridge.
+veth_bridge_source_suffix: '-phy'
+
+# Suffix for veth links attached to a Tenks OVS bridge.
+veth_vm_ovs_suffix: '-ovs'
+# Suffix for veth links attached to a VM. VMs aren't physical so '-phy' doesn't
+# seem right.
+veth_vm_source_suffix: '-tap'
 
 console_log_directory: /var/log/tenks/console_logs/
