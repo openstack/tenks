@@ -1,0 +1,3 @@
+---
+# Whether or not to plug the source end of the veth pair into a Linux bridge.
+veth_pair_plug_into_source: false
