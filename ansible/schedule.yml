@@ -12,7 +12,7 @@
   set_fact:
     hypervisor_vars: >
       {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
-  with_items: "{{ groups['controllers'] }}"
+  loop: "{{ groups['controllers'] }}"
 
 - name: Schedule VMs to hypervisors
   tenks_schedule:
@@ -26,4 +26,4 @@
     # tenks_schedule lookup plugin outputs a dict. Pretty-print this to persist
     # it in a YAML file.
     content: "{{ allocations.result | to_nice_yaml }}"
-    dest: "{{ base_path }}/allocations.yml"
+    dest: "{{ allocations_file_path }}"

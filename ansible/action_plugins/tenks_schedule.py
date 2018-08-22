@@ -15,18 +15,19 @@ class ActionModule(ActionBase):
         """
         Schedule specifications of VMs by flavour onto hypervisors.
 
-        :param hypervisor_vars: A dict of hostvars for each hypervisor, keyed
-                                by hypervisor hostname.
-        :param specs: A dict mapping flavour names to the number of VMs
-                      required of that flavour.
-        :param flavours: A dict mapping flavour names to a dict of properties
-                         of that flavour.
-        :param vm_name_prefix: A string with with to prefix all sequential VM
-                               names.
+        The following task vars are accepted:
+            :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
+                              by hypervisor hostname. Required.
+            :specs: A dict mapping flavour names to the number of VMs
+                    required of that flavour. Required.
+            :flavours: A dict mapping flavour names to a dict of properties
+                       of that flavour.
+            :vm_name_prefix: A string with with to prefix all sequential VM
+                             names.
+            :vol_name_prefix: A string with with to prefix all sequential
+                              volume names.
         :returns: A dict containing lists of VM details, keyed by the
                   hostname of the hypervisor to which they are scheduled.
-        :raises: AnsibleError if insufficient hypervisors exist to host the
-                 requested VMs.
         """
         result = super(ActionModule, self).run(tmp, task_vars)
         del tmp  # tmp no longer has any effect
@@ -37,8 +38,11 @@ class ActionModule(ActionBase):
         for flav, cnt in iteritems(task_vars['specs']):
             for _ in xrange(cnt):
                 vm = deepcopy(task_vars['flavours'][flav])
-                # Sequentially number the VM names.
+                # Sequentially number the VM and volume names.
                 vm['name'] = "%s%d" % (task_vars['vm_name_prefix'], idx)
+                for vol_idx, vol in enumerate(vm['volumes']):
+                    vol['name'] = "%s%d" % (task_vars['vol_name_prefix'],
+                                            vol_idx)
                 vms.append(vm)
                 idx += 1
 
@@ -53,7 +57,11 @@ class ActionModule(ActionBase):
             task_vars = {}
 
         REQUIRED_TASK_VARS = {'hypervisor_vars', 'specs', 'flavours'}
-        OPTIONAL_TASK_VARS = {('vm_name_prefix', 'vm')}
+        # Var names and their defaults.
+        OPTIONAL_TASK_VARS = {
+            ('vm_name_prefix', 'vm'),
+            ('vol_name_prefix', 'vol'),
+        }
         for var in REQUIRED_TASK_VARS:
             if var not in task_vars:
                 e = "The parameter '%s' must be specified." % var
