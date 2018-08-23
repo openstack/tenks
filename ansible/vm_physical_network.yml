@@ -1,0 +1,26 @@
+---
+- name: Gather details for VM physical network connection
+  block:
+    - set_fact:
+        # The index of the physical network within this hypervisor's physical
+        # networks.
+        idx: >-
+          {{ (physnet_mappings | dictsort | list).index(
+               (physnet, physnet_mappings[physnet])) }}
+
+    - set_fact:
+        # Veth pairs are unique for any VM-physnet combination. However, device
+        # names cannot be longer than 15 characters, so use physical networks'
+        # indices instead.
+        veth_base_name: >-
+          {{ veth_prefix + vm_name + '-' + idx }}
+
+- name: Set up veth pairs for the VM
+  include_role:
+    name: veth-pair
+  vars:
+    veth_pair_ovs_bridge: >-
+      {{ bridge_prefix ~ idx }}
+    veth_pair_ovs_link_name: "{{ veth_base_name + veth_vm_ovs_suffix }}"
+    veth_pair_source_link_name: >-
+      {{ veth_base_name + veth_vm_source_suffix }}
