@@ -29,12 +29,20 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
 def set_libvirt_interfaces(context, vm):
     """Set interfaces for a VM's specified physical networks.
     """
-    veth_suffix = _get_hostvar(context, 'veth_vm_source_suffix')
+    physnet_mappings = _get_hostvar(context, 'physnet_mappings')
+    prefix = _get_hostvar(context, 'veth_prefix')
+    suffix = _get_hostvar(context, 'veth_vm_source_suffix')
+
     vm['interfaces'] = []
-    for veth_base_name in vm['veths']:
+    # Libvirt doesn't need to know about physical networks, so pop them here.
+    for physnet in vm.pop('physical_networks', []):
+        # Get the ID of this physical network on the hypervisor.
+        idx = sorted(physnet_mappings).index(physnet)
         vm['interfaces'].append(
             {'type': 'direct',
-             'source': {'dev': veth_base_name + veth_suffix}}
+             # FIXME(w-miller): Don't duplicate the logic of this naming scheme
+             # from vm_physical_network.yml
+             'source': {'dev': prefix + vm['name'] + '-' + str(idx) + suffix}}
         )
     return vm
 
@@ -46,3 +54,4 @@ def set_libvirt_volume_pool(context, vm):
     pool = _get_hostvar(context, 'libvirt_pool_name')
     for vol in vm.get('volumes', []):
         vol['pool'] = pool
+    return vm
