@@ -10,7 +10,7 @@
 # during scheduling.
 - name: Collect hypervisor hostvars
   set_fact:
-    hypervisor_vars: >
+    hypervisor_vars: >-
       {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
   loop: "{{ groups['controllers'] }}"
 

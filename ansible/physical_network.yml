@@ -47,10 +47,10 @@
     name: veth-pair
   vars:
     veth_pair_ovs_bridge: "{{ tenks_bridge }}"
-    veth_pair_ovs_link_name: >
+    veth_pair_ovs_link_name: >-
       {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
     veth_pair_source_bridge: "{{ source_interface }}"
-    veth_pair_source_link_name: >
+    veth_pair_source_link_name: >-
       {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
     plug_into_source: true
 
@@ -63,7 +63,7 @@
         port: "{{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}"
         # Despite the module documentation, `set` will happily take multiple
         # properties.
-        set: >
+        set: >-
           Interface {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
@@ -73,7 +73,7 @@
       openvswitch_port:
         bridge: "{{ source_interface }}"
         port: "{{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}"
-        set: >
+        set: >-
           Interface {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +

@@ -1,6 +1,6 @@
 ---
 - name: Create veth pair
-  command: >
+  command: >-
     ip link add dev {{ veth_pair_ovs_link_name }}
     type veth
     peer name {{ veth_pair_source_link_name }}
@@ -17,7 +17,7 @@
   become: true
 
 - name: Plug veth into source bridge
-  command: >
+  command: >-
     brctl addif {{ veth_pair_source_bridge }}
     {{ veth_pair_source_link_name }}
   register: res
