@@ -29,33 +29,20 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
 def set_libvirt_interfaces(context, vm):
     """Set interfaces for a VM's specified physical networks.
     """
-    physnet_mappings = _get_hostvar(context, 'physnet_mappings')
-    veth_prefix = _get_hostvar(context, 'veth_prefix')
-    veth_    = _get_hostvar(context, 'veth_base_name')
-
-
+    veth_suffix = _get_hostvar(context, 'veth_vm_source_suffix')
     vm['interfaces'] = []
-    physnets = vm.pop('physical_networks', [])
-    for physnet in physnets:
-        try:
-            vm['interfaces'].append(
-                {'type': 'direct',
-                 'source': {'dev': physnet_mappings[physnet]}}
-            )
-        except KeyError:
-            raise AnsibleFilterError(to_text(
-                "No interface mapping was specified for physical network "
-                "'%s'." % physnet
-            ))
-     return vm
+    for veth_base_name in vm['veths']:
+        vm['interfaces'].append(
+            {'type': 'direct',
+             'source': {'dev': veth_base_name + veth_suffix}}
+        )
+    return vm
 
 
-def set_libvirt_volume_pool(vm, volume_pool):
+@contextfilter
+def set_libvirt_volume_pool(context, vm):
+    """Set the Libvirt volume pool for each volume.
     """
-    Set the Libvirt volume pool for each volume.
-
-    :param vm: A VM definiton.
-    :param volume_pool: The name of the Libvirt volume pool to use.
-    """
+    pool = _get_hostvar(context, 'libvirt_pool_name')
     for vol in vm.get('volumes', []):
-        vol['pool'] = volume_pool
+        vol['pool'] = pool
