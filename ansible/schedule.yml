@@ -12,7 +12,7 @@
   set_fact:
     hypervisor_vars: >-
       {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
-  loop: "{{ groups['controllers'] }}"
+  loop: "{{ groups['hypervisors'] }}"
 
 - name: Schedule VMs to hypervisors
   tenks_schedule:

@@ -1,6 +1,3 @@
-[controllers]
-# Empty group to provide delaration of controllers group.
-
 [hypervisors:children]
 libvirt
 

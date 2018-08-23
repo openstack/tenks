@@ -10,7 +10,7 @@
 # Start off by assuming the source interface is direct, unless proven
 # otherwise.
 - set_fact:
-    source_type: 'direct'
+    source_type: direct
 
 - name: Get source interface details
   command: ip -details link show {{ source_interface }}
@@ -78,8 +78,6 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_ovs_suffix }}
-
-  when: if_details.stdout_lines[-1].split()[0] == 'openvswitch'
 
 - name: Plug source interface into Tenks bridge
   when: source_type == 'direct'

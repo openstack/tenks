@@ -3,7 +3,7 @@
   tasks:
     - include_tasks: host_setup.yml
 
-- hosts: controllers
+- hosts: localhost
   tasks:
     - include_tasks: schedule.yml
 
@@ -19,11 +19,10 @@
         vm_name: "{{ item.0.name }}"
         physnet: "{{ item.1 }}"
       # Loop over each physical network for each VM allocated to this host.
-      # Allocations are stored in the controller node's vars.
+      # Allocations are stored in localhost's vars.
       loop: >-
-        {{ hostvars[groups.controllers.0].allocations.result[
-             inventory_hostname] | default([])
-             | subelements('physical_networks') }}
+        {{ hostvars['localhost'].allocations.result[inventory_hostname]
+             | default([]) | subelements('physical_networks') }}
 
 - hosts: libvirt
   tasks:
@@ -42,7 +41,7 @@
 
     - include_tasks: libvirt_create_vms.yml
       vars:
-        # Allocations are stored in the controller node's vars.
+        # Allocations are stored in the localhost's vars.
         vms: >-
-          {{ hostvars[groups.controllers.0].allocations.result[
-               inventory_hostname] | default([]) }}
+          {{ hostvars['localhost'].allocations.result[inventory_hostname]
+               | default([]) }}
