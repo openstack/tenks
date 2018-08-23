@@ -60,22 +60,24 @@
     - name: Create patch port on Tenks bridge
       openvswitch_port:
         bridge: "{{ tenks_bridge }}"
-        port: "{{ veth_prefix + tenks_bridge + veth_tenks_suffix }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}"
         # Despite the module documentation, `set` will happily take multiple
         # properties.
         set: >
-          Interface {{ veth_prefix + tenks_bridge + veth_tenks_suffix }}
+          Interface {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
             type=patch
-            options:peer={{ veth_prefix + tenks_bridge + veth_source_suffix }}
+            options:peer={{ veth_prefix + tenks_bridge +
+                            veth_bridge_source_suffix }}
 
     - name: Create patch port on source bridge
       openvswitch_port:
         bridge: "{{ source_interface }}"
-        port: "{{ veth_prefix + tenks_bridge + veth_source_suffix }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}"
         set: >
-          Interface {{ veth_prefix + tenks_bridge + veth_source_suffix }}
+          Interface {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
             type=patch
-            options:peer={{ veth_prefix + tenks_bridge + veth_tenks_suffix }}
+            options:peer={{ veth_prefix + tenks_bridge +
+                            veth_bridge_ovs_suffix }}
 
   when: if_details.stdout_lines[-1].split()[0] == 'openvswitch'
 
