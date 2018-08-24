@@ -4,9 +4,9 @@
     name: "{{ system_requirements }}"
   become: true
 
-- name: Ensure console log directory exists
+- name: Ensure log directory exists
   file:
-    path: "{{ console_log_directory }}"
+    path: "{{ log_directory }}"
     state: directory
   become: true
 
