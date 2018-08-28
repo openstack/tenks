@@ -6,7 +6,6 @@ physnet_mappings: {}
 virtualisation_provider: libvirt
 
 system_requirements:
-  - python-pip
   - python-virtualenv
 
 # Path to virtualenv used to install Python requirements. If a virtualenv does
