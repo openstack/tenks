@@ -11,7 +11,7 @@
   become: true
 
 - name: Check if ovs-vsctl command is present
-  shell: ovs-vsctl --version
+  command: ovs-vsctl --version
   register: ovs_vsctl_check
   failed_when: false
   changed_when: false
