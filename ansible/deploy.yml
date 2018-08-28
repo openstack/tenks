@@ -52,10 +52,12 @@
           {{ hostvars['localhost'].allocations.result[inventory_hostname]
                | default([]) }}
 
-- hosts: localhost
-  tasks:
-    - include_tasks: virtualbmc.yml
+    - include_role:
+        name: virtualbmc
       vars:
-        vms: >-
+        vbmc_libvirt_domains: >-
           {{ hostvars['localhost'].allocations.result[inventory_hostname]
-               | default([]) }}
+               | default([]) | map(attribute='name') | list }}
+        vbmc_log_directory: "{{ log_directory }}"
+        vbmc_virtualenv_path: "{{ virtualenv_path }}"
+        vbmc_python_upper_contraints_url: "{{ python_upper_constraints_url }}"

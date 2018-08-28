@@ -4,11 +4,21 @@
     service: vbmcd
 
 - name: Check that enough ports are available for Virtual BMC
-  fail: >
-    {{ vms | count }} VMs were specified to be created, but only
-    {{ vbmc_ipmi_port_range_end - vbmc_ipmi_port_range_start }} ports are
-    available for use by Virtual BMC.
-  when: (vms | count) > (vbmc_ipmi_port_range_end - vbmc_ipmi_port_range_start)
+  fail:
+    msg: >
+      {{ vbmc_libvirt_domains | count }} VMs were specified to be created, but
+      only {{ vbmc_ipmi_port_range_end - vbmc_ipmi_port_range_start }} ports
+      are available for use by Virtual BMC.
+  when: >-
+      (vbmc_libvirt_domains | count) >
+        (vbmc_ipmi_port_range_end - vbmc_ipmi_port_range_start)
+
+- name: Ensure Python requirements are installed
+  pip:
+    requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"
+    extra_args: >-
+      -c {{ vbmc_python_upper_contraints_url }}
+    virtualenv: "{{ vbmc_virtualenv_path }}"
 
 - name: Ensure Virtual BMC systemd service is configured
   template:
@@ -30,11 +40,11 @@
     daemon_reload: "{{ vbmc_service_file.changed }}"
   become: true
 
-- include_tasks: vm_virtualbmc.yml
+- include_tasks: domain.yml
   vars:
-    vm: "{{ vm }}"
+    domain: "{{ domain }}"
     port: "{{ vbmc_ipmi_port_range_start + port_offset }}"
-  loop: "{{ vms }}"
+  loop: "{{ vbmc_libvirt_domains }}"
   loop_control:
-    loop_var: vm
+    loop_var: domain
     index_var: port_offset

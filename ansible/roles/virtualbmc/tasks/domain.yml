@@ -3,15 +3,15 @@
   set_fact:
     # vbmcd should already be running, so --no-daemon stops vbmc from spawning
     # another instance of the daemon.
-    cmd: "'{{ virtualenv_path }}/bin/vbmc' --no-daemon"
-    log_arg: "--log-file '{{ log_directory }}/vbmc-{{ vm.name }}.log'"
+    cmd: "'{{ vbmc_virtualenv_path }}/bin/vbmc' --no-daemon"
+    log_arg: "--log-file '{{ vbmc_log_directory }}/vbmc-{{ domain }}.log'"
 
 # Even if the VM is present in VBMC, we can't guarantee that it's configured
 # correctly. It's easiest to delete and re-add it; this should involve minimal
 # downtime.
 - name: Ensure VM is stopped and deleted in VBMC
   command: >-
-    {{ cmd }} {{ item }} '{{ vm.name }}' {{ log_arg }}
+    {{ cmd }} {{ item }} '{{ domain }}' {{ log_arg }}
   loop:
     - stop
     - delete
@@ -22,9 +22,9 @@
     - "'No domain with matching name' not in res.stderr"
   become: true
 
-- name: Ensure VM is added to VBMC
+- name: Ensure domain is added to VBMC
   command: >-
-    {{ cmd }} add '{{ vm.name }}'
+    {{ cmd }} add '{{ domain }}'
       --port {{ port }}
       --username '{{ vbmc_ipmi_username }}'
       --password '{{ vbmc_ipmi_password }}'
@@ -34,5 +34,5 @@
 
 - name: Ensure VM is started in VBMC
   command: >
-    {{ cmd }} start '{{ vm.name }}' {{ log_arg }}
+    {{ cmd }} start '{{ domain }}' {{ log_arg }}
   become: true

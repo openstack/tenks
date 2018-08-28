@@ -12,7 +12,7 @@ virtualenv_path: "{{ '/'.join([ansible_env['HOME'], 'tenks-venv']) }}"
 
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
-python_upper_contraints_url: >-
+python_upper_constraints_url: >-
   https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt
 
 # Naming scheme for bridges created by tenks for physical networks is
@@ -36,13 +36,3 @@ veth_vm_source_suffix: '-tap'
 
 # Directory in which to store Tenks logs.
 log_directory: /var/log/tenks/
-
-# The address on which VBMC will listen for IPMI traffic.
-vbmc_ipmi_listen_address: 0.0.0.0
-# The range of ports available for use by VBMC.
-vbmc_ipmi_port_range_start: 6230
-vbmc_ipmi_port_range_end: 6240
-# The IPMI username that VBMC will use.
-vbmc_ipmi_username: username
-# The IPMI password that VBMC will use.
-vbmc_ipmi_password: password
