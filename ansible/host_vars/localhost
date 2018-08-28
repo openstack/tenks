@@ -1,7 +1,6 @@
 ---
-# FIXME(w-miller): set this more cleverly?
-base_path: "~/tenks/"
-allocations_file_path: "{{ base_path + '/allocations.yml' }}"
+allocations_file_path: >-
+    {{ '/'.join([(playbook_dir | dirname), 'allocations.yml']) }}
 
 # vm_types is a dict that defines different sets of VM specifications, keyed by
 # a 'VM type name' to associate with each set of specifications. An example of

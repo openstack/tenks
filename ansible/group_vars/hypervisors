@@ -8,7 +8,7 @@ system_requirements:
 
 # Path to virtualenv used to install Python requirements. If a virtualenv does
 # not exist at this location, one will be created.
-virtualenv_path: ~/tenks-venv
+virtualenv_path: "{{ '/'.join([ansible_env['HOME'], 'tenks-venv']) }}"
 
 python_requirements:
   - virtualbmc
