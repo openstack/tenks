@@ -35,9 +35,9 @@ class ActionModule(ActionBase):
                     of that type. Required.
             :vm_types: A dict mapping VM type names to a dict of properties
                        of that type.
-            :vm_name_prefix: A string with with to prefix all sequential VM
+            :vm_name_prefix: A string with which to prefix all sequential VM
                              names.
-            :vol_name_prefix: A string with with to prefix all sequential
+            :vol_name_prefix: A string with which to prefix all sequential
                               volume names.
         :returns: A dict containing lists of VM details, keyed by the
                   hostname of the hypervisor to which they are scheduled.
