@@ -11,7 +11,7 @@
   become: true
 
 - name: Check if ovs-vsctl command is present
-  shell: ovs-vsctl --version
+  command: ovs-vsctl --version
   register: ovs_vsctl_check
   failed_when: false
   changed_when: false
@@ -46,5 +46,8 @@
 
 - name: Ensure Python requirements are installed
   pip:
-    name: "{{ python_requirements }}"
+    requirements: >-
+      {{ '/'.join([(playbook_dir | dirname), 'venv-requirements.txt']) }}
+    extra_args: >-
+      -c {{ python_upper_contraints_url }}
     virtualenv: "{{ virtualenv_path }}"

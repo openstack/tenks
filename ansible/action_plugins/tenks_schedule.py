@@ -1,30 +1,43 @@
+# Copyright (c) 2018 StackHPC Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+
 # Avoid shadowing of system copy module by copy action plugin.
 from __future__ import absolute_import
 from copy import deepcopy
-import operator
 
 from ansible.errors import AnsibleActionFail
 from ansible.module_utils._text import to_text
 from ansible.plugins.action import ActionBase
-from six import iteritems
+import six
 
 
 class ActionModule(ActionBase):
 
     def run(self, tmp=None, task_vars=None):
         """
-        Schedule specifications of VMs by flavour onto hypervisors.
+        Schedule specifications of VMs by type onto hypervisors.
 
         The following task vars are accepted:
             :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
                               by hypervisor hostname. Required.
-            :specs: A dict mapping flavour names to the number of VMs
-                    required of that flavour. Required.
-            :flavours: A dict mapping flavour names to a dict of properties
-                       of that flavour.
-            :vm_name_prefix: A string with with to prefix all sequential VM
+            :specs: A dict mapping VM type names to the number of VMs required
+                    of that type. Required.
+            :vm_types: A dict mapping VM type names to a dict of properties
+                       of that type.
+            :vm_name_prefix: A string with which to prefix all sequential VM
                              names.
-            :vol_name_prefix: A string with with to prefix all sequential
+            :vol_name_prefix: A string with which to prefix all sequential
                               volume names.
         :returns: A dict containing lists of VM details, keyed by the
                   hostname of the hypervisor to which they are scheduled.
@@ -35,9 +48,9 @@ class ActionModule(ActionBase):
 
         vms = []
         idx = 0
-        for flav, cnt in iteritems(task_vars['specs']):
-            for _ in xrange(cnt):
-                vm = deepcopy(task_vars['flavours'][flav])
+        for typ, cnt in six.iteritems(task_vars['specs']):
+            for _ in six.range(cnt):
+                vm = deepcopy(task_vars['vm_types'][typ])
                 # Sequentially number the VM and volume names.
                 vm['name'] = "%s%d" % (task_vars['vm_name_prefix'], idx)
                 for vol_idx, vol in enumerate(vm['volumes']):
@@ -56,7 +69,7 @@ class ActionModule(ActionBase):
         if task_vars is None:
             task_vars = {}
 
-        REQUIRED_TASK_VARS = {'hypervisor_vars', 'specs', 'flavours'}
+        REQUIRED_TASK_VARS = {'hypervisor_vars', 'specs', 'vm_types'}
         # Var names and their defaults.
         OPTIONAL_TASK_VARS = {
             ('vm_name_prefix', 'vm'),

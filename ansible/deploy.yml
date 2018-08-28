@@ -3,6 +3,25 @@
   tasks:
     - include_tasks: host_setup.yml
 
+- hosts: libvirt
+  tasks:
+    - include_role:
+        name: stackhpc.libvirt-host
+      vars:
+        libvirt_host_pools:
+          - name: "{{ libvirt_pool_name }}"
+            type: "{{ libvirt_pool_type }}"
+            capacity: "{{ libvirt_pool_capacity }}"
+            path: "{{ libvirt_pool_path }}"
+            mode: "{{ libvirt_pool_mode }}"
+            owner: "{{ libvirt_pool_owner }}"
+            group: "{{ libvirt_pool_group }}"
+        libvirt_host_require_vt: "{{ libvirt_require_vt }}"
+
+# Ensure we have facts about all hypervisors before scheduling begins.
+- hosts: hypervisors
+  gather_facts: true
+
 - hosts: localhost
   tasks:
     - include_tasks: schedule.yml
@@ -26,19 +45,6 @@
 
 - hosts: libvirt
   tasks:
-    - include_role:
-        name: stackhpc.libvirt-host
-      vars:
-        libvirt_host_pools:
-          - name: "{{ libvirt_pool_name }}"
-            type: "{{ libvirt_pool_type }}"
-            capacity: "{{ libvirt_pool_capacity }}"
-            path: "{{ libvirt_pool_path }}"
-            mode: "{{ libvirt_pool_mode }}"
-            owner: "{{ libvirt_pool_owner }}"
-            group: "{{ libvirt_pool_group }}"
-        libvirt_host_require_vt: "{{ libvirt_require_vt }}"
-
     - include_tasks: libvirt_create_vms.yml
       vars:
         # Allocations are stored in the localhost's vars.
