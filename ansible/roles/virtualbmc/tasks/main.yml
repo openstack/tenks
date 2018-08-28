@@ -6,8 +6,9 @@
 - name: Check that enough ports are available for Virtual BMC
   fail:
     msg: >
-      {{ vbmc_libvirt_domains | count }} VMs were specified to be created, but
-      only {{ vbmc_ipmi_port_range_end - vbmc_ipmi_port_range_start }} ports
+      {{ vbmc_libvirt_domains | count }} nodes were specified to be added to
+      Virtual BMC, but only
+      {{ vbmc_ipmi_port_range_end - vbmc_ipmi_port_range_start }} ports
       are available for use by Virtual BMC.
   when: >-
       (vbmc_libvirt_domains | count) >

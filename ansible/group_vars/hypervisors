@@ -29,10 +29,10 @@ veth_bridge_ovs_suffix: '-ovs'
 veth_bridge_source_suffix: '-phy'
 
 # Suffix for veth links attached to a Tenks OVS bridge.
-veth_vm_ovs_suffix: '-ovs'
-# Suffix for veth links attached to a VM. VMs aren't physical so '-phy' doesn't
-# seem right.
-veth_vm_source_suffix: '-tap'
+veth_node_ovs_suffix: '-ovs'
+# Suffix for veth links attached to a node. Nodes aren't physical so '-phy'
+# doesn't seem right.
+veth_node_source_suffix: '-tap'
 
 # Directory in which to store Tenks logs.
 log_directory: /var/log/tenks/

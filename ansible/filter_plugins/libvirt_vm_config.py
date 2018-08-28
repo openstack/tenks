@@ -39,32 +39,33 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
 
 
 @contextfilter
-def set_libvirt_interfaces(context, vm):
-    """Set interfaces for a VM's specified physical networks.
+def set_libvirt_interfaces(context, node):
+    """Set interfaces for a node's specified physical networks.
     """
     physnet_mappings = _get_hostvar(context, 'physnet_mappings')
     prefix = _get_hostvar(context, 'veth_prefix')
-    suffix = _get_hostvar(context, 'veth_vm_source_suffix')
+    suffix = _get_hostvar(context, 'veth_node_source_suffix')
 
-    vm['interfaces'] = []
+    node['interfaces'] = []
     # Libvirt doesn't need to know about physical networks, so pop them here.
-    for physnet in vm.pop('physical_networks', []):
+    for physnet in node.pop('physical_networks', []):
         # Get the ID of this physical network on the hypervisor.
         idx = sorted(physnet_mappings).index(physnet)
-        vm['interfaces'].append(
+        node['interfaces'].append(
             {'type': 'direct',
              # FIXME(w-miller): Don't duplicate the logic of this naming scheme
-             # from vm_physical_network.yml
-             'source': {'dev': prefix + vm['name'] + '-' + str(idx) + suffix}}
+             # from node_physical_network.yml
+             'source': {'dev': prefix + node['name'] + '-' + str(idx) +
+                               suffix}}
         )
-    return vm
+    return node
 
 
 @contextfilter
-def set_libvirt_volume_pool(context, vm):
+def set_libvirt_volume_pool(context, node):
     """Set the Libvirt volume pool for each volume.
     """
     pool = _get_hostvar(context, 'libvirt_pool_name')
-    for vol in vm.get('volumes', []):
+    for vol in node.get('volumes', []):
         vol['pool'] = pool
-    return vm
+    return node
