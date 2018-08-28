@@ -1,0 +1,86 @@
+---
+- name: Fail if source interface does not exist
+  fail:
+    msg: >
+      The interface {{ source_interface }} specified for the physical network
+      {{ network_name }} does not exist.
+  when: source_interface not in ansible_interfaces
+
+### Firstly, some fact gathering.
+# Start off by assuming the source interface is direct, unless proven
+# otherwise.
+- set_fact:
+    source_type: direct
+
+- name: Get source interface details
+  command: ip -details link show {{ source_interface }}
+  register: if_details
+  changed_when: false
+
+- name: Register source interface as a Linux bridge
+  set_fact:
+    source_type: linux_bridge
+  when: if_details.stdout_lines[-1].split()[0] == 'bridge'
+
+- block:
+    - name: Get list of OVS bridges
+      command: ovs-vsctl list-br
+      register: ovs_bridges
+      changed_when: false
+
+    - name: Register source interface as an Open vSwitch bridge
+      set_fact:
+        source_type: ovs_bridge
+      when: source_interface in ovs_bridges.stdout_lines
+
+  when: if_details.stdout_lines[-1].split()[0] == 'openvswitch'
+
+
+### Actual configuration starts here.
+- name: Ensure Open vSwitch bridge exists
+  openvswitch_bridge:
+    bridge: "{{ tenks_bridge }}"
+
+- name: Connect to existing Linux bridge
+  when: source_type == 'linux_bridge'
+  include_role:
+    name: veth-pair
+  vars:
+    veth_pair_ovs_bridge: "{{ tenks_bridge }}"
+    veth_pair_ovs_link_name: >-
+      {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
+    veth_pair_source_bridge: "{{ source_interface }}"
+    veth_pair_source_link_name: >-
+      {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
+    plug_into_source: true
+
+- name: Connect to existing Open vSwitch bridge
+  when: source_type == 'ovs_bridge'
+  block:
+    - name: Create patch port on Tenks bridge
+      openvswitch_port:
+        bridge: "{{ tenks_bridge }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}"
+        # Despite the module documentation, `set` will happily take multiple
+        # properties.
+        set: >-
+          Interface {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
+            type=patch
+            options:peer={{ veth_prefix + tenks_bridge +
+                            veth_bridge_source_suffix }}
+
+    - name: Create patch port on source bridge
+      openvswitch_port:
+        bridge: "{{ source_interface }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}"
+        set: >-
+          Interface {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
+            type=patch
+            options:peer={{ veth_prefix + tenks_bridge +
+                            veth_bridge_ovs_suffix }}
+
+- name: Plug source interface into Tenks bridge
+  when: source_type == 'direct'
+  openvswitch_port:
+    bridge: "{{ tenks_bridge }}"
+    port: "{{ source_interface }}"

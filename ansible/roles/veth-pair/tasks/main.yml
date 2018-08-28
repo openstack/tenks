@@ -1,0 +1,29 @@
+---
+- name: Create veth pair
+  command: >-
+    ip link add dev {{ veth_pair_ovs_link_name }}
+    type veth
+    peer name {{ veth_pair_source_link_name }}
+  register: res
+  changed_when: res.rc == 0
+  # Return code 2 means the veth pair already exists
+  failed_when: res.rc not in [0, 2]
+  become: true
+
+- name: Plug veth into OVS bridge
+  openvswitch_port:
+    bridge: "{{ veth_pair_ovs_bridge }}"
+    port: "{{ veth_pair_ovs_link_name }}"
+  become: true
+
+- name: Plug veth into source bridge
+  command: >-
+    brctl addif {{ veth_pair_source_bridge }}
+    {{ veth_pair_source_link_name }}
+  register: res
+  failed_when:
+    - res.rc != 0
+    - "'already a member of a bridge' not in res.stderr"
+  changed_when: "'already a member of a bridge' not in res.stderr"
+  when: veth_pair_plug_into_source | bool
+  become: true

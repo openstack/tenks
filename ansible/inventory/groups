@@ -1,0 +1,5 @@
+[hypervisors:children]
+libvirt
+
+[libvirt]
+# Empty group to provide declaration of libvirt group.

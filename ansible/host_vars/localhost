@@ -1,0 +1,33 @@
+---
+allocations_file_path: >-
+    {{ '/'.join([(playbook_dir | dirname), 'allocations.yml']) }}
+
+# vm_types is a dict that defines different sets of VM specifications, keyed by
+# a 'VM type name' to associate with each set of specifications. An example of
+# the format of this variable is below:
+#
+# vm_types:
+#   # The type name.
+#   type0:
+#     # The amount of RAM, in mebibytes.
+#     memory_mb: 1024
+#     # The number of virtual CPUs.
+#     vcpus: 2
+#     # A list of volumes, each with a capacity.
+#     volumes:
+#       - capacity: 2GB
+#     # A list of physical network names to connect to. These physical network
+#     # names should be keyed in `physnet_mappings` in each hypervisor's host
+#     # vars.
+#     physical_networks:
+#       - physnet1
+vm_types: {}
+
+# specs is a dict that maps different VM type names (define in `vm_types`
+# above) to the number of VMs of that type that are to be created. Only VM
+# types which you want to create VMs from need be keyed here. For example:
+#
+# specs:
+#   # Create four VMs with the specifications defined in `vm_types` by 'type0'.
+#   type0: 4
+specs: {}

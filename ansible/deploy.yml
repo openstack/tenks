@@ -1,0 +1,53 @@
+---
+- hosts: hypervisors
+  tasks:
+    - include_tasks: host_setup.yml
+
+- hosts: libvirt
+  tasks:
+    - include_role:
+        name: stackhpc.libvirt-host
+      vars:
+        libvirt_host_pools:
+          - name: "{{ libvirt_pool_name }}"
+            type: "{{ libvirt_pool_type }}"
+            capacity: "{{ libvirt_pool_capacity }}"
+            path: "{{ libvirt_pool_path }}"
+            mode: "{{ libvirt_pool_mode }}"
+            owner: "{{ libvirt_pool_owner }}"
+            group: "{{ libvirt_pool_group }}"
+        libvirt_host_require_vt: "{{ libvirt_require_vt }}"
+
+# Ensure we have facts about all hypervisors before scheduling begins.
+- hosts: hypervisors
+  gather_facts: true
+
+- hosts: localhost
+  tasks:
+    - include_tasks: schedule.yml
+
+    - name: Load allocations from file
+      include_vars:
+        file: "{{ allocations_file_path }}"
+        name: allocations
+
+- hosts: hypervisors
+  tasks:
+    - include_tasks: vm_physical_network.yml
+      vars:
+        vm_name: "{{ item.0.name }}"
+        physnet: "{{ item.1 }}"
+      # Loop over each physical network for each VM allocated to this host.
+      # Allocations are stored in localhost's vars.
+      loop: >-
+        {{ hostvars['localhost'].allocations.result[inventory_hostname]
+             | default([]) | subelements('physical_networks') }}
+
+- hosts: libvirt
+  tasks:
+    - include_tasks: libvirt_create_vms.yml
+      vars:
+        # Allocations are stored in the localhost's vars.
+        vms: >-
+          {{ hostvars['localhost'].allocations.result[inventory_hostname]
+               | default([]) }}

@@ -1,0 +1,3 @@
+---
+- src: stackhpc.libvirt-host
+- src: stackhpc.libvirt-vm

@@ -1,0 +1,4 @@
+# This file contains the Python packages that are needed in the Tenks virtual
+# env.
+
+virtualbmc>=1.4.0 # Apache
