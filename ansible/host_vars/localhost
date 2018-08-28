@@ -1,7 +1,6 @@
 ---
-# FIXME(w-miller): set this more cleverly?
-base_path: "~/tenks/"
-allocations_file_path: "{{ base_path + '/allocations.yml' }}"
+allocations_file_path: >-
+    {{ '/'.join([(playbook_dir | dirname), 'allocations.yml']) }}
 
 flavours:
   flav0:
