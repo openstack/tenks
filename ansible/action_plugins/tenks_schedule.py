@@ -49,7 +49,7 @@ class ActionModule(ActionBase):
         vms = []
         idx = 0
         for typ, cnt in six.iteritems(task_vars['specs']):
-            for _ in six.range(cnt):
+            for _ in six.moves.range(cnt):
                 vm = deepcopy(task_vars['vm_types'][typ])
                 # Sequentially number the VM and volume names.
                 vm['name'] = "%s%d" % (task_vars['vm_name_prefix'], idx)
