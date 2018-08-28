@@ -35,4 +35,15 @@ veth_vm_ovs_suffix: '-ovs'
 # seem right.
 veth_vm_source_suffix: '-tap'
 
-console_log_directory: /var/log/tenks/console_logs/
+# Directory in which to store Tenks logs.
+log_directory: /var/log/tenks/
+
+# The address on which VBMC will listen for IPMI traffic.
+vbmc_ipmi_listen_address: 0.0.0.0
+# The range of ports available for use by VBMC.
+vbmc_ipmi_port_range_start: 6230
+vbmc_ipmi_port_range_end: 6240
+# The IPMI username that VBMC will use.
+vbmc_ipmi_username: username
+# The IPMI password that VBMC will use.
+vbmc_ipmi_password: password

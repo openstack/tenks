@@ -45,3 +45,11 @@
         vms: >-
           {{ hostvars['localhost'].allocations.result[inventory_hostname]
                | default([]) }}
+
+- hosts: localhost
+  tasks:
+    - include_tasks: virtualbmc.yml
+      vars:
+        vms: >-
+          {{ hostvars['localhost'].allocations.result[inventory_hostname]
+               | default([]) }}

@@ -1,0 +1,7 @@
+[Unit]
+Description=Virtual BMC daemon
+
+[Service]
+Type=simple
+Restart=on-failure
+ExecStart="{{ virtualenv_path }}/bin/vbmcd" --foreground
