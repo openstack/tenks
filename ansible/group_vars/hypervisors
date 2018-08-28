@@ -3,8 +3,6 @@
 # existing interface or an existing bridge.
 physnet_mappings: {}
 
-virtualisation_provider: libvirt
-
 system_requirements:
   - python-virtualenv
 
