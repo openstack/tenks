@@ -27,15 +27,15 @@ class ActionModule(ActionBase):
 
     def run(self, tmp=None, task_vars=None):
         """
-        Schedule specifications of VMs by flavour onto hypervisors.
+        Schedule specifications of VMs by type onto hypervisors.
 
         The following task vars are accepted:
             :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
                               by hypervisor hostname. Required.
-            :specs: A dict mapping flavour names to the number of VMs
-                    required of that flavour. Required.
-            :flavours: A dict mapping flavour names to a dict of properties
-                       of that flavour.
+            :specs: A dict mapping VM type names to the number of VMs required
+                    of that type. Required.
+            :vm_types: A dict mapping VM type names to a dict of properties
+                       of that type.
             :vm_name_prefix: A string with with to prefix all sequential VM
                              names.
             :vol_name_prefix: A string with with to prefix all sequential
@@ -49,9 +49,9 @@ class ActionModule(ActionBase):
 
         vms = []
         idx = 0
-        for flav, cnt in iteritems(task_vars['specs']):
+        for typ, cnt in iteritems(task_vars['specs']):
             for _ in xrange(cnt):
-                vm = deepcopy(task_vars['flavours'][flav])
+                vm = deepcopy(task_vars['vm_types'][typ])
                 # Sequentially number the VM and volume names.
                 vm['name'] = "%s%d" % (task_vars['vm_name_prefix'], idx)
                 for vol_idx, vol in enumerate(vm['volumes']):
@@ -70,7 +70,7 @@ class ActionModule(ActionBase):
         if task_vars is None:
             task_vars = {}
 
-        REQUIRED_TASK_VARS = {'hypervisor_vars', 'specs', 'flavours'}
+        REQUIRED_TASK_VARS = {'hypervisor_vars', 'specs', 'vm_types'}
         # Var names and their defaults.
         OPTIONAL_TASK_VARS = {
             ('vm_name_prefix', 'vm'),

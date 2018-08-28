@@ -3,8 +3,8 @@
 base_path: "~/tenks/"
 allocations_file_path: "{{ base_path + '/allocations.yml' }}"
 
-flavours:
-  flav0:
+vm_types:
+  type0:
     memory_mb: 4096
     vcpus: 4
     volumes:
@@ -13,4 +13,4 @@ flavours:
       - physnet1
 
 specs:
-  flav0: 4
+  type0: 4
