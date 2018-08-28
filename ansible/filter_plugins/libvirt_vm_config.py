@@ -13,7 +13,6 @@
 # under the License.
 
 from ansible.errors import AnsibleFilterError
-from ansible.module_utils._text import to_text
 from jinja2 import contextfilter
 
 
@@ -33,7 +32,7 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
         namespace = context
     else:
         if inventory_hostname not in context['hostvars']:
-            raise errors.AnsibleFilterError(
+            raise AnsibleFilterError(
                 "Inventory hostname '%s' not in hostvars" % inventory_hostname)
         namespace = context["hostvars"][inventory_hostname]
     return namespace.get(var_name)

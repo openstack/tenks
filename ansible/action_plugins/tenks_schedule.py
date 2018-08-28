@@ -15,12 +15,11 @@
 # Avoid shadowing of system copy module by copy action plugin.
 from __future__ import absolute_import
 from copy import deepcopy
-import operator
 
 from ansible.errors import AnsibleActionFail
 from ansible.module_utils._text import to_text
 from ansible.plugins.action import ActionBase
-from six import iteritems
+import six
 
 
 class ActionModule(ActionBase):
@@ -49,8 +48,8 @@ class ActionModule(ActionBase):
 
         vms = []
         idx = 0
-        for typ, cnt in iteritems(task_vars['specs']):
-            for _ in xrange(cnt):
+        for typ, cnt in six.iteritems(task_vars['specs']):
+            for _ in six.range(cnt):
                 vm = deepcopy(task_vars['vm_types'][typ])
                 # Sequentially number the VM and volume names.
                 vm['name'] = "%s%d" % (task_vars['vm_name_prefix'], idx)
