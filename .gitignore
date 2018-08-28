@@ -4,6 +4,8 @@
 *.retry
 # Tenks allocations file
 allocations.yml
+# Tenks Galaxy roles
+ansible/roles/stackhpc.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
