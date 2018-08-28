@@ -18,6 +18,10 @@
             group: "{{ libvirt_pool_group }}"
         libvirt_host_require_vt: "{{ libvirt_require_vt }}"
 
+# Ensure we have facts about all hypervisors before scheduling begins.
+- hosts: hypervisors
+  gather_facts: true
+
 - hosts: localhost
   tasks:
     - include_tasks: schedule.yml
