@@ -10,6 +10,11 @@ system_requirements:
 # not exist at this location, one will be created.
 virtualenv_path: "{{ '/'.join([ansible_env['HOME'], 'tenks-venv']) }}"
 
+# The URL of the upper constraints file to pass to pip when installing Python
+# packages.
+python_upper_contraints_url: >-
+  https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt
+
 # Naming scheme for bridges created by tenks for physical networks is
 # {{ bridge_prefix + i }}, where `i` is the index of the physical network in
 # physnet_mappings (sorted alphabetically by key).
@@ -41,8 +46,3 @@ vbmc_ipmi_port_range_end: 6240
 vbmc_ipmi_username: username
 # The IPMI password that VBMC will use.
 vbmc_ipmi_password: password
-
-# The URL of the upper constraints file to pass to pip when installing Python
-# packages.
-python_upper_contraints_url: >-
-  https://git.openstack.org/cgit/openstack/requirements/plain/upper-constraints.txt
