@@ -20,7 +20,7 @@ Role Variables
 - `veth_pair_source_link_name`: The name to give the veth link that plugs into
   the source device.
 - `veth_pair_source_bridge`: The name of the source Linux bridge to plug into. Must be
-  specified if and only if `plug_into_source` is enabled.
-- `plug_into_source`: Whether or not to plug the source end of the veth pair
-  into a Linux bridge. If enabled, `source_bridge`, `source_bridge` must also
-  be specified. Default is `false`.
+  specified if and only if `veth_pair_plug_into_source` is enabled.
+- `veth_pair_plug_into_source`: Whether or not to plug the source end of the
+  veth pair into a Linux bridge. If enabled, `veth_pair_source_bridge` must
+  also be specified. Default is `false`.
