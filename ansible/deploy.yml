@@ -44,20 +44,43 @@
              | default([]) | subelements('physical_networks') }}
 
 - hosts: libvirt
+  vars:
+    # Allocations are stored in the localhost's vars.
+    nodes: >-
+      {{ hostvars['localhost'].allocations.result[inventory_hostname]
+           | default([]) }}
   tasks:
-    - include_tasks: libvirt_create_vms.yml
+    - name: Create Libvirt VMs
+      include_tasks: libvirt_create_vms.yml
       vars:
-        # Allocations are stored in the localhost's vars.
-        nodes: >-
-          {{ hostvars['localhost'].allocations.result[inventory_hostname]
-               | default([]) }}
+        libvirt_nodes: "{{ nodes }}"
 
-    - include_role:
-        name: virtualbmc
+    - name: Check that enough ports are available for Virtual BMC
+      fail:
+        msg: >
+          {{ nodes | count }} nodes were specified to be added to Virtual BMC,
+          but only {{ ipmi_port_range_end - ipmi_port_range_start }} ports are
+          available for use by Virtual BMC.
+      when: >-
+          (nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
+
+    - name: Set up Virtual BMC daemon
+      include_role:
+        name: virtualbmc-daemon
       vars:
-        vbmc_libvirt_domains: >-
-          {{ hostvars['localhost'].allocations.result[inventory_hostname]
-               | default([]) | map(attribute='name') | list }}
-        vbmc_log_directory: "{{ log_directory }}"
+        vbmcd_virtualenv_path: "{{ virtualenv_path }}"
+        vbmcd_python_upper_contraints_url: "{{ python_upper_constraints_url }}"
+      when: (nodes | count) > 0
+
+    - name: Register domains with Virtual BMC
+      include_role:
+        name: virtualbmc-domain
+      vars:
+        vbmc_domain: "{{ domain }}"
+        vbmc_ipmi_port: "{{ ipmi_port_range_start + port_offset }}"
         vbmc_virtualenv_path: "{{ virtualenv_path }}"
-        vbmc_python_upper_contraints_url: "{{ python_upper_constraints_url }}"
+        vbmc_log_directory: "{{ log_directory }}"
+      loop: "{{ nodes | map(attribute='name') | list }}"
+      loop_control:
+        loop_var: domain
+        index_var: port_offset

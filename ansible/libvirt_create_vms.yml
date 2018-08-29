@@ -6,6 +6,6 @@
     libvirt_vm_default_console_log_dir: "{{ log_directory }}"
     # Configure VM definitions for the Libvirt provider.
     libvirt_vms: >-
-      {{ nodes | map('set_libvirt_interfaces')
-               | map('set_libvirt_volume_pool')
-               | list }}
+      {{ libvirt_nodes | map('set_libvirt_interfaces')
+                       | map('set_libvirt_volume_pool')
+                       | list }}
