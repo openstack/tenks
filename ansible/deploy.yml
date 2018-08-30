@@ -33,10 +33,13 @@
 
 - hosts: hypervisors
   tasks:
-    - include_tasks: node_physical_network.yml
+    - name: Set up veth pairs for each node
+      include_role:
+        name: veth-pair
       vars:
-        node_name: "{{ item.0.name }}"
-        physnet: "{{ item.1 }}"
+        veth_pair_ovs_bridge: "{{ item.1 | bridge_name }}"
+        veth_pair_ovs_link_name: "{{ item.0 | ovs_link_name(item.1) }}"
+        veth_pair_source_link_name: "{{ item.0 | source_link_name(item.1) }}"
       # Loop over each physical network for each node allocated to this host.
       # Allocations are stored in localhost's vars.
       loop: >-
