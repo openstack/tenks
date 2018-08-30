@@ -30,7 +30,7 @@
 # Check here to be safe.
 - name: Wait to ensure socket is closed
   wait_for:
-    host: "{{ vbmc_ipmi_listen_address }}"
+    host: "{{ vbmc_ipmi_address }}"
     port: "{{ vbmc_ipmi_port }}"
     state: stopped
     timeout: 15
@@ -41,7 +41,7 @@
       --port {{ vbmc_ipmi_port }}
       --username '{{ vbmc_ipmi_username }}'
       --password '{{ vbmc_ipmi_password }}'
-      --address {{ vbmc_ipmi_listen_address }}
+      --address {{ vbmc_ipmi_address }}
   become: true
 
 - name: Ensure domain is started in VBMC

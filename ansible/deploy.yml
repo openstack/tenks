@@ -40,14 +40,13 @@
       # Loop over each physical network for each node allocated to this host.
       # Allocations are stored in localhost's vars.
       loop: >-
-        {{ hostvars['localhost'].allocations.result[inventory_hostname]
+        {{ hostvars.localhost.allocations.result[inventory_hostname]
              | default([]) | subelements('physical_networks') }}
 
 - hosts: libvirt
   vars:
-    # Allocations are stored in the localhost's vars.
     nodes: >-
-      {{ hostvars['localhost'].allocations.result[inventory_hostname]
+      {{ hostvars.localhost.allocations.result[inventory_hostname]
            | default([]) }}
   tasks:
     - name: Create Libvirt VMs
@@ -77,6 +76,9 @@
         name: virtualbmc-domain
       vars:
         vbmc_domain: "{{ domain }}"
+        vbmc_ipmi_address: "{{ ipmi_address }}"
+        vbmc_ipmi_username: "{{ ipmi_username }}"
+        vbmc_ipmi_password: "{{ ipmi_password }}"
         vbmc_ipmi_port: "{{ ipmi_port_range_start + port_offset }}"
         vbmc_virtualenv_path: "{{ virtualenv_path }}"
         vbmc_log_directory: "{{ log_directory }}"
