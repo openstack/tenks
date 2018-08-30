@@ -3,7 +3,7 @@
   package:
     name: "{{ item }}"
     state: installed
-  with_items: "{{ vbmcd_packages }}"
+  loop: "{{ vbmcd_packages }}"
   become: true
 
 - name: Ensure Python requirements are installed
