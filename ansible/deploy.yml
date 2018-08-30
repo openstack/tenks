@@ -41,11 +41,11 @@
 
 - hosts: hypervisors
   tasks:
-    - include_tasks: vm_physical_network.yml
+    - include_tasks: node_physical_network.yml
       vars:
-        vm_name: "{{ item.0.name }}"
+        node_name: "{{ item.0.name }}"
         physnet: "{{ item.1 }}"
-      # Loop over each physical network for each VM allocated to this host.
+      # Loop over each physical network for each node allocated to this host.
       # Allocations are stored in localhost's vars.
       loop: >-
         {{ hostvars['localhost'].allocations.result[inventory_hostname]
@@ -70,7 +70,7 @@
     - name: Create Libvirt VMs
       include_tasks: libvirt_create_vms.yml
       vars:
-        vms: "{{ nodes }}"
+        libvirt_nodes: "{{ nodes }}"
 
     - name: Register domains with Virtual BMC
       include_role:

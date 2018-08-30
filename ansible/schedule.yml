@@ -1,4 +1,10 @@
 ---
+- name: Check that all specified node types exist
+  fail:
+    msg: The non-existent node type {{ item }} was specified in 'specs'.
+  when: item not in node_types
+  loop: "{{ specs.keys() }}"
+
 # Creates a dict mapping each hypervisor's hostname to its hostvars, to be used
 # during scheduling.
 - name: Collect hypervisor hostvars
@@ -7,14 +13,14 @@
       {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
   loop: "{{ groups['hypervisors'] }}"
 
-- name: Schedule VMs to hypervisors
+- name: Schedule nodes to hypervisors
   tenks_schedule:
     hypervisor_vars: "{{ hypervisor_vars }}"
-    vm_types: "{{ vm_types }}"
+    node_types: "{{ node_types }}"
     specs: "{{ specs }}"
   register: allocations
 
-- name: Write VM allocations to file
+- name: Write node allocations to file
   copy:
     # tenks_schedule lookup plugin outputs a dict. Pretty-print this to persist
     # it in a YAML file.

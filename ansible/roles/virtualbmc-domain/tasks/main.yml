@@ -10,10 +10,10 @@
         --log-file '{{ vbmc_log_directory }}/vbmc-{{ domain }}.log'
         {% endif %}
 
-# Even if the VM is present in VBMC, we can't guarantee that it's configured
-# correctly. It's easiest to delete and re-add it; this should involve minimal
-# downtime.
-- name: Ensure VM is stopped and deleted in VBMC
+# Even if the domain is present in VBMC, we can't guarantee that it's
+# configured correctly. It's easiest to delete and re-add it; this should
+# involve minimal downtime.
+- name: Ensure domain is stopped and deleted in VBMC
   command: >-
     {{ cmd }} {{ item }} '{{ domain }}'
   loop:
@@ -44,7 +44,7 @@
       --address {{ vbmc_ipmi_listen_address }}
   become: true
 
-- name: Ensure VM is started in VBMC
+- name: Ensure domain is started in VBMC
   command: >
     {{ cmd }} start '{{ domain }}'
   register: res

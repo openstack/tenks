@@ -1,0 +1,28 @@
+---
+- name: Gather details for node physical network connection
+  block:
+    - name: Get the physical network index
+      set_fact:
+        # The index of the physical network within this hypervisor's physical
+        # networks.
+        idx: >-
+          {{ (physnet_mappings | dictsort | list).index(
+               (physnet, physnet_mappings[physnet])) }}
+
+    - name: Set node veth base name
+      set_fact:
+        # Veth pairs are unique for any node-physnet combination. However,
+        # device names cannot be longer than 15 characters, so use physical
+        # networks' indices instead.
+        veth_base_name: >-
+          {{ veth_prefix + node_name + '-' + idx }}
+
+- name: Set up veth pairs for the node
+  include_role:
+    name: veth-pair
+  vars:
+    veth_pair_ovs_bridge: >-
+      {{ bridge_prefix ~ idx }}
+    veth_pair_ovs_link_name: "{{ veth_base_name + veth_node_ovs_suffix }}"
+    veth_pair_source_link_name: >-
+      {{ veth_base_name + veth_node_source_suffix }}
