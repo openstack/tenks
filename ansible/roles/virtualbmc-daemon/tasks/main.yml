@@ -1,4 +1,11 @@
 ---
+- name: Ensure package dependencies are installed
+  package:
+    name: "{{ item }}"
+    state: installed
+  with_items: "{{ vbmcd_packages }}"
+  become: true
+
 - name: Ensure Python requirements are installed
   pip:
     requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"
