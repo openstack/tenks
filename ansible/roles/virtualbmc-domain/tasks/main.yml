@@ -1,0 +1,54 @@
+---
+- name: Set VBMC command string
+  set_fact:
+    # vbmcd should already be running, so --no-daemon stops vbmc from spawning
+    # another instance of the daemon.
+    cmd: >-
+      '{{ vbmc_virtualenv_path }}/bin/vbmc'
+        --no-daemon
+        {% if vbmc_log_directory is not none %}
+        --log-file '{{ vbmc_log_directory }}/vbmc-{{ domain }}.log'
+        {% endif %}
+
+# Even if the VM is present in VBMC, we can't guarantee that it's configured
+# correctly. It's easiest to delete and re-add it; this should involve minimal
+# downtime.
+- name: Ensure VM is stopped and deleted in VBMC
+  command: >-
+    {{ cmd }} {{ item }} '{{ domain }}'
+  loop:
+    - stop
+    - delete
+  register: res
+  changed_when: res.rc == 0
+  failed_when:
+    - res.rc != 0
+    - "'No domain with matching name' not in res.stderr"
+  become: true
+
+# The commands above tend to return before the daemon has completed the action.
+# Check here to be safe.
+- name: Wait to ensure socket is closed
+  wait_for:
+    host: "{{ vbmc_ipmi_listen_address }}"
+    port: "{{ vbmc_ipmi_port }}"
+    state: stopped
+    timeout: 15
+
+- name: Ensure domain is added to VBMC
+  command: >-
+    {{ cmd }} add '{{ domain }}'
+      --port {{ vbmc_ipmi_port }}
+      --username '{{ vbmc_ipmi_username }}'
+      --password '{{ vbmc_ipmi_password }}'
+      --address {{ vbmc_ipmi_listen_address }}
+  become: true
+
+- name: Ensure VM is started in VBMC
+  command: >
+    {{ cmd }} start '{{ domain }}'
+  register: res
+  # Retry a few times in case the VBMC daemon has been slow to process the last
+  # few commands.
+  until: res is succeeded
+  become: true

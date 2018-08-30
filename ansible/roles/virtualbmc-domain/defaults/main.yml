@@ -1,0 +1,16 @@
+---
+# The address on which VBMC will listen for IPMI traffic for this domain.
+vbmc_ipmi_listen_address: 0.0.0.0
+# The port on which VBMC will listen for IPMI traffic for this domain.
+vbmc_ipmi_port: 6230
+# The IPMI username that VBMC will use.
+vbmc_ipmi_username: username
+# The IPMI password that VBMC will use.
+vbmc_ipmi_password: password
+
+# The name of the Libvirt domain to be added to Virtual BMC.
+vbmc_domain:
+# The directory in which to store VBMC logs.
+vbmc_log_directory:
+# The path to the virtualenv in which Virtual BMC is installed.
+vbmc_virtualenv_path:

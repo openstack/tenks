@@ -4,9 +4,9 @@
     name: "{{ system_requirements }}"
   become: true
 
-- name: Ensure console log directory exists
+- name: Ensure log directory exists
   file:
-    path: "{{ console_log_directory }}"
+    path: "{{ log_directory }}"
     state: directory
   become: true
 
@@ -43,11 +43,3 @@
   loop: "{{ physnet_mappings | dictsort }}"
   loop_control:
     index_var: idx
-
-- name: Ensure Python requirements are installed
-  pip:
-    requirements: >-
-      {{ '/'.join([(playbook_dir | dirname), 'venv-requirements.txt']) }}
-    extra_args: >-
-      -c {{ python_upper_contraints_url }}
-    virtualenv: "{{ virtualenv_path }}"

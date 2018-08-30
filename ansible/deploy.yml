@@ -5,7 +5,8 @@
 
 - hosts: libvirt
   tasks:
-    - include_role:
+    - name: Configure host for Libvirt
+      include_role:
         name: stackhpc.libvirt-host
       vars:
         libvirt_host_pools:
@@ -17,6 +18,13 @@
             owner: "{{ libvirt_pool_owner }}"
             group: "{{ libvirt_pool_group }}"
         libvirt_host_require_vt: "{{ libvirt_require_vt }}"
+
+    - name: Set up Virtual BMC daemon
+      include_role:
+        name: virtualbmc-daemon
+      vars:
+        vbmcd_virtualenv_path: "{{ virtualenv_path }}"
+        vbmcd_python_upper_contraints_url: "{{ python_upper_constraints_url }}"
 
 # Ensure we have facts about all hypervisors before scheduling begins.
 - hosts: hypervisors
@@ -44,10 +52,35 @@
              | default([]) | subelements('physical_networks') }}
 
 - hosts: libvirt
+  vars:
+    # Allocations are stored in the localhost's vars.
+    nodes: >-
+      {{ hostvars['localhost'].allocations.result[inventory_hostname]
+           | default([]) }}
   tasks:
-    - include_tasks: libvirt_create_vms.yml
+    - name: Check that enough ports are available for Virtual BMC
+      fail:
+        msg: >
+          {{ nodes | count }} nodes were specified to be added to Virtual BMC,
+          but only {{ ipmi_port_range_end - ipmi_port_range_start }} ports are
+          available for use by Virtual BMC.
+      when: >-
+          (nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
+
+    - name: Create Libvirt VMs
+      include_tasks: libvirt_create_vms.yml
       vars:
-        # Allocations are stored in the localhost's vars.
-        vms: >-
-          {{ hostvars['localhost'].allocations.result[inventory_hostname]
-               | default([]) }}
+        vms: "{{ nodes }}"
+
+    - name: Register domains with Virtual BMC
+      include_role:
+        name: virtualbmc-domain
+      vars:
+        vbmc_domain: "{{ domain }}"
+        vbmc_ipmi_port: "{{ ipmi_port_range_start + port_offset }}"
+        vbmc_virtualenv_path: "{{ virtualenv_path }}"
+        vbmc_log_directory: "{{ log_directory }}"
+      loop: "{{ nodes | map(attribute='name') | list }}"
+      loop_control:
+        loop_var: domain
+        index_var: port_offset

@@ -1,0 +1,27 @@
+---
+- name: Ensure Python requirements are installed
+  pip:
+    requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"
+    extra_args: >-
+      -c {{ vbmcd_python_upper_contraints_url }}
+    virtualenv: "{{ vbmcd_virtualenv_path }}"
+
+- name: Ensure Virtual BMC systemd service is configured
+  template:
+    src: templates/{{ item }}.j2
+    dest: /etc/systemd/system/{{ item }}
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  register: service_file
+  loop:
+    - "{{ service }}.service"
+
+- name: Ensure Virtual BMC systemd service is started and enabled
+  systemd:
+    name: "{{ service }}"
+    enabled: yes
+    state: started
+    daemon_reload: "{{ service_file.changed }}"
+  become: true
