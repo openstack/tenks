@@ -1,8 +1,4 @@
 ---
-- name: Set service name
-  set_fact:
-    service: vbmcd
-
 - name: Ensure Python requirements are installed
   pip:
     requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"

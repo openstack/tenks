@@ -5,7 +5,8 @@
 
 - hosts: libvirt
   tasks:
-    - include_role:
+    - name: Configure host for Libvirt
+      include_role:
         name: stackhpc.libvirt-host
       vars:
         libvirt_host_pools:
@@ -17,6 +18,13 @@
             owner: "{{ libvirt_pool_owner }}"
             group: "{{ libvirt_pool_group }}"
         libvirt_host_require_vt: "{{ libvirt_require_vt }}"
+
+    - name: Set up Virtual BMC daemon
+      include_role:
+        name: virtualbmc-daemon
+      vars:
+        vbmcd_virtualenv_path: "{{ virtualenv_path }}"
+        vbmcd_python_upper_contraints_url: "{{ python_upper_constraints_url }}"
 
 # Ensure we have facts about all hypervisors before scheduling begins.
 - hosts: hypervisors
@@ -50,11 +58,6 @@
       {{ hostvars['localhost'].allocations.result[inventory_hostname]
            | default([]) }}
   tasks:
-    - name: Create Libvirt VMs
-      include_tasks: libvirt_create_vms.yml
-      vars:
-        libvirt_nodes: "{{ nodes }}"
-
     - name: Check that enough ports are available for Virtual BMC
       fail:
         msg: >
@@ -64,13 +67,10 @@
       when: >-
           (nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
 
-    - name: Set up Virtual BMC daemon
-      include_role:
-        name: virtualbmc-daemon
+    - name: Create Libvirt VMs
+      include_tasks: libvirt_create_vms.yml
       vars:
-        vbmcd_virtualenv_path: "{{ virtualenv_path }}"
-        vbmcd_python_upper_contraints_url: "{{ python_upper_constraints_url }}"
-      when: (nodes | count) > 0
+        libvirt_nodes: "{{ nodes }}"
 
     - name: Register domains with Virtual BMC
       include_role:
