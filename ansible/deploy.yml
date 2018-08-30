@@ -50,11 +50,6 @@
       {{ hostvars['localhost'].allocations.result[inventory_hostname]
            | default([]) }}
   tasks:
-    - name: Create Libvirt VMs
-      include_tasks: libvirt_create_vms.yml
-      vars:
-        vms: "{{ nodes }}"
-
     - name: Check that enough ports are available for Virtual BMC
       fail:
         msg: >
@@ -63,6 +58,11 @@
           available for use by Virtual BMC.
       when: >-
           (nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
+
+    - name: Create Libvirt VMs
+      include_tasks: libvirt_create_vms.yml
+      vars:
+        vms: "{{ nodes }}"
 
     - name: Set up Virtual BMC daemon
       include_role:
