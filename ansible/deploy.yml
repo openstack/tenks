@@ -85,7 +85,7 @@
         vbmc_ipmi_port: "{{ ipmi_port_range_start + port_offset }}"
         vbmc_virtualenv_path: "{{ virtualenv_path }}"
         vbmc_log_directory: "{{ log_directory }}"
-      loop: "{{ nodes | map(attribute='name') | list }}"
+      loop: "{{ nodes | map(attribute='name') | sort | list }}"
       loop_control:
         loop_var: domain
         index_var: port_offset
