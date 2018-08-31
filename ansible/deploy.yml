@@ -89,3 +89,27 @@
       loop_control:
         loop_var: domain
         index_var: port_offset
+
+- hosts: localhost
+  tasks:
+    - name: Check that OpenStack credentials exist in the environment
+      fail:
+        msg: >
+          $OS_USERNAME was not found in the environment. Ensure the OpenStack
+          credentials exist in your environment, perhaps by sourcing your RC file.
+      when: not lookup('env', 'OS_USERNAME')
+
+    - name: Perform Ironic enrolment for each hypervisor's nodes
+      include_role:
+        name: ironic-enrolment
+      vars:
+        ironic_deploy_kernel_uuid: "{{ deploy_kernel_uuid }}"
+        ironic_deploy_ramdisk_uuid: "{{ deploy_ramdisk_uuid }}"
+        ironic_nodes: "{{ alloc.1 }}"
+        ironic_hypervisor: "{{ alloc.0 }}"
+        ironic_virtualenv_path: "{{ virtualenv_path }}"
+        ironic_python_upper_constraints_url: >-
+          {{ python_upper_constraints_url }}
+      loop: "{{ allocations.result.iteritems() | list }}"
+      loop_control:
+        loop_var: alloc

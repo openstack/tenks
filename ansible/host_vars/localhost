@@ -32,3 +32,8 @@ node_types: {}
 #   # 'type0'.
 #   type0: 4
 specs: {}
+
+# The Glance UUID of the image to use for the deployment kernel.
+deploy_kernel_uuid:
+# The Glance UUID of the image to use for the deployment ramdisk.
+deploy_ramdisk_uuid:

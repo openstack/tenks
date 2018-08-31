@@ -111,7 +111,7 @@ def ovs_link_name(context, node, physnet):
 def source_to_ovs_link_name(context, source):
     """Get the corresponding OVS link name for a source link name.
     """
-    base = source[:len(_get_hostvar(context, 'veth_node_source_suffix'))]
+    base = source[:-len(_get_hostvar(context, 'veth_node_source_suffix'))]
     return base + _get_hostvar(context, 'veth_node_ovs_suffix')
 
 
