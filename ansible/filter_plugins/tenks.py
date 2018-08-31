@@ -11,6 +11,9 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import math
+import re
+import six
 
 from ansible.errors import AnsibleFilterError
 from jinja2 import contextfilter
@@ -33,10 +36,15 @@ class FilterModule(object):
             'bridge_name': bridge_name,
             'ovs_link_name': ovs_link_name,
             'source_link_name': source_link_name,
+            'source_to_ovs_link_name': source_to_ovs_link_name,
+            'source_link_to_physnet_name': source_link_to_physnet_name,
 
             # Libvirt filters.
             'set_libvirt_interfaces': set_libvirt_interfaces,
             'set_libvirt_volume_pool': set_libvirt_volume_pool,
+
+            # Miscellaneous filters.
+            'size_string_to_gb': size_string_to_gb,
         }
 
 
@@ -80,7 +88,7 @@ def bridge_name(context, physnet):
     """Get the Tenks OVS bridge name from a physical network name.
     """
     return (_get_hostvar(context, 'bridge_prefix') +
-                _physnet_index(context, physnet))
+                str(_physnet_name_to_index(context, physnet)))
 
 
 @contextfilter
@@ -99,13 +107,77 @@ def ovs_link_name(context, node, physnet):
                 _get_hostvar(context, 'veth_node_ovs_suffix'))
 
 
+@contextfilter
+def source_to_ovs_link_name(context, source):
+    """Get the corresponding OVS link name for a source link name.
+    """
+    base = source[:len(_get_hostvar(context, 'veth_node_source_suffix'))]
+    return base + _get_hostvar(context, 'veth_node_ovs_suffix')
+
+
+@contextfilter
+def source_link_to_physnet_name(context, source):
+    """ Get the physical network name that a source veth link is connected to.
+    """
+    prefix = _get_hostvar(context, 'veth_prefix')
+    suffix = _get_hostvar(context, 'veth_node_source_suffix')
+    match = re.compile(r"%s.*-(\d+)%s"
+                       % (re.escape(prefix), re.escape(suffix))).match(source)
+    idx = match.group(1)
+    return _physnet_index_to_name(context, int(idx))
+
+
+def size_string_to_gb(size):
+    """
+    Parse a size string, and convert to the integer number of GB it represents.
+    """
+    return int(math.ceil(_parse_size_string(size) / 10**9))
+
+
+def _parse_size_string(size):
+    """
+    Parse a capacity string.
+
+    Takes a string representing a capacity and returns the size in bytes, as an
+    integer. Accepts strings such as "5", "5B", "5GB", " 5  GB ", etc...
+
+    :param size: The size string to parse.
+    :returns: The number of bytes represented by `size`, as an integer.
+    """
+    UNITS = {"": 1, "K": 10**3, "M": 10**6, "G": 10**9, "T": 10**12}
+    UNITS.update({k + "B": v for (k, v) in six.iteritems(UNITS)})
+
+    # If an integer is passed, treat it as a string without units.
+    size = str(size)
+    match = re.compile(r"\s*(\d+)\s*([A-Z]*)\s*$").match(size)
+    if not match:
+        msg = "The size string '%s' is not of a valid format." % size
+        raise AnsibleFilterError(to_text(msg))
+    number = match.group(1)
+    unit = match.group(2)
+    try:
+        return int(number) * UNITS[unit]
+    except KeyError:
+        msg = ("The size string '%s' contains an invalid unit '%s'. Valid "
+               "units are: %s." % (size, unit, ", ".join(UNITS.keys())))
+        raise AnsibleFilterError(to_text(msg))
+
+
 def _link_name(context, node, physnet):
     prefix = _get_hostvar(context, 'veth_prefix')
-    return prefix + node['name'] + '-' + _physnet_index(context, physnet)
+    return prefix + node['name'] + '-' + str(_physnet_name_to_index(context,
+                                                                    physnet))
 
 
-def _physnet_index(context, physnet):
-    """Get the ID of this physical network on the hypervisor, as a string.
+def _physnet_name_to_index(context, physnet):
+    """Get the ID of this physical network on the hypervisor.
     """
     physnet_mappings = _get_hostvar(context, 'physnet_mappings')
-    return str(sorted(physnet_mappings).index(physnet))
+    return sorted(physnet_mappings).index(physnet)
+
+
+def _physnet_index_to_name(context, idx):
+    """Get the name of this physical network on the hypervisor.
+    """
+    physnet_mappings = _get_hostvar(context, 'physnet_mappings')
+    return sorted(physnet_mappings)[idx]
