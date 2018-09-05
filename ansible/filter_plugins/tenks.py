@@ -140,28 +140,33 @@ def _parse_size_string(size):
     Parse a capacity string.
 
     Takes a string representing a capacity and returns the size in bytes, as an
-    integer. Accepts strings such as "5", "5B", "5GB", " 5  GB ", etc...
+    integer. Accepts strings such as "5", "5B", "5g", "5GB", " 5  GiB ", etc.
+    Case insensitive. See `man virsh` for more details.
 
     :param size: The size string to parse.
     :returns: The number of bytes represented by `size`, as an integer.
     """
-    UNITS = {"": 1, "K": 10**3, "M": 10**6, "G": 10**9, "T": 10**12}
-    UNITS.update({k + "B": v for (k, v) in six.iteritems(UNITS)})
-
+    # Base values for units.
+    BIN = 1024
+    DEC = 1000
+    POWERS = {"": 0, "k": 1, "m": 2, "g": 3, "t": 4}
     # If an integer is passed, treat it as a string without units.
-    size = str(size)
-    match = re.compile(r"\s*(\d+)\s*([A-Z]*)\s*$").match(size)
+    size = str(size).lower()
+    regex = r"\s*(\d+)\s*([%s])?(i?b)?\s*$" % "".join(POWERS.keys())
+    match = re.compile(regex).match(size)
     if not match:
         msg = "The size string '%s' is not of a valid format." % size
         raise AnsibleFilterError(to_text(msg))
     number = match.group(1)
-    unit = match.group(2)
-    try:
-        return int(number) * UNITS[unit]
-    except KeyError:
-        msg = ("The size string '%s' contains an invalid unit '%s'. Valid "
-               "units are: %s." % (size, unit, ", ".join(UNITS.keys())))
-        raise AnsibleFilterError(to_text(msg))
+    power = match.group(2)
+    unit = match.group(3)
+    if not power:
+        power = ""
+    if unit == "b":
+        base = DEC
+    else:
+        base = BIN
+    return int(number) * (base ** POWERS[power])
 
 
 def _link_name(context, node, physnet):
