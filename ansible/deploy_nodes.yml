@@ -1,0 +1,88 @@
+---
+# Ensure we have facts about all hypervisors before scheduling begins.
+- hosts: hypervisors
+  gather_facts: true
+
+- hosts: localhost
+  tasks:
+    - include_tasks: schedule.yml
+
+    - name: Load allocations from file
+      include_vars:
+        file: "{{ allocations_file_path }}"
+        name: allocations
+
+- hosts: hypervisors
+  tasks:
+    - name: Set up veth pairs for each node
+      include_role:
+        name: veth-pair
+      vars:
+        veth_pair_ovs_bridge: "{{ item.1 | bridge_name }}"
+        veth_pair_ovs_link_name: "{{ item.0 | ovs_link_name(item.1) }}"
+        veth_pair_source_link_name: "{{ item.0 | source_link_name(item.1) }}"
+      # Loop over each physical network for each node allocated to this host.
+      # Allocations are stored in localhost's vars.
+      loop: >-
+        {{ hostvars.localhost.allocations.result[inventory_hostname]
+             | default([]) | subelements('physical_networks') }}
+
+- hosts: libvirt
+  vars:
+    nodes: >-
+      {{ hostvars.localhost.allocations.result[inventory_hostname]
+           | default([]) }}
+  tasks:
+    - name: Check that enough ports are available for Virtual BMC
+      fail:
+        msg: >
+          {{ nodes | count }} nodes were specified to be added to Virtual BMC,
+          but only {{ ipmi_port_range_end - ipmi_port_range_start }} ports are
+          available for use by Virtual BMC.
+      when: >-
+          (nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
+
+    - name: Create Libvirt VMs
+      include_tasks: libvirt_create_vms.yml
+      vars:
+        libvirt_nodes: "{{ nodes }}"
+
+    - name: Register domains with Virtual BMC
+      include_role:
+        name: virtualbmc-domain
+      vars:
+        vbmc_domain: "{{ domain }}"
+        vbmc_ipmi_address: "{{ ipmi_address }}"
+        vbmc_ipmi_username: "{{ ipmi_username }}"
+        vbmc_ipmi_password: "{{ ipmi_password }}"
+        vbmc_ipmi_port: "{{ ipmi_port_range_start + port_offset }}"
+        vbmc_virtualenv_path: "{{ virtualenv_path }}"
+        vbmc_log_directory: "{{ log_directory }}"
+      loop: "{{ nodes | map(attribute='name') | sort | list }}"
+      loop_control:
+        loop_var: domain
+        index_var: port_offset
+
+- hosts: localhost
+  tasks:
+    - name: Check that OpenStack credentials exist in the environment
+      fail:
+        msg: >
+          $OS_USERNAME was not found in the environment. Ensure the OpenStack
+          credentials exist in your environment, perhaps by sourcing your RC file.
+      when: not lookup('env', 'OS_USERNAME')
+
+    - name: Perform Ironic enrolment for each hypervisor's nodes
+      include_role:
+        name: ironic-enrolment
+      vars:
+        ironic_deploy_kernel_uuid: "{{ deploy_kernel_uuid }}"
+        ironic_deploy_ramdisk_uuid: "{{ deploy_ramdisk_uuid }}"
+        ironic_nodes: "{{ alloc.1 }}"
+        ironic_hypervisor: "{{ alloc.0 }}"
+        ironic_virtualenv_path: "{{ virtualenv_path }}"
+        ironic_python_upper_constraints_url: >-
+          {{ python_upper_constraints_url }}
+      loop: "{{ allocations.result.iteritems() | list }}"
+      loop_control:
+        loop_var: alloc
