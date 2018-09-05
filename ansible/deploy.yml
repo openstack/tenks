@@ -52,11 +52,6 @@
       {{ hostvars.localhost.allocations.result[inventory_hostname]
            | default([]) }}
   tasks:
-    - name: Create Libvirt VMs
-      include_tasks: libvirt_create_vms.yml
-      vars:
-        libvirt_nodes: "{{ nodes }}"
-
     - name: Check that enough ports are available for Virtual BMC
       fail:
         msg: >
@@ -65,6 +60,11 @@
           available for use by Virtual BMC.
       when: >-
           (nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
+
+    - name: Create Libvirt VMs
+      include_tasks: libvirt_create_vms.yml
+      vars:
+        libvirt_nodes: "{{ nodes }}"
 
     - name: Set up Virtual BMC daemon
       include_role:
@@ -105,11 +105,11 @@
       vars:
         ironic_deploy_kernel_uuid: "{{ deploy_kernel_uuid }}"
         ironic_deploy_ramdisk_uuid: "{{ deploy_ramdisk_uuid }}"
-        ironic_nodes: "{{ alloc.1 }}"
-        ironic_hypervisor: "{{ alloc.0 }}"
+        ironic_nodes: "{{ alloc.value }}"
+        ironic_hypervisor: "{{ alloc.key }}"
         ironic_virtualenv_path: "{{ virtualenv_path }}"
         ironic_python_upper_constraints_url: >-
           {{ python_upper_constraints_url }}
-      loop: "{{ allocations.result.iteritems() | list }}"
+      loop: "{{ query('dict', allocations.result) }}"
       loop_control:
         loop_var: alloc
