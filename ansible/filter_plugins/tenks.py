@@ -16,6 +16,7 @@ import re
 import six
 
 from ansible.errors import AnsibleFilterError
+from ansible.module_utils._text import to_text
 from jinja2 import contextfilter
 
 
@@ -32,7 +33,7 @@ class FilterModule(object):
 
     def filters(self):
         return {
-             # Network name filters.
+            # Network name filters.
             'bridge_name': bridge_name,
             'ovs_link_name': ovs_link_name,
             'source_link_name': source_link_name,
@@ -88,7 +89,7 @@ def bridge_name(context, physnet):
     """Get the Tenks OVS bridge name from a physical network name.
     """
     return (_get_hostvar(context, 'bridge_prefix') +
-                str(_physnet_name_to_index(context, physnet)))
+            str(_physnet_name_to_index(context, physnet)))
 
 
 @contextfilter
@@ -96,7 +97,7 @@ def source_link_name(context, node, physnet):
     """Get the source veth link name for a node/physnet combination.
     """
     return (_link_name(context, node, physnet) +
-                _get_hostvar(context, 'veth_node_source_suffix'))
+            _get_hostvar(context, 'veth_node_source_suffix'))
 
 
 @contextfilter
@@ -104,7 +105,7 @@ def ovs_link_name(context, node, physnet):
     """Get the OVS veth link name for a node/physnet combination.
     """
     return (_link_name(context, node, physnet) +
-                _get_hostvar(context, 'veth_node_ovs_suffix'))
+            _get_hostvar(context, 'veth_node_ovs_suffix'))
 
 
 @contextfilter
