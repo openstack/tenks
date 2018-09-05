@@ -7,20 +7,56 @@ testing purposes.
 Getting Started
 ---------------
 
+Pre-Requisites
+^^^^^^^^^^^^^^
+
 Tenks has dependencies on Ansible roles that are hosted by Ansible Galaxy.
 Given that your virtualenv of choice is active and Ansible (>=2.6) is
 installed inside it, Tenks' role dependencies can be installed by
 `ansible-galaxy install --role-file=requirements.yml
 --roles-path=ansible/roles/`.
 
+Configuration
+^^^^^^^^^^^^^
+
+An override file should be created to configure Tenks. Any variables specified
+in this file will take precedence over their default settings in Tenks. This
+will allow you to set options as necessary for your setup, without needing to
+directly modify Tenks' variable files. An example override file can be found
+in `ansible/override.yml.example`.
+
+Most of the configuration you will need to do relates to variables defined in
+`ansible/host_vars/localhost`. You can set your own values for these in your
+override file (mentioned above). In addition to other options, you will need to
+define the types of node you'd like to be able to manage as a dict in
+`node_types`, as well as the desired deployment specifications in `specs`.
+Format and guidance for available options will be found within the variable
+file.
+
+Broadly, most variables in `ansible/group_vars/*` have sensible defaults which
+may be left as-is unless you have a particular need to configure them. A
+notable exception to this is the variable `physnet_mappings` in
+`ansible/group_vars/hypervisors`, which should map physical network names to
+the device to use for that network: this can be a network interface, or an
+existing OVS or Linux bridge. If these mappings are the same for all hosts in
+your `hypervisors` group, you may set a single dict `physnet_mappings` in your
+overrides file, and this will be used for all hosts. If different mappings are
+required for different hosts, you will need to individually specify them: for a
+host with hostname *myhost*, set `physnet_mappings` within the file
+`ansible/host_vars/myhost`.
+
+Deployment
+^^^^^^^^^^
+
 Currently, Tenks does not have a CLI or wrapper. A virtual cluster can be
-deployed by configuring the variables defined in `group_vars/*` as necessary,
-then calling
-`ansible-playbook --inventory ansible/inventory ansible/deploy.yml`. Individual
-sections of Tenks can be run separately by substituting `ansible/deploy.yml` in
-the command above with the path to the playbook you want to run. The current
-playbooks can be seen in the Ansible structure diagram in the *Development*
-section.
+deployed by calling
+`ansible-playbook --inventory ansible/inventory ansible/deploy.yml --extra-vars=@override.yml`,
+where `override.yml` is the path to your override file. The `deploy.yml`
+playbook includes various constituent playbooks which perform different parts
+of the deployment. An individual section of Tenks can be run separately by
+substituting `ansible/deploy.yml` in the command above with the path to the
+playbook you want to run. The current playbooks can be seen in the Ansible
+structure diagram in the *Development* section.
 
 Development
 -----------

@@ -1,0 +1,23 @@
+---
+# This is an example override file, which can be used as a template for your
+# own override file.
+
+node_types:
+  type0:
+    memory_mb: 1024
+    vcpus: 1
+    volumes:
+      - capacity: 2GB
+    physical_networks:
+      - physnet0
+
+specs:
+  - type: type0
+    count: 3
+    ironic_config:
+      resource_class: my_rc
+
+# Remember that these mappings will apply to all hosts unless specific mappings
+# are specified in individual host_vars files.
+physnet_mappings:
+  physnet0: brfoo
