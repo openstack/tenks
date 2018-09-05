@@ -1,6 +1,6 @@
 ---
 # The address on which VBMC will listen for IPMI traffic for this domain.
-vbmc_listen_address:
+vbmc_ipmi_address:
 # The port on which VBMC will listen for IPMI traffic for this domain.
 vbmc_ipmi_port:
 # The IPMI username that VBMC will use.
