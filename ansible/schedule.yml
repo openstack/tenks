@@ -24,11 +24,11 @@
         hypervisor_vars: "{{ hypervisor_vars }}"
         node_types: "{{ node_types }}"
         specs: "{{ specs }}"
-      register: allocations
+      register: scheduling
 
     - name: Write node allocations to file
       copy:
         # tenks_schedule lookup plugin outputs a dict. Pretty-print this to
         # persist it in a YAML file.
-        content: "{{ allocations.result | to_nice_yaml }}"
+        content: "{{ scheduling.result | to_nice_yaml }}"
         dest: "{{ allocations_file_path }}"

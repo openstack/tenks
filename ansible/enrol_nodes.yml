@@ -23,6 +23,6 @@
         ironic_virtualenv_path: "{{ virtualenv_path }}"
         ironic_python_upper_constraints_url: >-
           {{ python_upper_constraints_url }}
-      loop: "{{ query('dict', allocations.result) }}"
+      loop: "{{ query('dict', allocations) }}"
       loop_control:
         loop_var: alloc

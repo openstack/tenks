@@ -9,7 +9,7 @@
 - hosts: libvirt
   vars:
     nodes: >-
-      {{ hostvars.localhost.allocations.result[inventory_hostname]
+      {{ hostvars.localhost.allocations[inventory_hostname]
            | default([]) }}
   tasks:
     - name: Create VM

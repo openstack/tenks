@@ -10,6 +10,3 @@
 
 - name: Set up virtual node BMCs
   import_playbook: bmc.yml
-
-- name: Enrol nodes in Ironic
-  import_playbook: ironic_enrolment.yml

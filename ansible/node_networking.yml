@@ -8,7 +8,7 @@
 - hosts: hypervisors
   vars:
     nodes: >-
-      {{ hostvars.localhost.allocations.result[inventory_hostname]
+      {{ hostvars.localhost.allocations[inventory_hostname]
            | default([]) }}
   tasks:
     - name: Set up veth pairs for each node

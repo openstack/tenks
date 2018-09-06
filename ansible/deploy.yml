@@ -4,3 +4,6 @@
 
 - name: Perform deployment node configuration
   import_playbook: deploy_nodes.yml
+
+- name: Enrol nodes in Ironic
+  import_playbook: enrol_nodes.yml
