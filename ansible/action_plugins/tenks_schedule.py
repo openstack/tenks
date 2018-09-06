@@ -65,6 +65,11 @@ class ActionModule(ActionBase):
                 for vol_idx, vol in enumerate(node['volumes']):
                     vol['name'] = "%s%d" % (task_vars['vol_name_prefix'],
                                             vol_idx)
+                try:
+                    node['ironic_config'] = spec['ironic_config']
+                except KeyError:
+                    # Ironic config is not mandatory.
+                    pass
                 nodes.append(node)
                 idx += 1
 
