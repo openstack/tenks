@@ -35,6 +35,9 @@
     state: stopped
     timeout: 15
 
+# These tasks will trigger ansible lint rule ANSIBLE0012 because they are not
+# idempotent (we always delete and recreate the domain). Use a tag to suppress
+# the checks.
 - name: Ensure domain is added to VBMC
   command: >-
     {{ cmd }} add '{{ domain }}'
@@ -43,6 +46,8 @@
       --password '{{ vbmc_ipmi_password }}'
       --address {{ vbmc_ipmi_address }}
   become: true
+  tags:
+    - skip_ansible_lint
 
 - name: Ensure domain is started in VBMC
   command: >
@@ -52,3 +57,5 @@
   # few commands.
   until: res is succeeded
   become: true
+  tags:
+    - skip_ansible_lint

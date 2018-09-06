@@ -13,7 +13,6 @@
 # under the License.
 import math
 import re
-import six
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils._text import to_text
