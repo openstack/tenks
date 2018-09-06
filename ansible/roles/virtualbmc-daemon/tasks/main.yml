@@ -1,7 +1,10 @@
 ---
-- name: Set service name
-  set_fact:
-    service: vbmcd
+- name: Ensure package dependencies are installed
+  package:
+    name: "{{ item }}"
+    state: installed
+  loop: "{{ vbmcd_packages }}"
+  become: true
 
 - name: Ensure Python requirements are installed
   pip:

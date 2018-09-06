@@ -5,7 +5,8 @@
 
 - hosts: libvirt
   tasks:
-    - include_role:
+    - name: Configure host for Libvirt
+      include_role:
         name: stackhpc.libvirt-host
       vars:
         libvirt_host_pools:

@@ -40,6 +40,7 @@
 - name: Ensure Open vSwitch bridge exists
   openvswitch_bridge:
     bridge: "{{ tenks_bridge }}"
+  become: true
 
 - name: Connect to existing Linux bridge
   when: source_type == 'linux_bridge'
