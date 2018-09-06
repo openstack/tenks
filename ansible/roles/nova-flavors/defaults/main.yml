@@ -1,0 +1,25 @@
+---
+# A list of Nova flavors to create.
+# For example:
+#
+# flavors:
+#     # Required.
+#   - resource_class: my_rc
+#     # Required.
+#     node_type: type0
+#     # Defaults to `resource_class`.
+#     name: my_flavor
+#     # Optional, defaults to [].
+#     required_traits: []
+#     # Optional, defaults to [].
+#     forbidden_traits: []
+#     # Extra key-value pairs to add to the flavor's specs. Optional, defaults
+#     # to {}.
+#     custom_specs: {}
+flavors: []
+
+# The path to the virtualenv in which to install the OpenStack clients.
+flavors_virtualenv_path:
+# The URL of the upper constraints file to pass to pip when installing Python
+# packages.
+flavors_python_upper_constraints_url:

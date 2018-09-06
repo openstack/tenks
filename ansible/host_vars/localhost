@@ -51,20 +51,24 @@ node_types: {}
 specs: []
 
 # nova_flavors is a list of Nova flavors to be created. Each flavor must
-# specify the resource class it is associated with. This resource class must
-# be referenced in `specs`.
-#
+# specify the resource class it is associated with, as well as the Tenks node
+# type whose hardware specs should be used.
 # For example:
 #
 # nova_flavors:
 #     # Required.
 #   - resource_class: my_rc
+#     # Required.
+#     node_type: type0
 #     # Defaults to `resource_class`.
 #     name: my_flavor
 #     # Optional, defaults to [].
 #     required_traits: []
 #     # Optional, defaults to [].
 #     forbidden_traits: []
+#     # Extra key-value pairs to add to the flavor's specs. Optional, defaults
+#     # to {}.
+#     custom_specs: {}
 nova_flavors: []
 
 # The Glance UUID of the image to use for the deployment kernel.

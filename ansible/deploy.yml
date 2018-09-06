@@ -7,3 +7,6 @@
 
 - name: Enrol nodes in Ironic
   import_playbook: enrol_nodes.yml
+
+- name: Register flavors in Nova
+  import_playbook: register_flavors.yml
