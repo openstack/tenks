@@ -11,7 +11,3 @@ libvirt_pool_group: "{{ ansible_user_id }}"
 # By default, allow QEMU without hardware virtualisation since this is a
 # development tool.
 libvirt_require_vt: false
-
-# The range of ports available for use for node IPMI traffic.
-ipmi_port_range_start: 6230
-ipmi_port_range_end: 6240

@@ -1,0 +1,90 @@
+---
+- name: Get vNIC MAC addresses
+  # The output format of this command gives two lines of header, followed by
+  # (for each vNIC):
+  # <name> <type> <source interface> <model> <MAC>
+  # The VMs will have been created with the virt module, using become: true.
+  # This targets /bin/virsh rather than /usr/bin/virsh.
+  command: /bin/virsh domiflist '{{ node.name }}'
+  register: iflist_res
+  changed_when: false
+  become: true
+  delegate_to: "{{ ironic_hypervisor }}"
+  run_once: true
+
+# We need to do this for each run to ensure other nodes' NICs don't carry over
+# to this run.
+- name: Reset list of NICs
+  set_fact:
+    nics: []
+
+- name: Collect MAC addresses into NIC list
+  set_fact:
+    nics: "{{ nics | union([{'mac': item.split()[4]}]) }}"
+  loop: "{{ iflist_res.stdout_lines[2:] }}"
+
+- name: Create node in Ironic
+  os_ironic:
+    auth_type: password
+    driver: ipmi
+    driver_info:
+      power:
+        ipmi_address: "{{ hostvars[ironic_hypervisor].ipmi_address }}"
+        # This is passed in from main.yml.
+        ipmi_port: "{{ ipmi_port }}"
+        ipmi_username: "{{ hostvars[ironic_hypervisor].ipmi_username }}"
+        ipmi_password: "{{ hostvars[ironic_hypervisor].ipmi_password }}"
+      deploy:
+        deploy_kernel: "{{ ironic_deploy_kernel_uuid | default(omit, true) }}"
+        deploy_ramdisk: "{{ ironic_deploy_ramdisk_uuid | default(omit, true) }}"
+    name: "{{ node.name }}"
+    nics: "{{ nics }}"
+    properties:
+      ram: "{{ node.memory_mb }}"
+      # FIXME(w-miller): Instead of assuming the first volume is the primary
+      # volume, make this configurable?
+      disk_size: >-
+        {{ (node.volumes.0.capacity | default('1')) | size_string_to_gb }}
+      cpus: "{{ node.vcpus }}"
+  vars:
+    # This module requires the openstacksdk package, which is installed within
+    # our virtualenv.
+    ansible_python_interpreter: >-
+      {{ '/'.join([ironic_virtualenv_path, 'bin', 'python']) }}
+  register: created_node
+
+# The os_ironic module automatically brings the node from 'enrol' to
+# 'available' state, but we still need to set more port and node attributes.
+# Use maintenance mode to do this.
+- name: Put Ironic node into maintenance mode
+  command: >-
+    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance set
+      '{{ created_node.uuid }}'
+
+# FIXME(w-miller): Make interfaces/driver configurable, for example to allow
+# use of Redfish instead of IPMI.
+- name: Set Ironic node resource class
+  command: >-
+    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set
+      '{{ created_node.uuid }}'
+      --resource-class {{ node.type }}
+#        --boot-interface pxe
+#        --deploy-interface iscsi
+#        --management-interface ipmitool
+#        --network-interface neutron
+#        --power-interface ipmitool
+
+- name: Set additional Ironic port attributes
+  include_tasks: port.yml
+  vars:
+    source_interface: "{{ vnic.split()[2] }}"
+    mac: "{{ vnic.split()[4] }}"
+  # Loop over each NIC.
+  loop: "{{ iflist_res.stdout_lines[2:] }}"
+  loop_control:
+    loop_var: vnic
+
+- name: Bring Ironic node out of maintenance mode
+  command: >-
+    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance
+      unset '{{ created_node.uuid }}'

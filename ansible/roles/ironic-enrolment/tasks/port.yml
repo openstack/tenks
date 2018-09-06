@@ -1,0 +1,29 @@
+---
+- name: Get Ironic port UUID
+  command: >-
+    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal port list
+       --format value
+       --column UUID
+       --address {{ mac }}
+  register: uuid
+  changed_when: false
+
+- name: Get physical network name
+  set_fact:
+    physnet: "{{ source_interface | source_link_to_physnet_name }}"
+
+- name: Get bridge name
+  set_fact:
+    bridge: "{{ physnet | bridge_name }}"
+
+- name: Set Ironic port attributes
+  command: >-
+    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal port set
+      {{ uuid.stdout }}
+      --physical-network '{{ physnet }}'
+      --local-link-connection switch_id='{{ hostvars[ironic_hypervisor][
+                                              'ansible_' + bridge
+                                              ].macaddress }}'
+      --local-link-connection switch_info='{{ bridge }}'
+      --local-link-connection port_id='{{ source_interface
+                                           | source_to_ovs_link_name }}'

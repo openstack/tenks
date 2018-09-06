@@ -51,6 +51,8 @@ class ActionModule(ActionBase):
         for typ, cnt in six.iteritems(task_vars['specs']):
             for _ in six.moves.range(cnt):
                 node = deepcopy(task_vars['node_types'][typ])
+                # Set the type, for future reference.
+                node['type'] = typ
                 # Sequentially number the node and volume names.
                 node['name'] = "%s%d" % (task_vars['node_name_prefix'], idx)
                 for vol_idx, vol in enumerate(node['volumes']):
