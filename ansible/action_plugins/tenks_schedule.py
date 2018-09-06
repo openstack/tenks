@@ -31,8 +31,7 @@ class ActionModule(ActionBase):
         The following task vars are accepted:
             :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
                               by hypervisor hostname. Required.
-            :specs: A dict mapping node type names to the number of nodes
-                    required of that type. Required.
+            :specs: A list of node specifications to be instantiated. Required.
             :node_types: A dict mapping node type names to a dict of properties
                          of that type.
             :node_name_prefix: A string with which to prefix all sequential
@@ -48,7 +47,15 @@ class ActionModule(ActionBase):
 
         nodes = []
         idx = 0
-        for typ, cnt in six.iteritems(task_vars['specs']):
+        for spec in task_vars['specs']:
+            try:
+                typ = spec['type']
+                cnt = spec['count']
+            except KeyError:
+                e = ("All specs must contain a `type` and a `count`. "
+                     "Offending spec: %s" % spec)
+                raise AnsibleActionFail(to_text(e))
+
             for _ in six.moves.range(cnt):
                 node = deepcopy(task_vars['node_types'][typ])
                 # Set the type, for future reference.

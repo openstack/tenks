@@ -7,9 +7,11 @@
   tasks:
     - name: Check that all specified node types exist
       fail:
-        msg: The non-existent node type {{ item }} was specified in 'specs'.
-      when: item not in node_types
-      loop: "{{ specs.keys() }}"
+        msg: >
+          The non-existent node type {{ item.type }} was specified in
+          'specs'.
+      when: item.type not in node_types
+      loop: "{{ specs }}"
 
     # Creates a dict mapping each hypervisor's hostname to its hostvars, to be
     # used during scheduling.
