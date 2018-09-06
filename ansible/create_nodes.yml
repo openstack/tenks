@@ -1,0 +1,24 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Load allocations from file
+      include_vars:
+        file: "{{ allocations_file_path }}"
+        name: allocations
+
+- hosts: libvirt
+  vars:
+    nodes: >-
+      {{ hostvars.localhost.allocations.result[inventory_hostname]
+           | default([]) }}
+  tasks:
+    - name: Create VM
+      include_role:
+        name: stackhpc.libvirt-vm
+      vars:
+        libvirt_vm_default_console_log_dir: "{{ log_directory }}"
+        # Configure VM definitions for the Libvirt provider.
+        libvirt_vms: >-
+          {{ nodes | map('set_libvirt_interfaces')
+                   | map('set_libvirt_volume_pool')
+                   | list }}

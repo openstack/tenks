@@ -1,28 +1,34 @@
 ---
-- name: Check that all specified node types exist
-  fail:
-    msg: The non-existent node type {{ item }} was specified in 'specs'.
-  when: item not in node_types
-  loop: "{{ specs.keys() }}"
+# Ensure we have facts about all hypervisors before scheduling begins.
+- hosts: hypervisors
+  gather_facts: true
 
-# Creates a dict mapping each hypervisor's hostname to its hostvars, to be used
-# during scheduling.
-- name: Collect hypervisor hostvars
-  set_fact:
-    hypervisor_vars: >-
-      {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
-  loop: "{{ groups['hypervisors'] }}"
+- hosts: localhost
+  tasks:
+    - name: Check that all specified node types exist
+      fail:
+        msg: The non-existent node type {{ item }} was specified in 'specs'.
+      when: item not in node_types
+      loop: "{{ specs.keys() }}"
 
-- name: Schedule nodes to hypervisors
-  tenks_schedule:
-    hypervisor_vars: "{{ hypervisor_vars }}"
-    node_types: "{{ node_types }}"
-    specs: "{{ specs }}"
-  register: allocations
+    # Creates a dict mapping each hypervisor's hostname to its hostvars, to be
+    # used during scheduling.
+    - name: Collect hypervisor hostvars
+      set_fact:
+        hypervisor_vars: >-
+          {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
+      loop: "{{ groups['hypervisors'] }}"
 
-- name: Write node allocations to file
-  copy:
-    # tenks_schedule lookup plugin outputs a dict. Pretty-print this to persist
-    # it in a YAML file.
-    content: "{{ allocations.result | to_nice_yaml }}"
-    dest: "{{ allocations_file_path }}"
+    - name: Schedule nodes to hypervisors
+      tenks_schedule:
+        hypervisor_vars: "{{ hypervisor_vars }}"
+        node_types: "{{ node_types }}"
+        specs: "{{ specs }}"
+      register: allocations
+
+    - name: Write node allocations to file
+      copy:
+        # tenks_schedule lookup plugin outputs a dict. Pretty-print this to
+        # persist it in a YAML file.
+        content: "{{ allocations.result | to_nice_yaml }}"
+        dest: "{{ allocations_file_path }}"
