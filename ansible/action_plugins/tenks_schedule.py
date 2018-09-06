@@ -58,6 +58,9 @@ class ActionModule(ActionBase):
 
             for _ in six.moves.range(cnt):
                 node = deepcopy(task_vars['node_types'][typ])
+                # All nodes need a BMC type.
+                node.setdefault('bmc_type', task_vars['hostvars']['localhost'][
+                    'default_bmc_type'])
                 # Set the type, for future reference.
                 node['type'] = typ
                 # Sequentially number the node and volume names.

@@ -6,20 +6,22 @@
         file: "{{ allocations_file_path }}"
         name: allocations
 
-- hosts: libvirt
+- name: Perform Virtual BMC configuration
+  hosts: libvirt
   vars:
-    nodes: >-
+    vbmc_nodes: >-
       {{ hostvars.localhost.allocations[inventory_hostname]
-           | default([]) }}
+           | default([]) | selectattr('bmc_type', 'eq',
+                                      bmc_emulators.virtualbmc) | list }}
   tasks:
     - name: Check that enough ports are available for Virtual BMC
       fail:
         msg: >
-          {{ nodes | count }} nodes were specified to be added to Virtual BMC,
-          but only {{ ipmi_port_range_end - ipmi_port_range_start }} ports are
-          available for use by Virtual BMC.
+          {{ vbmc_nodes | count }} nodes were specified to be added to Virtual
+          BMC, but only {{ ipmi_port_range_end - ipmi_port_range_start }} ports
+          are available for use by Virtual BMC.
       when: >-
-          (nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
+          (vbmc_nodes | count) > (ipmi_port_range_end - ipmi_port_range_start)
 
     - name: Register domains with Virtual BMC
       include_role:
@@ -32,7 +34,7 @@
         vbmc_ipmi_port: "{{ ipmi_port_range_start + port_offset }}"
         vbmc_virtualenv_path: "{{ virtualenv_path }}"
         vbmc_log_directory: "{{ log_directory }}"
-      loop: "{{ nodes | map(attribute='name') | sort | list }}"
+      loop: "{{ vbmc_nodes | map(attribute='name') | sort | list }}"
       loop_control:
         loop_var: domain
         index_var: port_offset

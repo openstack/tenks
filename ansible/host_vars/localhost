@@ -83,7 +83,6 @@ default_bmc_type: ipmi
 # values can be overridden per-node.
 default_bmc_info:
   ipmi:
-    bmc_emulator: virtualbmc
     hardware_type: ipmi
     boot_interface: pxe
     deploy_interface: iscsi
@@ -91,9 +90,13 @@ default_bmc_info:
     power_interface: ipmitool
   # NOTE(w-miller): Redfish is not currently fully supported by Tenks.
   redfish:
-    bmc_emulator: sushy-tools
     hardware_type: redfish
     boot_interface: pxe
     deploy_interface: iscsi
     management_interface: redfish
     power_interface: redfish
+
+# Maps BMC emulation tools to the BMC type they support.
+bmc_emulators:
+  virtualbmc: ipmi
+  sushy-tools: redfish
