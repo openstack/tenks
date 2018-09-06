@@ -39,13 +39,6 @@
         deploy_ramdisk: "{{ ironic_deploy_ramdisk_uuid | default(omit, true) }}"
     name: "{{ node.name }}"
     nics: "{{ nics }}"
-    properties:
-      ram: "{{ node.memory_mb }}"
-      # FIXME(w-miller): Instead of assuming the first volume is the primary
-      # volume, make this configurable?
-      disk_size: >-
-        {{ (node.volumes.0.capacity | default('1')) | size_string_to_gb }}
-      cpus: "{{ node.vcpus }}"
   vars:
     # This module requires the openstacksdk package, which is installed within
     # our virtualenv.
