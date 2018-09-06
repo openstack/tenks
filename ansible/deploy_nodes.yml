@@ -1,0 +1,12 @@
+---
+- name: Schedule nodes
+  import_playbook: schedule.yml
+
+- name: Set up node networking
+  import_playbook: node_networking.yml
+
+- name: Create nodes
+  import_playbook: create_nodes.yml
+
+- name: Set up virtual node BMCs
+  import_playbook: bmc.yml

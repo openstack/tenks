@@ -36,3 +36,13 @@ veth_node_source_suffix: '-tap'
 
 # Directory in which to store Tenks logs.
 log_directory: /var/log/tenks/
+
+# The address on which VBMC will listen for node IPMI communication.
+ipmi_address: 0.0.0.0
+# The range of ports available for use for node IPMI communication.
+ipmi_port_range_start: 6230
+ipmi_port_range_end: 6240
+# The username to use for node IPMI communication.
+ipmi_username: username
+# The password to use for node IPMI communication.
+ipmi_password: password
