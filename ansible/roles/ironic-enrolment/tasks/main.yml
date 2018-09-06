@@ -16,3 +16,6 @@
   loop_control:
     loop_var: ironic_node
     index_var: port_offset
+  # If no ironic_config options were set, this means that enrolment should not
+  # be performed.
+  when: "'ironic_config' in ironic_node"

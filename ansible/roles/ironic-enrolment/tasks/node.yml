@@ -1,4 +1,11 @@
 ---
+- name: Check node has a resource class
+  fail:
+    msg: >
+      The `ironic_config` of node '{{ node }}' does not contain a
+      `resource_class`.
+  when: "'resource_class' not in node.ironic_config"
+
 - name: Get vNIC MAC addresses
   # The output format of this command gives two lines of header, followed by
   # (for each vNIC):
@@ -26,7 +33,9 @@
 - name: Create node in Ironic
   os_ironic:
     auth_type: password
-    driver: ipmi
+    driver: >-
+      {{ node.ironic_config.hardware_type | default(
+           default_bmc_info[node.bmc_type].hardware_type) }}
     driver_info:
       power:
         ipmi_address: "{{ hostvars[ironic_hypervisor].ipmi_address }}"
@@ -54,18 +63,30 @@
     '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance set
       '{{ created_node.uuid }}'
 
-# FIXME(w-miller): Make interfaces/driver configurable, for example to allow
-# use of Redfish instead of IPMI.
-- name: Set Ironic node resource class
+- name: Set additional Ironic node attributes
   command: >-
     '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set
       '{{ created_node.uuid }}'
-      --resource-class {{ node.type }}
-#        --boot-interface pxe
-#        --deploy-interface iscsi
-#        --management-interface ipmitool
-#        --network-interface neutron
-#        --power-interface ipmitool
+      --resource-class {{ node.ironic_config.resource_class }}
+        --boot-interface
+          {{ node.ironic_config.boot_interface | default(
+               default_bmc_info[node.bmc_type].boot_interface) }}
+        --deploy-interface
+          {{ node.ironic_config.deploy_interface | default(
+               default_bmc_info[node.bmc_type].deploy_interface) }}
+        --management-interface
+          {{ node.ironic_config.management_interface | default(
+               default_bmc_info[node.bmc_type].management_interface) }}
+        --power-interface
+          {{ node.ironic_config.power_interface | default(
+               default_bmc_info[node.bmc_type].power_interface) }}
+
+- name: Add Ironic node traits
+  command: >-
+    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node add trait
+      '{{ created_node.uuid }}'
+      {{ " ".join(node.ironic_config.traits) }}
+  when: node.ironic_config.traits | default([])
 
 - name: Set additional Ironic port attributes
   include_tasks: port.yml
