@@ -43,11 +43,14 @@ class ActionModule(ActionBase):
                   hostname of the hypervisor to which they are scheduled.
         """
         result = super(ActionModule, self).run(tmp, task_vars)
+        # Initialise our return dict.
+        result['result'] = {}
         del tmp  # tmp no longer has any effect
         self._validate_vars(task_vars)
 
         nodes = []
         idx = 0
+        hypervisor_names = task_vars['hypervisor_vars'].keys()
         for typ, cnt in six.iteritems(task_vars['specs']):
             for _ in six.moves.range(cnt):
                 node = deepcopy(task_vars['node_types'][typ])
@@ -59,12 +62,15 @@ class ActionModule(ActionBase):
                     vol['name'] = "%s%d" % (task_vars['vol_name_prefix'],
                                             vol_idx)
                 nodes.append(node)
+                # Perform round-robin scheduling with node index modulo number
+                # of hypervisors.
+                hyp_name = hypervisor_names[idx % len(hypervisor_names)]
+                try:
+                    result['result'][hyp_name].append(node)
+                except KeyError:
+                    # This hypervisor doesn't yet have any scheduled nodes.
+                    result['result'][hyp_name] = [node]
                 idx += 1
-
-        # TODO(w-miller): currently we just arbitrarily schedule all nodes to
-        # the first hypervisor. Improve this algorithm to make it more
-        # sophisticated.
-        result['result'] = {task_vars['hypervisor_vars'].keys()[0]: nodes}
         return result
 
     def _validate_vars(self, task_vars):

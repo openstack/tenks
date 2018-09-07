@@ -24,4 +24,5 @@
         name: virtualbmc-daemon
       vars:
         vbmcd_virtualenv_path: "{{ virtualenv_path }}"
-        vbmcd_python_upper_contraints_url: "{{ python_upper_constraints_url }}"
+        vbmcd_python_upper_constraints_url: >-
+          {{ python_upper_constraints_url }}

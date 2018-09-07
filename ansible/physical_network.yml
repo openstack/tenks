@@ -13,7 +13,8 @@
     source_type: direct
 
 - name: Get source interface details
-  command: ip -details link show {{ source_interface }}
+  # NOTE(w-miller): The `ip` command may not be in $PATH, so use the full path.
+  command: /usr/sbin/ip -details link show {{ source_interface }}
   register: if_details
   changed_when: false
 
@@ -69,6 +70,7 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_source_suffix }}
+      become: true
 
     - name: Create patch port on source bridge
       openvswitch_port:
@@ -79,9 +81,11 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_ovs_suffix }}
+      become: true
 
 - name: Plug source interface into Tenks bridge
   when: source_type == 'direct'
   openvswitch_port:
     bridge: "{{ tenks_bridge }}"
     port: "{{ source_interface }}"
+  become: true
