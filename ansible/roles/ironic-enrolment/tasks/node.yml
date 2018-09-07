@@ -67,18 +67,15 @@
     '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set
       '{{ created_node.uuid }}'
       --resource-class {{ node.ironic_config.resource_class }}
-        --boot-interface
-          {{ node.ironic_config.boot_interface | default(
-               default_interfaces[node.ironic_driver].boot_interface) }}
-        --deploy-interface
-          {{ node.ironic_config.deploy_interface | default(
-               default_interfaces[node.ironic_driver].deploy_interface) }}
-        --management-interface
-          {{ node.ironic_config.management_interface | default(
-               default_interfaces[node.ironic_driver].management_interface) }}
-        --power-interface
-          {{ node.ironic_config.power_interface | default(
-               default_interfaces[node.ironic_driver].power_interface) }}
+      {% for iface in ironic_interfaces %}
+        {% if (iface + '_interface') in node.ironic_config %}
+          --{{ iface }}-interface {{ node.ironic_config[iface + '_interface'] }}
+        {% endif %}
+      {% endfor %}
+      {% for key, val in (
+           node.ironic_config.properties | default({})).iteritems() %}
+        --property '{{ key }}={{ val }}'
+      {% endfor %}
 
 - name: Add Ironic node traits
   command: >-

@@ -41,13 +41,22 @@ node_types: {}
 #       resource_class: my_rc
 #       # Optional - defaults to [].
 #       traits: []
-#       # The following variables are all optional; if not set, a default will
-#       # be inferred from the `ironic_driver` specified by the node type
-#       # `type`.
+#       # A dict of key-value pairs to be set as properties on the Ironic
+#       # nodes. Can be used to set capabilities. Optional - defaults to {}.
+#       properties: {}
+#       # The following variables are all optional; if not set, Ironic's
+#       # default value will be used.
+#       bios_interface: no-bios
 #       boot_interface: pxe
+#       console_interface: ipmitool-socat
 #       deploy_interface: iscsi
+#       inspect_interface: inspector
 #       management_interface: ipmitool
+#       network_interface: neutron
 #       power_interface: ipmitool
+#       raid_interface: no-raid
+#       storage_interface: noop
+#       vendor_interface: ipmitool
 specs: []
 
 # nova_flavors is a list of Nova flavors to be created. Each flavor must
@@ -82,34 +91,6 @@ allocations_file_path: >-
 
 # The default Ironic driver of a node. Can be overridden per-node.
 default_ironic_driver: ipmi
-# Maps Ironic drivers to a dict containing default values for Ironic node
-# interfaces. Any of these values can be overridden per-node.
-default_interfaces:
-  ipmi:
-    bios_interface: no-bios
-    boot_interface: pxe
-    console_interface: ipmitool-socat
-    deploy_interface: iscsi
-    inspect_interface: inspector
-    management_interface: ipmitool
-    network_interface: neutron
-    power_interface: ipmitool
-    raid_interface: no-raid
-    storage_interface: noop
-    vendor_interface: ipmitool
-  # NOTE(w-miller): Redfish is not currently fully supported by Tenks.
-  redfish:
-    bios_interface: no-bios
-    boot_interface: pxe
-    console_interface: no-console
-    deploy_interface: iscsi
-    inspect_interface: inspector
-    management_interface: redfish
-    network_interface: neutron
-    power_interface: redfish
-    raid_interface: no-raid
-    storage_interface: noop
-    vendor_interface: no-vendor
 
 # Maps BMC emulation tools to the Ironic driver they support.
 bmc_emulators:
