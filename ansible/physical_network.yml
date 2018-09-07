@@ -13,7 +13,8 @@
     source_type: direct
 
 - name: Get source interface details
-  command: ip -details link show {{ source_interface }}
+  # NOTE(w-miller): The `ip` command may not be in $PATH, so use the full path.
+  command: /usr/sbin/ip -details link show {{ source_interface }}
   register: if_details
   changed_when: false
 
