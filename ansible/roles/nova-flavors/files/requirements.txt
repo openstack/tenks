@@ -1,0 +1,4 @@
+# This file contains the Python packages that are needed in the Tenks virtual
+# env.
+
+openstacksdk>=0.17.2 # Apache

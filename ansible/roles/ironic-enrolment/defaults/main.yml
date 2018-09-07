@@ -12,3 +12,16 @@ ironic_virtualenv_path:
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
 ironic_python_upper_constraints_url:
+# A list of the interfaces that can be configured on an Ironic node.
+ironic_interfaces:
+  - bios
+  - boot
+  - console
+  - deploy
+  - inspect
+  - management
+  - network
+  - power
+  - raid
+  - storage
+  - vendor

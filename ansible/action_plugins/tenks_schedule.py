@@ -31,8 +31,7 @@ class ActionModule(ActionBase):
         The following task vars are accepted:
             :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
                               by hypervisor hostname. Required.
-            :specs: A dict mapping node type names to the number of nodes
-                    required of that type. Required.
+            :specs: A list of node specifications to be instantiated. Required.
             :node_types: A dict mapping node type names to a dict of properties
                          of that type.
             :node_name_prefix: A string with which to prefix all sequential
@@ -48,12 +47,22 @@ class ActionModule(ActionBase):
         del tmp  # tmp no longer has any effect
         self._validate_vars(task_vars)
 
-        nodes = []
         idx = 0
         hypervisor_names = task_vars['hypervisor_vars'].keys()
-        for typ, cnt in six.iteritems(task_vars['specs']):
+        for spec in task_vars['specs']:
+            try:
+                typ = spec['type']
+                cnt = spec['count']
+            except KeyError:
+                e = ("All specs must contain a `type` and a `count`. "
+                     "Offending spec: %s" % spec)
+                raise AnsibleActionFail(to_text(e))
             for _ in six.moves.range(cnt):
                 node = deepcopy(task_vars['node_types'][typ])
+                # All nodes need an Ironic driver.
+                node.setdefault('ironic_driver',
+                                task_vars['hostvars']['localhost'][
+                                    'default_ironic_driver'])
                 # Set the type, for future reference.
                 node['type'] = typ
                 # Sequentially number the node and volume names.
@@ -61,7 +70,11 @@ class ActionModule(ActionBase):
                 for vol_idx, vol in enumerate(node['volumes']):
                     vol['name'] = "%s%d" % (task_vars['vol_name_prefix'],
                                             vol_idx)
-                nodes.append(node)
+                try:
+                    node['ironic_config'] = spec['ironic_config']
+                except KeyError:
+                    # Ironic config is not mandatory.
+                    pass
                 # Perform round-robin scheduling with node index modulo number
                 # of hypervisors.
                 hyp_name = hypervisor_names[idx % len(hypervisor_names)]

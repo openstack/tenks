@@ -1,0 +1,11 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Register Nova flavors
+      include_role:
+        name: nova-flavors
+      vars:
+        flavors_virtualenv_path: "{{ virtualenv_path }}"
+        flavors_python_upper_constraints_url: >-
+          {{ python_upper_constraints_url }}
+        flavors: "{{ nova_flavors }}"

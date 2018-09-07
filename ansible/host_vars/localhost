@@ -1,7 +1,4 @@
 ---
-allocations_file_path: >-
-    {{ '/'.join([(playbook_dir | dirname), 'allocations.yml']) }}
-
 # node_types is a dict that defines different sets of node specifications,
 # keyed by a 'node type name' to associate with each set of specifications. An
 # example of the format of this variable is below:
@@ -21,19 +18,81 @@ allocations_file_path: >-
 #     # vars.
 #     physical_networks:
 #       - physnet1
+#     # The Ironic driver for nodes of this type. If not set,
+#     # `default_ironic_driver` will be used.
+#     ironic_driver: ipmi
 node_types: {}
 
-# specs is a dict that maps different node type names (define in `node_types`
-# above) to the number of nodes of that type that are to be created. Only node
-# types which you want to create nodes from need be keyed here. For example:
+# specs is a list of configurations of nodes to be created. Each configuration
+# can specify the number of nodes to be created, the type (from `node_types`)
+# of these nodes, and optionally configuration for the Ironic nodes to be
+# enroled from these nodes. If `ironic_config` is not set, Ironic enrolment
+# will be skipped for that spec.
+# For example:
 #
 # specs:
-#   # Create four nodes with the specifications defined in `node_types` by
-#   # 'type0'.
-#   type0: 4
-specs: {}
+#     # Required.
+#   - type: type0
+#     # Required.
+#     count: 4
+#     # Optional.
+#     ironic_config:
+#       # Required.
+#       resource_class: my_rc
+#       # Optional - defaults to [].
+#       traits: []
+#       # A dict of key-value pairs to be set as properties on the Ironic
+#       # nodes. Can be used to set capabilities. Optional - defaults to {}.
+#       properties: {}
+#       # The following variables are all optional; if not set, Ironic's
+#       # default value will be used.
+#       bios_interface: no-bios
+#       boot_interface: pxe
+#       console_interface: ipmitool-socat
+#       deploy_interface: iscsi
+#       inspect_interface: inspector
+#       management_interface: ipmitool
+#       network_interface: neutron
+#       power_interface: ipmitool
+#       raid_interface: no-raid
+#       storage_interface: noop
+#       vendor_interface: ipmitool
+specs: []
+
+# nova_flavors is a list of Nova flavors to be created. Each flavor must
+# specify the resource class it is associated with, as well as the Tenks node
+# type whose hardware specs should be used.
+# For example:
+#
+# nova_flavors:
+#     # Required.
+#   - resource_class: my_rc
+#     # Required.
+#     node_type: type0
+#     # Defaults to `resource_class`.
+#     name: my_flavor
+#     # Optional, defaults to [].
+#     required_traits: []
+#     # Optional, defaults to [].
+#     forbidden_traits: []
+#     # Extra key-value pairs to add to the flavor's specs. Optional, defaults
+#     # to {}.
+#     custom_specs: {}
+nova_flavors: []
 
 # The Glance UUID of the image to use for the deployment kernel.
 deploy_kernel_uuid:
 # The Glance UUID of the image to use for the deployment ramdisk.
 deploy_ramdisk_uuid:
+
+
+allocations_file_path: >-
+    {{ '/'.join([(playbook_dir | dirname), 'allocations.yml']) }}
+
+# The default Ironic driver of a node. Can be overridden per-node.
+default_ironic_driver: ipmi
+
+# Maps BMC emulation tools to the Ironic driver they support.
+bmc_emulators:
+  virtualbmc: ipmi
+  sushy-tools: redfish
