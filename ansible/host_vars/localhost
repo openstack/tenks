@@ -18,9 +18,9 @@
 #     # vars.
 #     physical_networks:
 #       - physnet1
-#     # The BMC type for nodes of this type. If not set, `default_bmc_type`
-#     # will be used.
-#     bmc_type: ipmi
+#     # The Ironic driver for nodes of this type. If not set,
+#     # `default_ironic_driver` will be used.
+#     ironic_driver: ipmi
 node_types: {}
 
 # specs is a list of configurations of nodes to be created. Each configuration
@@ -42,8 +42,8 @@ node_types: {}
 #       # Optional - defaults to [].
 #       traits: []
 #       # The following variables are all optional; if not set, a default will
-#       # be inferred from the `bmc_type` specified by the node type `type`.
-#       hardware_type: ipmi
+#       # be inferred from the `ironic_driver` specified by the node type
+#       # `type`.
 #       boot_interface: pxe
 #       deploy_interface: iscsi
 #       management_interface: ipmitool
@@ -80,14 +80,12 @@ deploy_ramdisk_uuid:
 allocations_file_path: >-
     {{ '/'.join([(playbook_dir | dirname), 'allocations.yml']) }}
 
-# The default BMC type of a node. Can be overridden per-node.
-default_bmc_type: ipmi
-# Maps BMC types to a dict containing default values for Ironic node
-# interfaces, a hardware type, and a BMC emulation tool to use. Any of these
-# values can be overridden per-node.
-default_bmc_info:
+# The default Ironic driver of a node. Can be overridden per-node.
+default_ironic_driver: ipmi
+# Maps Ironic drivers to a dict containing default values for Ironic node
+# interfaces. Any of these values can be overridden per-node.
+default_interfaces:
   ipmi:
-    hardware_type: ipmi
     boot_interface: pxe
     deploy_interface: iscsi
     management_interface: ipmitool
@@ -100,7 +98,7 @@ default_bmc_info:
     management_interface: redfish
     power_interface: redfish
 
-# Maps BMC emulation tools to the BMC type they support.
+# Maps BMC emulation tools to the Ironic driver they support.
 bmc_emulators:
   virtualbmc: ipmi
   sushy-tools: redfish

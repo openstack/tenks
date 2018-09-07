@@ -34,8 +34,7 @@
   os_ironic:
     auth_type: password
     driver: >-
-      {{ node.ironic_config.hardware_type | default(
-           default_bmc_info[node.bmc_type].hardware_type) }}
+      {{ node.ironic_config.ironic_driver | default(default_ironic_driver) }}
     driver_info:
       power:
         ipmi_address: "{{ hostvars[ironic_hypervisor].ipmi_address }}"
@@ -70,16 +69,16 @@
       --resource-class {{ node.ironic_config.resource_class }}
         --boot-interface
           {{ node.ironic_config.boot_interface | default(
-               default_bmc_info[node.bmc_type].boot_interface) }}
+               default_interfaces[node.ironic_driver].boot_interface) }}
         --deploy-interface
           {{ node.ironic_config.deploy_interface | default(
-               default_bmc_info[node.bmc_type].deploy_interface) }}
+               default_interfaces[node.ironic_driver].deploy_interface) }}
         --management-interface
           {{ node.ironic_config.management_interface | default(
-               default_bmc_info[node.bmc_type].management_interface) }}
+               default_interfaces[node.ironic_driver].management_interface) }}
         --power-interface
           {{ node.ironic_config.power_interface | default(
-               default_bmc_info[node.bmc_type].power_interface) }}
+               default_interfaces[node.ironic_driver].power_interface) }}
 
 - name: Add Ironic node traits
   command: >-

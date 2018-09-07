@@ -11,7 +11,7 @@
   vars:
     vbmc_nodes: >-
       {{ hostvars.localhost.allocations[inventory_hostname]
-           | default([]) | selectattr('bmc_type', 'eq',
+           | default([]) | selectattr('ironic_driver', 'eq',
                                       bmc_emulators.virtualbmc) | list }}
   tasks:
     - name: Check that enough ports are available for Virtual BMC
