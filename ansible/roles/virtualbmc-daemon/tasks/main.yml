@@ -6,9 +6,19 @@
   loop: "{{ vbmcd_packages }}"
   become: true
 
+# This is useful to get a uniquely generated temporary path.
+- name: Create temporary file for pip requirements
+  tempfile:
+  register: req_file
+
+- name: Copy requirements file to temporary location
+  copy:
+    src: requirements.txt
+    dest: "{{ req_file.path }}"
+
 - name: Ensure Python requirements are installed
   pip:
-    requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"
+    requirements: "{{ req_file.path }}"
     extra_args: >-
       -c {{ vbmcd_python_upper_constraints_url }}
     virtualenv: "{{ vbmcd_virtualenv_path }}"
