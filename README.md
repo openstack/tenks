@@ -15,4 +15,18 @@ installed inside it, Tenks' role dependencies can be installed by
 
 Currently, Tenks does not have a CLI or wrapper. A virtual cluster can be
 deployed by configuring the variables defined in `group_vars/*` as necessary,
-then calling `ansible-playbook --inventory ansible/inventory ansible/deploy.yml`.
+then calling
+`ansible-playbook --inventory ansible/inventory ansible/deploy.yml`. Individual
+sections of Tenks can be run separately by substituting `ansible/deploy.yml` in
+the command above with the path to the playbook you want to run. The current
+playbooks can be seen in the Ansible structure diagram in the *Development*
+section.
+
+Development
+-----------
+
+A diagram representing the Ansible structure of Tenks can be seen below. Blue
+rectangles represent playbooks, green rounded rectangles represent task books,
+red ellipses represent roles and yellow rhombi represent action plugins.
+
+![Tenks Ansible structure](assets/tenks_ansible_structure.png)
