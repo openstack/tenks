@@ -86,17 +86,30 @@ default_ironic_driver: ipmi
 # interfaces. Any of these values can be overridden per-node.
 default_interfaces:
   ipmi:
+    bios_interface: no-bios
     boot_interface: pxe
+    console_interface: ipmitool-socat
     deploy_interface: iscsi
+    inspect_interface: inspector
     management_interface: ipmitool
+    network_interface: neutron
     power_interface: ipmitool
+    raid_interface: no-raid
+    storage_interface: noop
+    vendor_interface: ipmitool
   # NOTE(w-miller): Redfish is not currently fully supported by Tenks.
   redfish:
-    hardware_type: redfish
+    bios_interface: no-bios
     boot_interface: pxe
+    console_interface: no-console
     deploy_interface: iscsi
+    inspect_interface: inspector
     management_interface: redfish
+    network_interface: neutron
     power_interface: redfish
+    raid_interface: no-raid
+    storage_interface: noop
+    vendor_interface: no-vendor
 
 # Maps BMC emulation tools to the Ironic driver they support.
 bmc_emulators:
