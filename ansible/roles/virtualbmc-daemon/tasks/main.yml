@@ -10,7 +10,7 @@
   pip:
     requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"
     extra_args: >-
-      -c {{ vbmcd_python_upper_contraints_url }}
+      -c {{ vbmcd_python_upper_constraints_url }}
     virtualenv: "{{ vbmcd_virtualenv_path }}"
 
 - name: Ensure Virtual BMC systemd service is configured
