@@ -22,23 +22,33 @@
         #   * Add required and forbidden traits.
         #   * Add any custom specs from the user.
         extra_specs: >-
-          {{ {
-            "resources:DISK_GB": 0,
-            "resources:MEMORY_MB": 0,
-            "resources:VCPU": 0,
-            "resources:CUSTOM_" ~ (
-              item.resource_class | upper
-                | regex_replace('[^A-Za-z0-9]', '_')): 1
-             }
-             | combine(dict(item.required_traits | default([])
-                       | map('regex_replace', '(.*)', 'trait:\1')
-                       | zip_longest([], fillvalue='required')))
-             | combine(dict(item.forbidden_traits | default([])
-                       | map('regex_replace', '(.*)', 'trait:\1')
-                       | zip_longest([], fillvalue='forbidden')))
-             | combine(item.custom_specs | default({}))
+          {{ hw_specs
+               | combine(resource_class)
+               | combine(required_traits)
+               | combine(forbidden_traits)
+               | combine(item.custom_specs | default({}))
           }}
       vars:
+        hw_specs:
+          "resources:DISK_GB": 0
+          "resources:MEMORY_MB": 0
+          "resources:VCPU": 0
+        resource_class: >-
+          {{ {
+              "resources:CUSTOM_" ~ (
+                item.resource_class | upper
+                  | regex_replace('[^A-Z0-9]', '_')): 1
+             } }}
+        required_traits: >-
+          {{ dict(item.required_traits
+                    | default([])
+                    | map('regex_replace', '(.*)', 'trait:\1')
+                    | zip_longest([], fillvalue='required')) }}
+        forbidden_traits: >-
+          {{ dict(item.forbidden_traits
+                   | default([])
+                   | map('regex_replace', '(.*)', 'trait:\1')
+                   | zip_longest([], fillvalue='forbidden')) }}
         ansible_python_interpreter: >-
           {{ '/'.join([flavors_virtualenv_path, 'bin', 'python']) }}
       loop: "{{ flavors }}"
