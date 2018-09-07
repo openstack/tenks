@@ -70,6 +70,7 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_source_suffix }}
+      become: true
 
     - name: Create patch port on source bridge
       openvswitch_port:
@@ -80,9 +81,11 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_ovs_suffix }}
+      become: true
 
 - name: Plug source interface into Tenks bridge
   when: source_type == 'direct'
   openvswitch_port:
     bridge: "{{ tenks_bridge }}"
     port: "{{ source_interface }}"
+  become: true
