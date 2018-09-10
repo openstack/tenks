@@ -45,6 +45,7 @@
       --username '{{ vbmc_ipmi_username }}'
       --password '{{ vbmc_ipmi_password }}'
       --address {{ vbmc_ipmi_address }}
+  when: vbmc_state == 'present'
   become: true
   tags:
     - skip_ansible_lint
@@ -56,6 +57,7 @@
   # Retry a few times in case the VBMC daemon has been slow to process the last
   # few commands.
   until: res is succeeded
+  when: vbmc_state == 'present'
   become: true
   tags:
     - skip_ansible_lint

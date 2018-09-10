@@ -1,7 +1,9 @@
 Virtual BMC Domain
 ==================
 
-This role ensures a Libvirt domain is added to and started in Virtual BMC.
+This role configures a Libvirt domain in Virtual BMC. If `vbmc_state` is
+`present`, it will ensure the domain is added and started; if `vbmc_state` is
+`absent`, it will ensure the domain is stopped and deleted.
 
 Requirements
 ------------
@@ -22,3 +24,5 @@ Role Variables
 - `vbmc_ipmi_password`: The IPMI password that Virtual BMC will use.
 - `vbmc_log_directory`: The directory in which to store Virtual BMC logs. If
    not overridden from `None`, output will not be logged to a file.
+- `vbmc_state`: Whether the domain should be `present` or `absent` in Virtual
+  BMC. Defaults to `present`.

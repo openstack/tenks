@@ -13,3 +13,5 @@ vbmc_domain:
 vbmc_log_directory:
 # The path to the virtualenv in which Virtual BMC is installed.
 vbmc_virtualenv_path:
+# Whether the domain should be `present` or `absent` in Virtual BMC.
+vbmc_state: present
