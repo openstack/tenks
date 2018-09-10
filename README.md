@@ -1,14 +1,11 @@
-Tenks
-=====
+# Tenks
 
 Tenks is a utility that manages virtual bare metal clusters for development and
 testing purposes.
 
-Getting Started
----------------
+## Getting Started
 
-Pre-Requisites
-^^^^^^^^^^^^^^
+### Pre-Requisites
 
 Tenks has dependencies on Ansible roles that are hosted by Ansible Galaxy.
 Given that your virtualenv of choice is active and Ansible (>=2.6) is
@@ -16,8 +13,7 @@ installed inside it, Tenks' role dependencies can be installed by
 `ansible-galaxy install --role-file=requirements.yml
 --roles-path=ansible/roles/`.
 
-Configuration
-^^^^^^^^^^^^^
+### Configuration
 
 An override file should be created to configure Tenks. Any variables specified
 in this file will take precedence over their default settings in Tenks. This
@@ -45,8 +41,7 @@ required for different hosts, you will need to individually specify them: for a
 host with hostname *myhost*, set `physnet_mappings` within the file
 `ansible/host_vars/myhost`.
 
-Deployment
-^^^^^^^^^^
+### Deployment
 
 Currently, Tenks does not have a CLI or wrapper. A virtual cluster can be
 deployed by calling
@@ -58,8 +53,7 @@ substituting `ansible/deploy.yml` in the command above with the path to the
 playbook you want to run. The current playbooks can be seen in the Ansible
 structure diagram in the *Development* section.
 
-Development
------------
+## Development
 
 A diagram representing the Ansible structure of Tenks can be seen below. Blue
 rectangles represent playbooks, green rounded rectangles represent task books,
