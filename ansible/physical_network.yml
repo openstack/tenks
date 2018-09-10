@@ -72,10 +72,12 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_source_suffix }}
-        state: "{{ state }}"
+      # If 'absent', we've already deleted the bridge earlier, so no need to
+      # delete the port.
+      when: state != 'absent'
       become: true
 
-    - name: Create patch port on source bridge
+    - name: Configure patch port on source bridge
       openvswitch_port:
         bridge: "{{ source_interface }}"
         port: "{{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}"
@@ -87,10 +89,13 @@
         state: "{{ state }}"
       become: true
 
-- name: Ensure source interface plugged state in Tenks bridge is correct
+- name: Plug source interface into Tenks bridge
   when: source_type == 'direct'
   openvswitch_port:
     bridge: "{{ tenks_bridge }}"
     port: "{{ source_interface }}"
     state: "{{ state }}"
+  # If 'absent', we've already deleted the bridge earlier, so no need to unplug
+  # the interface.
+  when: state != 'absent'
   become: true
