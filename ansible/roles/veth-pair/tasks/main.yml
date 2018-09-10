@@ -1,8 +1,2 @@
 ---
-- name: Ensure veth pair is absent
-  include_tasks: absent.yml
-  when: veth_pair_state == 'absent'
-
-- name: Ensure veth pair is present
-  include_tasks: present.yml
-  when: veth_pair_state != 'absent'
+- include_tasks: "{{ veth_pair_state }}.yml"

@@ -1,11 +1,4 @@
 ---
-- name: Unplug veth from OVS bridge
-  openvswitch_port:
-    bridge: "{{ veth_pair_ovs_bridge }}"
-    port: "{{ veth_pair_ovs_link_name }}"
-    state: absent
-  become: true
-
 - name: Unplug veth from source bridge
   command: >-
     brctl delif {{ veth_pair_source_bridge }}
