@@ -6,31 +6,38 @@
       `resource_class`.
   when: "'resource_class' not in node.ironic_config"
 
-- name: Get vNIC MAC addresses
-  # The output format of this command gives two lines of header, followed by
-  # (for each vNIC):
-  # <name> <type> <source interface> <model> <MAC>
-  # The VMs will have been created with the virt module, using become: true.
-  # This targets /bin/virsh rather than /usr/bin/virsh.
-  command: /bin/virsh domiflist '{{ node.name }}'
-  register: iflist_res
-  changed_when: false
-  become: true
-  delegate_to: "{{ ironic_hypervisor }}"
-  run_once: true
+- name: Collect domain NIC MAC addresses
+  block:
+    - name: Get vNIC MAC addresses
+      # The output format of this command gives two lines of header, followed by
+      # (for each vNIC):
+      # <name> <type> <source interface> <model> <MAC>
+      # The VMs will have been created with the virt module, using become: true.
+      # This targets /bin/virsh rather than /usr/bin/virsh.
+      command: /bin/virsh domiflist '{{ node.name }}'
+      register: iflist_res
+      changed_when: false
+      become: true
+      delegate_to: "{{ ironic_hypervisor }}"
+      run_once: true
 
-# We need to do this for each run to ensure other nodes' NICs don't carry over
-# to this run.
-- name: Reset list of NICs
-  set_fact:
-    nics: []
+    # We need to do this for each run to ensure other nodes' NICs don't carry over
+    # to this run.
+    - name: Reset list of NICs
+      set_fact:
+        nics: []
 
-- name: Collect MAC addresses into NIC list
-  set_fact:
-    nics: "{{ nics | union([{'mac': item.split()[4]}]) }}"
-  loop: "{{ iflist_res.stdout_lines[2:] }}"
+    - name: Collect MAC addresses into NIC list
+      set_fact:
+        nics: "{{ nics | union([{'mac': item.split()[4]}]) }}"
+      loop: "{{ iflist_res.stdout_lines[2:] }}"
+      when: node.state == 'present'
 
-- name: Create node in Ironic
+  # If the node's state is 'absent', the domain will already have been
+  # destroyed.
+  when: node.state == 'present'
+
+- name: Configure node in Ironic
   os_ironic:
     auth_type: password
     driver: >-
@@ -46,55 +53,61 @@
         deploy_kernel: "{{ ironic_deploy_kernel_uuid | default(omit, true) }}"
         deploy_ramdisk: "{{ ironic_deploy_ramdisk_uuid | default(omit, true) }}"
     name: "{{ node.name }}"
-    nics: "{{ nics }}"
+    # The 'nics' list can be empty without a problem if state is 'absent'.
+    nics: "{{ nics | default([]) }}"
+    state: "{{ node.state }}"
   vars:
     # This module requires the openstacksdk package, which is installed within
     # our virtualenv.
     ansible_python_interpreter: >-
       {{ '/'.join([ironic_virtualenv_path, 'bin', 'python']) }}
-  register: created_node
+  register: node_res
 
-# The os_ironic module automatically brings the node from 'enrol' to
-# 'available' state, but we still need to set more port and node attributes.
-# Use maintenance mode to do this.
-- name: Put Ironic node into maintenance mode
-  command: >-
-    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance set
-      '{{ created_node.uuid }}'
+- name: Perform node and port attribute manipulation
+  block:
+    # The os_ironic module automatically brings the node from 'enrol' to
+    # 'available' state, but we still need to set more port and node attributes.
+    # Use maintenance mode to do this.
+    - name: Put Ironic node into maintenance mode
+      command: >-
+        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance set
+          '{{ node_res.uuid }}'
 
-- name: Set additional Ironic node attributes
-  command: >-
-    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set
-      '{{ created_node.uuid }}'
-      --resource-class {{ node.ironic_config.resource_class }}
-      {% for iface in ironic_interfaces %}
-        {% if (iface + '_interface') in node.ironic_config %}
-          --{{ iface }}-interface {{ node.ironic_config[iface + '_interface'] }}
-        {% endif %}
-      {% endfor %}
-      {% for key, val in (
-           node.ironic_config.properties | default({})).iteritems() %}
-        --property '{{ key }}={{ val }}'
-      {% endfor %}
+    - name: Set additional Ironic node attributes
+      command: >-
+        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set
+          '{{ node_res.uuid }}'
+          --resource-class {{ node.ironic_config.resource_class }}
+          {% for iface in ironic_interfaces %}
+            {% if (iface + '_interface') in node.ironic_config %}
+              --{{ iface }}-interface {{ node.ironic_config[iface + '_interface'] }}
+            {% endif %}
+          {% endfor %}
+          {% for key, val in (
+               node.ironic_config.properties | default({})).iteritems() %}
+            --property '{{ key }}={{ val }}'
+          {% endfor %}
 
-- name: Add Ironic node traits
-  command: >-
-    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node add trait
-      '{{ created_node.uuid }}'
-      {{ " ".join(node.ironic_config.traits) }}
-  when: node.ironic_config.traits | default([])
+    - name: Add Ironic node traits
+      command: >-
+        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node add trait
+          '{{ node_res.uuid }}'
+          {{ " ".join(node.ironic_config.traits) }}
+      when: node.ironic_config.traits | default([])
 
-- name: Set additional Ironic port attributes
-  include_tasks: port.yml
-  vars:
-    source_interface: "{{ vnic.split()[2] }}"
-    mac: "{{ vnic.split()[4] }}"
-  # Loop over each NIC.
-  loop: "{{ iflist_res.stdout_lines[2:] }}"
-  loop_control:
-    loop_var: vnic
+    - name: Set additional Ironic port attributes
+      include_tasks: port.yml
+      vars:
+        source_interface: "{{ vnic.split()[2] }}"
+        mac: "{{ vnic.split()[4] }}"
+      # Loop over each NIC.
+      loop: "{{ iflist_res.stdout_lines[2:] }}"
+      loop_control:
+        loop_var: vnic
 
-- name: Bring Ironic node out of maintenance mode
-  command: >-
-    '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance
-      unset '{{ created_node.uuid }}'
+    - name: Bring Ironic node out of maintenance mode
+      command: >-
+        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance
+          unset '{{ node_res.uuid }}'
+
+  when: node.state == 'present'
