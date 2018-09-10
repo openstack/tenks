@@ -6,7 +6,7 @@
           -c {{ flavors_python_upper_constraints_url }}
         virtualenv: "{{ flavors_virtualenv_path }}"
 
-    - name: Register Nova flavors
+    - name: Configure Nova flavors
       os_nova_flavor:
         auth_type: password
         name: "{{ item.name | default(item.resource_class) }}"
@@ -28,6 +28,7 @@
                | combine(forbidden_traits)
                | combine(item.custom_specs | default({}))
           }}
+        state: "{{ flavors_state }}"
       vars:
         hw_specs:
           "resources:DISK_GB": 0

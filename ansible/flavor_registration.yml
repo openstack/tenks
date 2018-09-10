@@ -1,7 +1,7 @@
 ---
 - hosts: localhost
   tasks:
-    - name: Register Nova flavors
+    - name: Configure Nova flavors
       include_role:
         name: nova-flavors
       vars:
@@ -9,3 +9,4 @@
         flavors_python_upper_constraints_url: >-
           {{ python_upper_constraints_url }}
         flavors: "{{ nova_flavors }}"
+        flavors_state: "{{ 'absent' if cmd == 'teardown' else 'present' }}"

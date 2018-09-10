@@ -23,3 +23,5 @@ flavors_virtualenv_path:
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
 flavors_python_upper_constraints_url:
+# Whether the specified flavors should be `present` or `absent`.
+flavors_state: present
