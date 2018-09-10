@@ -90,12 +90,13 @@
       become: true
 
 - name: Plug source interface into Tenks bridge
-  when: source_type == 'direct'
   openvswitch_port:
     bridge: "{{ tenks_bridge }}"
     port: "{{ source_interface }}"
     state: "{{ state }}"
-  # If 'absent', we've already deleted the bridge earlier, so no need to unplug
-  # the interface.
-  when: state != 'absent'
+  when:
+    - source_type == 'direct'
+    # If 'absent', we've already deleted the bridge earlier, so no need to
+    # unplug the interface.
+    - state != 'absent'
   become: true
