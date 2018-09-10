@@ -1,45 +1,31 @@
 ---
-- name: Ensure general system requirements are installed
-  yum:
-    name: "{{ system_requirements }}"
-  become: true
+- hosts: hypervisors
+  tasks:
+    - include_tasks: hypervisor_setup.yml
 
-- name: Ensure log directory exists
-  file:
-    path: "{{ log_directory }}"
-    state: directory
-  become: true
+- hosts: libvirt
+  tasks:
+    - block:
+        - name: Configure host for Libvirt
+          include_role:
+            name: stackhpc.libvirt-host
+          vars:
+            libvirt_host_pools:
+              - name: "{{ libvirt_pool_name }}"
+                type: "{{ libvirt_pool_type }}"
+                capacity: "{{ libvirt_pool_capacity }}"
+                path: "{{ libvirt_pool_path }}"
+                mode: "{{ libvirt_pool_mode }}"
+                owner: "{{ libvirt_pool_owner }}"
+                group: "{{ libvirt_pool_group }}"
+            libvirt_host_require_vt: "{{ libvirt_require_vt }}"
 
-- name: Check if ovs-vsctl command is present
-  command: ovs-vsctl --version
-  register: ovs_vsctl_check
-  failed_when: false
-  changed_when: false
+        - name: Set up Virtual BMC daemon
+          include_role:
+            name: virtualbmc-daemon
+          vars:
+            vbmcd_virtualenv_path: "{{ virtualenv_path }}"
+            vbmcd_python_upper_constraints_url: >-
+              {{ python_upper_constraints_url }}
 
-- block:
-    - name: Ensure Open vSwitch package is installed
-      yum:
-        name: openvswitch
-      become: true
-
-    - name: Ensure Open vSwitch is started and enabled
-      service:
-        name: openvswitch
-        state: running
-        enabled: true
-      become: true
-  # Assume a non-zero return code means the command does not exist. Do this
-  # check to avoid installing Open vSwitch system-wide if the command already
-  # exists as a link to a containerised version of OVS.
-  when: ovs_vsctl_check.rc != 0
-
-- name: Configure physical networks
-  include_tasks: physical_network.yml
-  vars:
-    network_name: "{{ item.0 }}"
-    tenks_bridge: "{{ bridge_prefix ~ idx }}"
-    source_interface: "{{ item.1 }}"
-  # Sort to ensure we always enumerate in the same order.
-  loop: "{{ physnet_mappings | dictsort }}"
-  loop_control:
-    index_var: idx
+      when: cmd == 'deploy'

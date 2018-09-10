@@ -1,4 +1,8 @@
 ---
+# The Tenks command to perform. 'deploy' will spin up a cluster to the given
+# specification; 'teardown' will tear it down.
+cmd: deploy
+
 # node_types is a dict that defines different sets of node specifications,
 # keyed by a 'node type name' to associate with each set of specifications. An
 # example of the format of this variable is below:

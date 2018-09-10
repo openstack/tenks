@@ -38,12 +38,13 @@
 
 
 ### Actual configuration starts here.
-- name: Ensure Open vSwitch bridge exists
+- name: Ensure Open vSwitch bridge is in the correct state
   openvswitch_bridge:
     bridge: "{{ tenks_bridge }}"
+    state: "{{ state }}"
   become: true
 
-- name: Connect to existing Linux bridge
+- name: Configure existing Linux bridge
   when: source_type == 'linux_bridge'
   include_role:
     name: veth-pair
@@ -54,12 +55,13 @@
     veth_pair_source_bridge: "{{ source_interface }}"
     veth_pair_source_link_name: >-
       {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
-    plug_into_source: true
+    veth_pair_plug_into_source: true
+    veth_pair_state: "{{ state }}"
 
-- name: Connect to existing Open vSwitch bridge
+- name: Configure existing Open vSwitch bridge
   when: source_type == 'ovs_bridge'
   block:
-    - name: Create patch port on Tenks bridge
+    - name: Configure patch port on Tenks bridge
       openvswitch_port:
         bridge: "{{ tenks_bridge }}"
         port: "{{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}"
@@ -70,6 +72,7 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_source_suffix }}
+        state: "{{ state }}"
       become: true
 
     - name: Create patch port on source bridge
@@ -81,11 +84,13 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_ovs_suffix }}
+        state: "{{ state }}"
       become: true
 
-- name: Plug source interface into Tenks bridge
+- name: Ensure source interface plugged state in Tenks bridge is correct
   when: source_type == 'direct'
   openvswitch_port:
     bridge: "{{ tenks_bridge }}"
     port: "{{ source_interface }}"
+    state: "{{ state }}"
   become: true

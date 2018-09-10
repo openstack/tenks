@@ -41,15 +41,25 @@ required for different hosts, you will need to individually specify them: for a
 host with hostname *myhost*, set `physnet_mappings` within the file
 `ansible/host_vars/myhost`.
 
-### Deployment
+### Commands
 
-Currently, Tenks does not have a CLI or wrapper. A virtual cluster can be
-deployed by calling
-`ansible-playbook --inventory ansible/inventory ansible/deploy.yml --extra-vars=@override.yml`,
-where `override.yml` is the path to your override file. The `deploy.yml`
-playbook includes various constituent playbooks which perform different parts
-of the deployment. An individual section of Tenks can be run separately by
-substituting `ansible/deploy.yml` in the command above with the path to the
+Tenks has a variable `cmd` which specifies the command to be run. This variable
+can be set in your override file (see above). The possible values it can take
+are:
+
+* `deploy`: create a virtual cluster to the specification given. This is the
+  default command.
+* `teardown`: tear down any existing virtual cluster with the specification
+  given.
+
+### Running Tenks
+
+Currently, Tenks does not have a CLI or wrapper. It can be run by calling
+`ansible-playbook --inventory ansible/inventory ansible/run.yml --extra-vars=@override.yml`,
+where `override.yml` is the path to your override file. The `run.yml` playbook
+includes various constituent playbooks which perform different parts of the
+deployment. An individual section of Tenks can be run separately by
+substituting `ansible/run.yml` in the command above with the path to the
 playbook you want to run. The current playbooks can be seen in the Ansible
 structure diagram in the *Development* section.
 
