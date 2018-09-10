@@ -3,7 +3,7 @@
   set_fact:
     # vbmcd should already be running, so --no-daemon stops vbmc from spawning
     # another instance of the daemon.
-    cmd: >-
+    vbmc_cmd: >-
       '{{ vbmc_virtualenv_path }}/bin/vbmc'
         --no-daemon
         {% if vbmc_log_directory is not none %}
@@ -15,7 +15,7 @@
 # involve minimal downtime.
 - name: Ensure domain is stopped and deleted in VBMC
   command: >-
-    {{ cmd }} {{ item }} '{{ domain }}'
+    {{ vbmc_cmd }} {{ item }} '{{ domain }}'
   loop:
     - stop
     - delete
@@ -40,7 +40,7 @@
 # the checks.
 - name: Ensure domain is added to VBMC
   command: >-
-    {{ cmd }} add '{{ domain }}'
+    {{ vbmc_cmd }} add '{{ domain }}'
       --port {{ vbmc_ipmi_port }}
       --username '{{ vbmc_ipmi_username }}'
       --password '{{ vbmc_ipmi_password }}'
@@ -52,7 +52,7 @@
 
 - name: Ensure domain is started in VBMC
   command: >
-    {{ cmd }} start '{{ domain }}'
+    {{ vbmc_cmd }} start '{{ domain }}'
   register: res
   # Retry a few times in case the VBMC daemon has been slow to process the last
   # few commands.
