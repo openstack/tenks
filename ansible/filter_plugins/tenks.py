@@ -41,6 +41,7 @@ class FilterModule(object):
 
             # Libvirt filters.
             'set_libvirt_interfaces': set_libvirt_interfaces,
+            'set_libvirt_start_params': set_libvirt_start_params,
             'set_libvirt_volume_pool': set_libvirt_volume_pool,
 
             # Miscellaneous filters.
@@ -80,6 +81,18 @@ def set_libvirt_volume_pool(context, node):
     pool = _get_hostvar(context, 'libvirt_pool_name')
     for vol in node.get('volumes', []):
         vol['pool'] = pool
+    return node
+
+
+def set_libvirt_start_params(node):
+    """Set the Libvirt start and autostart parameters.
+
+    Since Ironic will be managing the power state and we may want to perform
+    inspection, don't start the VM after definition or automatically start on
+    host start-up.
+    """
+    node['start'] = False
+    node['autostart'] = False
     return node
 
 
