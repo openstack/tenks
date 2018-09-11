@@ -21,4 +21,5 @@
         libvirt_vms: >-
           {{ nodes | map('set_libvirt_interfaces')
                    | map('set_libvirt_volume_pool')
+                   | map('set_libvirt_start_params')
                    | list }}
