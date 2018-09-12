@@ -1,7 +1,8 @@
 ---
 - hosts: all
   tasks:
-    - set_fact:
+    - name: Set command for teardown
+      set_fact:
         cmd: teardown
 
 - name: Schedule removal of nodes
