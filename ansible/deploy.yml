@@ -1,9 +1,14 @@
 ---
-- name: Perform deployment host configuration
-  import_playbook: host_setup.yml
+- hosts: all
+  tasks:
+    - set_fact:
+        cmd: deploy
 
 - name: Schedule nodes
   import_playbook: schedule.yml
+
+- name: Perform deployment host configuration
+  import_playbook: host_setup.yml
 
 - name: Configure node networking
   import_playbook: node_networking.yml

@@ -54,14 +54,20 @@ are:
 
 ### Running Tenks
 
-Currently, Tenks does not have a CLI or wrapper. It can be run by calling
-`ansible-playbook --inventory ansible/inventory ansible/run.yml --extra-vars=@override.yml`,
-where `override.yml` is the path to your override file. The `run.yml` playbook
-includes various constituent playbooks which perform different parts of the
-deployment. An individual section of Tenks can be run separately by
-substituting `ansible/run.yml` in the command above with the path to the
-playbook you want to run. The current playbooks can be seen in the Ansible
-structure diagram in the *Development* section.
+Currently, Tenks does not have a CLI or wrapper. Deployment can be run by
+calling `ansible-playbook --inventory ansible/inventory ansible/deploy.yml
+--extra-vars=@override.yml`, where `override.yml` is the path to your override
+file.
+
+The `deploy.yml` playbook will run deployment from start to finish;
+`teardown.yml` is `deploy.yml`'s "mirror image" to tear down a cluster. These
+playbooks automatically set `cmd` appropriately, and they contain various
+constituent playbooks which perform different parts of the deployment. An
+individual section of Tenks can be run separately by substituting
+`ansible/deploy.yml` in the command above with the path to the playbook(s) you
+want to run. The current playbooks can be seen in the Ansible structure diagram
+in the *Development* section. Bear in mind that you will have to set `cmd` in
+your override file if you are running any of the sub-playbooks individually.
 
 ## Development
 
