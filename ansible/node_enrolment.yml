@@ -1,9 +1,9 @@
 - hosts: localhost
   tasks:
-    - name: Load allocations from file
+    - name: Load state from file
       include_vars:
-        file: "{{ allocations_file_path }}"
-        name: allocations
+        file: "{{ state_file_path }}"
+        name: state
 
     - name: Check that OpenStack credentials exist in the environment
       fail:
@@ -22,7 +22,7 @@
         # basis to account for existing allocations, rather than for all nodes
         # here.
         ironic_nodes: >-
-          {{ alloc.value
+          {{ alloc.value.nodes
                | map('combine', {'state': ('absent' if cmd == 'teardown'
                                            else 'present')})
                | list }}
@@ -30,6 +30,6 @@
         ironic_virtualenv_path: "{{ virtualenv_path }}"
         ironic_python_upper_constraints_url: >-
           {{ python_upper_constraints_url }}
-      loop: "{{ query('dict', allocations) }}"
+      loop: "{{ query('dict', state) }}"
       loop_control:
         loop_var: alloc

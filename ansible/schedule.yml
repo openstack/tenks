@@ -21,16 +21,28 @@
           {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
       loop: "{{ groups['hypervisors'] }}"
 
-    - name: Schedule nodes to hypervisors
-      tenks_schedule:
+    - name: Check if an existing state file exists
+      stat:
+        path: "{{ state_file_path }}"
+      register: stat_result
+
+    - name: Read existing state from file
+      include_vars:
+        file: "{{ state_file_path }}"
+        name: current_state
+      when: stat_result.exists
+
+    - name: Get updated state
+      tenks_update_state:
         hypervisor_vars: "{{ hypervisor_vars }}"
         node_types: "{{ node_types }}"
         specs: "{{ specs }}"
-      register: scheduling
+        state: "{{ current_state | default(omit) }}"
+      register: new_state
 
-    - name: Write node allocations to file
+    - name: Write new state to file
       copy:
         # tenks_schedule lookup plugin outputs a dict. Pretty-print this to
         # persist it in a YAML file.
-        content: "{{ scheduling.result | to_nice_yaml }}"
-        dest: "{{ allocations_file_path }}"
+        content: "{{ new_state.result | to_nice_yaml }}"
+        dest: "{{ state_file_path }}"

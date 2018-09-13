@@ -1,5 +1,15 @@
 ---
+- hosts: localhost
+  tasks:
+    - name: Load state from file
+      include_vars:
+        file: "{{ state_file_path }}"
+        name: state
+
 - hosts: hypervisors
+  vars:
+    indexed_physnet_mappings: >-
+      {{ state[inventory_hostname].physnet_mappings }}
   tasks:
     - include_tasks: hypervisor_setup.yml
 

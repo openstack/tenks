@@ -1,15 +1,15 @@
 ---
 - hosts: localhost
   tasks:
-    - name: Load allocations from file
+    - name: Load state from file
       include_vars:
-        file: "{{ allocations_file_path }}"
-        name: allocations
+        file: "{{ state_file_path }}"
+        name: state
 
 - hosts: libvirt
   vars:
     nodes: >-
-      {{ hostvars.localhost.allocations[inventory_hostname]
+      {{ hostvars.localhost.state[inventory_hostname].nodes
            | default([]) }}
   tasks:
     - name: Configure VMs
@@ -19,7 +19,7 @@
         libvirt_vm_default_console_log_dir: "{{ log_directory }}"
         # Configure VM definitions for the Libvirt provider.
         # FIXME(w-miller): Set absent/present in tenks_schedule on a per-node
-        # basis to account for existing allocations, rather than for all nodes
+        # basis to account for existing state, rather than for all nodes
         # here.
         libvirt_vms: >-
           {{ nodes | map('combine',

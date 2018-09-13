@@ -1,16 +1,16 @@
 ---
 - hosts: localhost
   tasks:
-    - name: Load allocations from file
+    - name: Load state from file
       include_vars:
-        file: "{{ allocations_file_path }}"
-        name: allocations
+        file: "{{ state_file_path }}"
+        name: state
 
 - name: Perform Virtual BMC configuration
   hosts: libvirt
   vars:
     vbmc_nodes: >-
-      {{ hostvars.localhost.allocations[inventory_hostname]
+      {{ hostvars.localhost.state[inventory_hostname].nodes
            | default([]) | selectattr('ironic_driver', 'eq',
                                       bmc_emulators.virtualbmc) | list }}
   tasks:
