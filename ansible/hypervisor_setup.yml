@@ -42,9 +42,9 @@
   include_tasks: physical_network.yml
   vars:
     network_name: "{{ pn.key }}"
-    tenks_bridge: "{{ bridge_prefix ~ pn.value.idx }}"
-    source_interface: "{{ pn.value.device }}"
+    tenks_bridge: "{{ bridge_prefix ~ (pn.key | physnet_name_to_index) }}"
+    source_interface: "{{ pn.value }}"
     state: "{{ 'absent' if cmd == 'teardown' else 'present' }}"
-  loop: "{{ query('dict', indexed_physnet_mappings) }}"
+  loop: "{{ query('dict', physnet_mappings) }}"
   loop_control:
     loop_var: pn

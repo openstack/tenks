@@ -30,7 +30,7 @@
       include_vars:
         file: "{{ state_file_path }}"
         name: current_state
-      when: stat_result.exists
+      when: stat_result.stat.exists
 
     - name: Get updated state
       tenks_update_state:

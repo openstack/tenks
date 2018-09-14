@@ -4,12 +4,12 @@
     - name: Load state from file
       include_vars:
         file: "{{ state_file_path }}"
-        name: state
+        name: tenks_state
 
 - hosts: libvirt
   vars:
     nodes: >-
-      {{ hostvars.localhost.state[inventory_hostname].nodes
+      {{ hostvars.localhost.tenks_state[inventory_hostname].nodes
            | default([]) }}
   tasks:
     - name: Configure VMs

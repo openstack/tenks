@@ -3,7 +3,7 @@
     - name: Load state from file
       include_vars:
         file: "{{ state_file_path }}"
-        name: state
+        name: tenks_state
 
     - name: Check that OpenStack credentials exist in the environment
       fail:
@@ -30,6 +30,6 @@
         ironic_virtualenv_path: "{{ virtualenv_path }}"
         ironic_python_upper_constraints_url: >-
           {{ python_upper_constraints_url }}
-      loop: "{{ query('dict', state) }}"
+      loop: "{{ query('dict', tenks_state) }}"
       loop_control:
         loop_var: alloc

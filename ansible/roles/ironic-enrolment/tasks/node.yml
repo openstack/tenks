@@ -40,8 +40,7 @@
 - name: Configure node in Ironic
   os_ironic:
     auth_type: password
-    driver: >-
-      {{ node.ironic_config.ironic_driver | default(default_ironic_driver) }}
+    driver: "{{ node.ironic_driver }}"
     driver_info:
       power:
         ipmi_address: "{{ hostvars[ironic_hypervisor].ipmi_address }}"

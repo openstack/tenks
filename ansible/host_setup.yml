@@ -4,12 +4,12 @@
     - name: Load state from file
       include_vars:
         file: "{{ state_file_path }}"
-        name: state
+        name: tenks_state
 
 - hosts: hypervisors
   vars:
-    indexed_physnet_mappings: >-
-      {{ state[inventory_hostname].physnet_mappings }}
+    physnet_indices: >-
+      {{ hostvars.localhost.tenks_state[inventory_hostname].physnet_indices }}
   tasks:
     - include_tasks: hypervisor_setup.yml
 

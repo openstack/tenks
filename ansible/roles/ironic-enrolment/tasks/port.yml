@@ -10,7 +10,8 @@
 
 - name: Get physical network name
   set_fact:
-    physnet: "{{ source_interface | source_link_to_physnet_name }}"
+    physnet: "{{ source_interface | source_link_to_physnet_name(
+                   inventory_hostname=ironic_hypervisor) }}"
 
 - name: Get bridge name
   set_fact:
@@ -26,4 +27,4 @@
                                               ].macaddress }}'
       --local-link-connection switch_info='{{ bridge }}'
       --local-link-connection port_id='{{ source_interface
-                                           | source_to_ovs_link_name }}'
+        | source_to_ovs_link_name(inventory_hostname=ironic_hypervisor) }}'

@@ -52,48 +52,47 @@ class ActionModule(ActionBase):
         self._validate_args(args)
 
         # Modify the state as necessary.
-        self._map_physnets(args['state'], args['hypervisor_vars'])
+        self._set_physnet_idxs(args['state'], args['hypervisor_vars'])
         self._process_specs(task_vars['hostvars']['localhost'], args)
 
         # Return the modified state.
         result['result'] = args['state']
         return result
 
-    def _map_physnets(self, state, hypervisor_vars):
+    def _set_physnet_idxs(self, state, hypervisor_vars):
         """
-        Set physnet mappings for each host.
+        Set the index of each physnet for each host.
 
         Use the specified physnet mappings and any existing physnet indices to
-        ensure all physnet mappings exist in `state` with an index.
+        ensure the generated indices are consistent.
         """
         for hostname, hostvars in six.iteritems(hypervisor_vars):
             # The desired mappings given in the Tenks configuration. These do
             # not include IDXs which are an implementation detail of Tenks.
             specified_mappings = hostvars['physnet_mappings']
             try:
-                # The mappings currently in the state file, including IDXs.
-                old_mappings = state[hostname]['physnet_mappings']
+                # The physnet indices currently in the state file.
+                old_idxs = state[hostname]['physnet_indices']
             except KeyError:
                 # The hypervisor is new since the last run.
                 state[hostname] = {}
-                old_mappings = {}
-            # The new set of mappings to store as state.
-            new_mappings = {}
+                old_idxs = {}
+            new_idxs = {}
             next_idx = 0
-            used_idxs = {pn['idx'] for pn in old_mappings.values()}
+            used_idxs = old_idxs.values()
             for name, dev in six.iteritems(specified_mappings):
                 try:
                     # We need to re-use the IDXs of any existing physnets.
-                    idx = old_mappings[name]['idx']
+                    idx = old_idxs[name]
                 except KeyError:
                     # New physnet requires a new IDX.
                     while next_idx in used_idxs:
                         next_idx += 1
-                    used_idxs.add(next_idx)
+                    used_idxs.append(next_idx)
                     idx = next_idx
                 finally:
-                    new_mappings[name] = {'idx': idx, 'device': dev}
-            state[hostname]['physnet_mappings'] = new_mappings
+                    new_idxs[name] = idx
+            state[hostname]['physnet_indices'] = new_idxs
 
     def _process_specs(self, localhost_vars, args):
         """
@@ -115,8 +114,9 @@ class ActionModule(ActionBase):
                     # fulfil any spec.
                     node['state'] = 'absent'
 
-        # Now create all the required new nodes.
-        self._create_nodes(localhost_vars, args)
+        if localhost_vars['cmd'] != 'teardown':
+            # Now create all the required new nodes.
+            self._create_nodes(localhost_vars, args)
 
     def _tick_off_node(self, specs, node):
         """

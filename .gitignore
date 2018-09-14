@@ -2,8 +2,8 @@
 .*
 # Ansible retry files
 *.retry
-# Tenks allocations file
-allocations.yml
+# Tenks state file
+state.yml
 # Tenks Galaxy roles
 ansible/roles/stackhpc.*
 
