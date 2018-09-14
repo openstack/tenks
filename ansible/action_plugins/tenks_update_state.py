@@ -55,25 +55,27 @@ class ActionModule(ActionBase):
         result['result'] = {}
         del tmp  # tmp no longer has any effect
 
-        args = self._task.args
-        self._validate_args(args)
+        self.args = self._task.args
+        self.localhost_vars = task_vars['hostvars']['localhost']
+        self._validate_args()
 
         # Modify the state as necessary.
-        self._set_physnet_idxs(args['state'], args['hypervisor_vars'])
-        self._process_specs(task_vars['hostvars']['localhost'], args)
+        self._set_physnet_idxs()
+        self._process_specs()
 
         # Return the modified state.
-        result['result'] = args['state']
+        result['result'] = self.args['state']
         return result
 
-    def _set_physnet_idxs(self, state, hypervisor_vars):
+    def _set_physnet_idxs(self):
         """
         Set the index of each physnet for each host.
 
         Use the specified physnet mappings and any existing physnet indices to
         ensure the generated indices are consistent.
         """
-        for hostname, hostvars in six.iteritems(hypervisor_vars):
+        state = self.args['state']
+        for hostname, hostvars in six.iteritems(self.args['hypervisor_vars']):
             # The desired mappings given in the Tenks configuration. These do
             # not include IDXs which are an implementation detail of Tenks.
             specified_mappings = hostvars['physnet_mappings']
@@ -86,7 +88,7 @@ class ActionModule(ActionBase):
                 old_idxs = {}
             new_idxs = {}
             next_idx = 0
-            used_idxs = list(old_idxs.values())
+            used_idxs = list(six.itervalues(old_idxs))
             for name, dev in six.iteritems(specified_mappings):
                 try:
                     # We need to re-use the IDXs of any existing physnets.
@@ -100,7 +102,7 @@ class ActionModule(ActionBase):
                 new_idxs[name] = idx
             state[hostname]['physnet_indices'] = new_idxs
 
-    def _process_specs(self, localhost_vars, args):
+    def _process_specs(self):
         """
         Ensure the correct nodes are present in `state`.
 
@@ -109,20 +111,26 @@ class ActionModule(ActionBase):
         `specs`.
         """
         # Iterate through existing nodes, marking for deletion where necessary.
-        for hyp in args['state'].values():
+        for hyp in six.itervalues(self.args['state']):
             # Anything already marked as 'absent' should no longer exist.
-            hyp['nodes'] = [n for n in hyp.get('nodes', [])
+            hyp['nodes'] = [n for n in hyp['nodes']
                             if n.get('state') != 'absent']
             for node in hyp['nodes']:
-                if ((localhost_vars['cmd'] == 'teardown' or
-                     not self._tick_off_node(args['specs'], node))):
+                if ((self.localhost_vars['cmd'] == 'teardown' or
+                     not self._tick_off_node(self.args['specs'], node))):
                     # We need to delete this node, since it exists but does not
                     # fulfil any spec.
                     node['state'] = 'absent'
 
-        if localhost_vars['cmd'] != 'teardown':
+        if self.localhost_vars['cmd'] != 'teardown':
+            # Ensure all hosts exist in state.
+            for hostname in self.args['hypervisor_vars']:
+                self.args['state'].setdefault(hostname, {})
+                self.args['state'][hostname].setdefault('nodes', [])
             # Now create all the required new nodes.
-            self._create_nodes(localhost_vars, args)
+            scheduler = RoundRobinScheduler(self.args['hypervisor_vars'],
+                                            self.args['state'])
+            self._create_nodes(scheduler)
 
     def _tick_off_node(self, specs, node):
         """
@@ -141,58 +149,52 @@ class ActionModule(ActionBase):
                 return True
         return False
 
-    def _create_nodes(self, localhost_vars, args):
+    def _create_nodes(self, scheduler):
         """
         Create new nodes to fulfil the specs.
         """
-        scheduler = RoundRobinScheduler(args['hypervisor_vars'],
-                                        args['state'])
         # Anything left in specs needs to be created.
-        for spec in args['specs']:
+        for spec in self.args['specs']:
             for _ in six.moves.range(spec['count']):
-                node = self._gen_node(localhost_vars, spec['type'],
-                                      args, spec.get('ironic_config'))
+                node = self._gen_node(spec['type'], spec.get('ironic_config'))
                 hostname, idx = scheduler.choose_host(node)
                 # Set node name based on its index.
-                node['name'] = "%s%d" % (args['node_name_prefix'], idx)
+                node['name'] = "%s%d" % (self.args['node_name_prefix'], idx)
                 # Set IPMI port using its index as an offset from the lowest
                 # port.
                 node['ipmi_port'] = (
-                    args['hypervisor_vars'][hostname][
+                    self.args['hypervisor_vars'][hostname][
                         'ipmi_port_range_start'] + idx)
-                # Set up node list structure for this host.
-                args['state'].setdefault(hostname, {})
-                args['state'][hostname].setdefault('nodes', [])
-                args['state'][hostname]['nodes'].append(node)
+                self.args['state'][hostname]['nodes'].append(node)
 
-    def _gen_node(self, localhost_vars, type_name, args, ironic_config=None):
+    def _gen_node(self, type_name, ironic_config=None):
         """
         Generate a node description.
 
         A name will not be assigned at this point because we don't know which
         hypervisor the node will be scheduled to.
         """
-        node_type = args['node_types'][type_name]
+        node_type = self.args['node_types'][type_name]
         node = deepcopy(node_type)
         # All nodes need an Ironic driver.
         node.setdefault(
             'ironic_driver',
-            localhost_vars['default_ironic_driver']
+            self.localhost_vars['default_ironic_driver']
         )
         # Set the type name, for future reference.
         node['type'] = type_name
         # Sequentially number the volume names.
         for vol_idx, vol in enumerate(node['volumes']):
             vol['name'] = (
-                "%s%d" % (args['vol_name_prefix'], vol_idx))
+                "%s%d" % (self.args['vol_name_prefix'], vol_idx))
         # Ironic config is not mandatory.
         if ironic_config:
             node['ironic_config'] = ironic_config
         return node
 
-    def _validate_args(self, args):
-        if args is None:
-            args = {}
+    def _validate_args(self):
+        if self.args is None:
+            self.args = {}
 
         REQUIRED_ARGS = {'hypervisor_vars', 'specs', 'node_types'}
         # Var names and their defaults.
@@ -204,20 +206,20 @@ class ActionModule(ActionBase):
             ('vol_name_prefix', 'vol'),
         ]
         for arg in REQUIRED_ARGS:
-            if arg not in args:
+            if arg not in self.args:
                 e = "The parameter '%s' must be specified." % arg
                 raise AnsibleActionFail(to_text(e))
 
         for arg in OPTIONAL_ARGS:
-            if arg[0] not in args:
-                args[arg[0]] = arg[1]
+            if arg[0] not in self.args:
+                self.args[arg[0]] = arg[1]
 
-        if not args['hypervisor_vars']:
+        if not self.args['hypervisor_vars']:
             e = ("There are no hosts in the 'hypervisors' group to which we "
                  "can schedule.")
             raise AnsibleActionFail(to_text(e))
 
-        for spec in args['specs']:
+        for spec in self.args['specs']:
             if 'type' not in spec or 'count' not in spec:
                 e = ("All specs must contain a `type` and a `count`. "
                      "Offending spec: %s" % spec)
@@ -278,6 +280,8 @@ class Scheduler():
             self.hostvars[hostname]['ipmi_port_range_start'] + 1)
         get_idx = (
             lambda n: int(re.match(r'[A-Za-z]*([0-9]+)$', n).group(1)))
+        if hostname not in self.state:
+            self._host_free_idxs[hostname] = all_idxs
         used_idxs = {get_idx(n['name']) for n in self.state[hostname]['nodes']
                      if n.get('state') != 'absent'}
         self._host_free_idxs[hostname] = sorted([i for i in all_idxs
