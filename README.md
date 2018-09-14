@@ -13,6 +13,22 @@ installed inside it, Tenks' role dependencies can be installed by
 `ansible-galaxy install --role-file=requirements.yml
 --roles-path=ansible/roles/`.
 
+### Hosts
+
+Tenks uses Ansible inventory to manage hosts. A multi-host setup is therefore
+supported, although the default hosts configuration will deploy an all-in-one
+setup on the host where the `ansible-playbook` command is executed
+(`localhost`).
+
+* Configuration management of the Tenks cluster is always performed on
+  `localhost`.
+* The `hypervisors` group should not directly contain any hosts. Its sub-groups
+  must contain one or more system. Systems in its sub-groups will host a subset
+  of the noides deployed by Tenks.
+
+    * The `libvirt` group is a sub-group of `hypervisors`. Systems in this
+      group will act as hypervisors using the Libvirt provider.
+
 ### Configuration
 
 An override file should be created to configure Tenks. Any variables specified
@@ -68,6 +84,23 @@ individual section of Tenks can be run separately by substituting
 want to run. The current playbooks can be seen in the Ansible structure diagram
 in the *Development* section. Bear in mind that you will have to set `cmd` in
 your override file if you are running any of the sub-playbooks individually.
+
+Once a cluster has been deployed, it can be reconfigured by modifying the Tenks
+configuration and rerunning `deploy.yml`. Node specs can be changed (including
+increasing/decreasing the number of nodes); node types can also be
+reconfigured. Existing nodes will be preserved where possible.
+
+## Limitations
+
+The following is a non-exhaustive list of current known limitations of Tenks:
+
+* When using the Libvirt provider (currently the only provider), Tenks
+  hypervisors cannot co-exist with a containerised Libvirt daemon (for example,
+  as deployed by Kolla in the nova-libvirt container). Tenks will configure an
+  uncontainerised Libvirt daemon instance on the hypervisor, and this may
+  conflict with an existing containerised daemon. A workaround is to disable
+  the Nova virtualised compute service on each Tenks hypervisor if it is
+  present (for example, `docker stop nova_libvirt`) before running Tenks.
 
 ## Development
 

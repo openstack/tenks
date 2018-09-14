@@ -28,7 +28,11 @@ import six
 class ActionModule(ActionBase):
     def run(self, tmp=None, task_vars=None):
         """
-        Schedule specifications of nodes by type onto hypervisors.
+        Produce a dict of Tenks state.
+
+        Actions include:
+            * Generating indices for physical networks for each hypervisor.
+            * Scheduling specifications of nodes by type onto hypervisors.
 
         The following task vars are accepted:
             :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
@@ -40,8 +44,11 @@ class ActionModule(ActionBase):
                                node names.
             :vol_name_prefix: A string with which to prefix all sequential
                               volume names.
-        :returns: A dict containing lists of node details, keyed by the
-                  hostname of the hypervisor to which they are scheduled.
+            :state: A dict of existing Tenks state (as produced by a previous
+                    run of this module), to be taken into account in this run.
+                    Optional.
+        :returns: A dict of Tenks state for each hypervisor, keyed by the
+                  hostname of the hypervisor to which the state refers.
         """
         result = super(ActionModule, self).run(tmp, task_vars)
         # Initialise our return dict.
