@@ -17,6 +17,7 @@ import re
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils._text import to_text
 from jinja2 import contextfilter
+import six
 
 
 class FilterModule(object):
@@ -35,6 +36,8 @@ class FilterModule(object):
             # Network name filters.
             'bridge_name': bridge_name,
             'ovs_link_name': ovs_link_name,
+            'physnet_index_to_name': physnet_index_to_name,
+            'physnet_name_to_index': physnet_name_to_index,
             'source_link_name': source_link_name,
             'source_to_ovs_link_name': source_to_ovs_link_name,
             'source_link_to_physnet_name': source_link_to_physnet_name,
@@ -97,47 +100,58 @@ def set_libvirt_start_params(node):
 
 
 @contextfilter
-def bridge_name(context, physnet):
+def bridge_name(context, physnet, inventory_hostname=None):
     """Get the Tenks OVS bridge name from a physical network name.
     """
-    return (_get_hostvar(context, 'bridge_prefix') +
-            str(_physnet_name_to_index(context, physnet)))
+    return (_get_hostvar(context, 'bridge_prefix',
+                         inventory_hostname=inventory_hostname) +
+            str(physnet_name_to_index(context, physnet,
+                                      inventory_hostname=inventory_hostname)))
 
 
 @contextfilter
-def source_link_name(context, node, physnet):
+def source_link_name(context, node, physnet, inventory_hostname=None):
     """Get the source veth link name for a node/physnet combination.
     """
-    return (_link_name(context, node, physnet) +
-            _get_hostvar(context, 'veth_node_source_suffix'))
+    return (_link_name(context, node, physnet,
+                       inventory_hostname=inventory_hostname) +
+            _get_hostvar(context, 'veth_node_source_suffix',
+                         inventory_hostname=inventory_hostname))
 
 
 @contextfilter
-def ovs_link_name(context, node, physnet):
+def ovs_link_name(context, node, physnet, inventory_hostname=None):
     """Get the OVS veth link name for a node/physnet combination.
     """
-    return (_link_name(context, node, physnet) +
-            _get_hostvar(context, 'veth_node_ovs_suffix'))
+    return (_link_name(context, node, physnet,
+                       inventory_hostname=inventory_hostname) +
+            _get_hostvar(context, 'veth_node_ovs_suffix',
+                         inventory_hostname=inventory_hostname))
 
 
 @contextfilter
-def source_to_ovs_link_name(context, source):
+def source_to_ovs_link_name(context, source, inventory_hostname=None):
     """Get the corresponding OVS link name for a source link name.
     """
-    base = source[:-len(_get_hostvar(context, 'veth_node_source_suffix'))]
-    return base + _get_hostvar(context, 'veth_node_ovs_suffix')
+    base = source[:-len(_get_hostvar(context, 'veth_node_source_suffix',
+                                     inventory_hostname=inventory_hostname))]
+    return base + _get_hostvar(context, 'veth_node_ovs_suffix',
+                               inventory_hostname=inventory_hostname)
 
 
 @contextfilter
-def source_link_to_physnet_name(context, source):
+def source_link_to_physnet_name(context, source, inventory_hostname=None):
     """ Get the physical network name that a source veth link is connected to.
     """
-    prefix = _get_hostvar(context, 'veth_prefix')
-    suffix = _get_hostvar(context, 'veth_node_source_suffix')
+    prefix = _get_hostvar(context, 'veth_prefix',
+                          inventory_hostname=inventory_hostname)
+    suffix = _get_hostvar(context, 'veth_node_source_suffix',
+                          inventory_hostname=inventory_hostname)
     match = re.compile(r"%s.*-(\d+)%s"
                        % (re.escape(prefix), re.escape(suffix))).match(source)
     idx = match.group(1)
-    return _physnet_index_to_name(context, int(idx))
+    return physnet_index_to_name(context, int(idx),
+                                 inventory_hostname=inventory_hostname)
 
 
 def size_string_to_gb(size):
@@ -181,21 +195,36 @@ def _parse_size_string(size):
     return int(number) * (base ** POWERS[power])
 
 
-def _link_name(context, node, physnet):
-    prefix = _get_hostvar(context, 'veth_prefix')
-    return prefix + node['name'] + '-' + str(_physnet_name_to_index(context,
-                                                                    physnet))
+def _link_name(context, node, physnet, inventory_hostname=None):
+    prefix = _get_hostvar(context, 'veth_prefix',
+                          inventory_hostname=inventory_hostname)
+    return (prefix + node['name'] + '-' +
+            str(physnet_name_to_index(context, physnet,
+                                      inventory_hostname=inventory_hostname)))
 
 
-def _physnet_name_to_index(context, physnet):
+@contextfilter
+def physnet_name_to_index(context, physnet, inventory_hostname=None):
     """Get the ID of this physical network on the hypervisor.
     """
-    physnet_mappings = _get_hostvar(context, 'physnet_mappings')
-    return sorted(physnet_mappings).index(physnet)
+    if not inventory_hostname:
+        inventory_hostname = _get_hostvar(context, 'inventory_hostname')
+    # localhost stores the state.
+    state = _get_hostvar(context, 'tenks_state',
+                         inventory_hostname='localhost')
+    return state[inventory_hostname]['physnet_indices'][physnet]
 
 
-def _physnet_index_to_name(context, idx):
+@contextfilter
+def physnet_index_to_name(context, idx, inventory_hostname=None):
     """Get the name of this physical network on the hypervisor.
     """
-    physnet_mappings = _get_hostvar(context, 'physnet_mappings')
-    return sorted(physnet_mappings)[idx]
+    if not inventory_hostname:
+        inventory_hostname = _get_hostvar(context, 'inventory_hostname')
+    # localhost stores the state.
+    state = _get_hostvar(context, 'tenks_state',
+                         inventory_hostname='localhost')
+    # We should have exactly one physnet with this index.
+    for k, v in six.iteritems(state[inventory_hostname]['physnet_indices']):
+        if v == idx:
+            return k
