@@ -15,7 +15,6 @@
 from __future__ import absolute_import
 import imp
 import os
-import sys
 
 import unittest
 
@@ -23,7 +22,7 @@ import unittest
 try:
     from unittest.mock import MagicMock
 except ImportError:
-    from mock import MagicMock
+    from mock import MagicMock # noqa
 
 
 # Import method lifted from kolla_ansible's test_merge_config.py
@@ -32,6 +31,7 @@ PLUGIN_FILE = os.path.join(PROJECT_DIR,
                            'ansible/action_plugins/tenks_update_state.py')
 
 tus = imp.load_source('tenks_update_state', PLUGIN_FILE)
+
 
 class TestTenksUpdateState(unittest.TestCase):
     def setUp(self):
