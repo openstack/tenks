@@ -86,7 +86,7 @@ class ActionModule(ActionBase):
                 old_idxs = {}
             new_idxs = {}
             next_idx = 0
-            used_idxs = old_idxs.values()
+            used_idxs = list(old_idxs.values())
             for name, dev in six.iteritems(specified_mappings):
                 try:
                     # We need to re-use the IDXs of any existing physnets.
@@ -97,8 +97,7 @@ class ActionModule(ActionBase):
                         next_idx += 1
                     used_idxs.append(next_idx)
                     idx = next_idx
-                finally:
-                    new_idxs[name] = idx
+                new_idxs[name] = idx
             state[hostname]['physnet_indices'] = new_idxs
 
     def _process_specs(self, localhost_vars, args):
