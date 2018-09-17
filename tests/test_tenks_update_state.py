@@ -13,11 +13,14 @@
 # under the License.
 
 from __future__ import absolute_import
+import copy
 import imp
 import os
 
+from ansible.errors import AnsibleActionFail
 import six
 import unittest
+
 
 # Python 2/3 compatibility.
 try:
@@ -84,13 +87,13 @@ class TestTenksUpdateState(unittest.TestCase):
             'node_types': self.node_types,
             'node_name_prefix': 'test_node_pfx',
             'specs': self.specs,
+            'state': {},
             'vol_name_prefix': 'test_vol_pfx',
         }
         # Alias for brevity.
         self.args = self.mod.args
 
     def test__set_physnet_idxs_no_state(self):
-        self.args['state'] = {}
         self.mod._set_physnet_idxs()
         expected_indices = {
             'physnet0': 0,
@@ -99,7 +102,6 @@ class TestTenksUpdateState(unittest.TestCase):
                          expected_indices)
 
     def test__set_physnet_idxs_no_state_two_hosts(self):
-        self.args['state'] = {}
         self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
         self.mod._set_physnet_idxs()
         expected_indices = {
@@ -110,7 +112,6 @@ class TestTenksUpdateState(unittest.TestCase):
                              expected_indices)
 
     def test_set_physnet_idxs__no_state_two_hosts_different_nets(self):
-        self.args['state'] = {}
         self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
         self.hypervisor_vars['foo']['physnet_mappings'].update({
             'physnet1': 'dev1',
@@ -127,7 +128,6 @@ class TestTenksUpdateState(unittest.TestCase):
             six.assertCountEqual(self, idxs, set(idxs))
 
     def test_set_physnet_idxs__idx_maintained_after_removal(self):
-        self.args['state'] = {}
         self.hypervisor_vars['foo']['physnet_mappings'].update({
             'physnet1': 'dev1',
         })
@@ -141,7 +141,6 @@ class TestTenksUpdateState(unittest.TestCase):
         )
 
     def _test__process_specs_no_state_create_nodes(self):
-        self.args['state'] = {}
         self.mod._process_specs()
         self.assertEqual(len(self.args['state']['foo']['nodes']), 2)
         return self.args['state']['foo']['nodes']
@@ -178,3 +177,69 @@ class TestTenksUpdateState(unittest.TestCase):
                               [vol['name'] for vol in node['volumes']])
             for c in {'10GB', '20GB'}:
                 self.assertIn(c, [vol['capacity'] for vol in node['volumes']])
+
+    def test__process_specs_apply_twice(self):
+        self.mod._process_specs()
+        created_state = copy.deepcopy(self.args['state'])
+        self.mod._process_specs()
+        self.assertEqual(created_state, self.args['state'])
+
+    def test__process_specs_unnecessary_node(self):
+        # Create some nodes definitions.
+        self.mod._process_specs()
+
+        # Add another node to the state that isn't required.
+        self.args['state']['foo']['nodes'].append(copy.deepcopy(
+            self.args['state']['foo']['nodes'][0]))
+        self.args['state']['foo']['nodes'][-1]['vcpus'] = 42
+        new_node = copy.deepcopy(self.args['state']['foo']['nodes'][-1])
+
+        self.mod._process_specs()
+        # Check that node has been marked for deletion.
+        self.assertNotIn(new_node, self.args['state']['foo']['nodes'])
+        new_node['state'] = 'absent'
+        self.assertIn(new_node, self.args['state']['foo']['nodes'])
+
+    def test__process_specs_teardown(self):
+        # Create some nodes definitions.
+        self.mod._process_specs()
+
+        # After teardown, we expected all created definitions to now have an
+        # 'absent' state.
+        expected_state = copy.deepcopy(self.args['state'])
+        for node in expected_state['foo']['nodes']:
+            node['state'] = 'absent'
+        self.mod.localhost_vars['cmd'] = 'teardown'
+        self.mod._process_specs()
+        self.assertEqual(expected_state, self.args['state'])
+
+        # After yet another run, the 'absent' state nodes should be deleted
+        # from state altogether.
+        self.mod._process_specs()
+        self.assertEqual(self.args['state']['foo']['nodes'], [])
+
+    def test__process_specs_no_hypervisors(self):
+        self.args['hypervisor_vars'] = {}
+        self.assertRaises(AnsibleActionFail, self.mod._process_specs)
+
+    def test__process_specs_no_hypervisors_on_physnet(self):
+        self.node_types['type0']['physical_networks'].append('another_pn')
+        self.assertRaises(AnsibleActionFail, self.mod._process_specs)
+
+    def test__process_specs_one_hypervisor_on_physnet(self):
+        self.node_types['type0']['physical_networks'].append('another_pn')
+        self.hypervisor_vars['bar'] = copy.deepcopy(
+            self.hypervisor_vars['foo'])
+        self.hypervisor_vars['bar']['physnet_mappings']['another_pn'] = 'dev1'
+        self.mod._process_specs()
+
+        # Check all nodes were scheduled to the hypervisor connected to the
+        # new physnet.
+        self.assertEqual(len(self.args['state']['foo']['nodes']), 0)
+        self.assertEqual(len(self.args['state']['bar']['nodes']), 2)
+
+    def test__process_specs_not_enough_ports(self):
+        # Give 'foo' only a single IPMI port to allocate.
+        self.hypervisor_vars['foo']['ipmi_port_range_start'] = 123
+        self.hypervisor_vars['foo']['ipmi_port_range_end'] = 123
+        self.assertRaises(AnsibleActionFail, self.mod._process_specs)
