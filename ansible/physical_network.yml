@@ -38,12 +38,13 @@
 
 
 ### Actual configuration starts here.
-- name: Ensure Open vSwitch bridge exists
+- name: Ensure Open vSwitch bridge is in the correct state
   openvswitch_bridge:
     bridge: "{{ tenks_bridge }}"
+    state: "{{ state }}"
   become: true
 
-- name: Connect to existing Linux bridge
+- name: Configure existing Linux bridge
   when: source_type == 'linux_bridge'
   include_role:
     name: veth-pair
@@ -54,12 +55,13 @@
     veth_pair_source_bridge: "{{ source_interface }}"
     veth_pair_source_link_name: >-
       {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
-    plug_into_source: true
+    veth_pair_plug_into_source: true
+    veth_pair_state: "{{ state }}"
 
-- name: Connect to existing Open vSwitch bridge
+- name: Configure existing Open vSwitch bridge
   when: source_type == 'ovs_bridge'
   block:
-    - name: Create patch port on Tenks bridge
+    - name: Configure patch port on Tenks bridge
       openvswitch_port:
         bridge: "{{ tenks_bridge }}"
         port: "{{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}"
@@ -70,9 +72,12 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_source_suffix }}
+      # If 'absent', we've already deleted the bridge earlier, so no need to
+      # delete the port.
+      when: state != 'absent'
       become: true
 
-    - name: Create patch port on source bridge
+    - name: Configure patch port on source bridge
       openvswitch_port:
         bridge: "{{ source_interface }}"
         port: "{{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}"
@@ -81,11 +86,17 @@
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_ovs_suffix }}
+        state: "{{ state }}"
       become: true
 
 - name: Plug source interface into Tenks bridge
-  when: source_type == 'direct'
   openvswitch_port:
     bridge: "{{ tenks_bridge }}"
     port: "{{ source_interface }}"
+    state: "{{ state }}"
+  when:
+    - source_type == 'direct'
+    # If 'absent', we've already deleted the bridge earlier, so no need to
+    # unplug the interface.
+    - state != 'absent'
   become: true

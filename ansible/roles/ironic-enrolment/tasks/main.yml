@@ -16,7 +16,7 @@
       -c {{ ironic_python_upper_constraints_url }}
     virtualenv: "{{ ironic_virtualenv_path }}"
 
-- name: Enrol the Ironic nodes
+- name: Configure Ironic node enrolment
   include_tasks: node.yml
   vars:
     node: "{{ ironic_node }}"

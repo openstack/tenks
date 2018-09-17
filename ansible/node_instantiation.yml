@@ -12,14 +12,20 @@
       {{ hostvars.localhost.allocations[inventory_hostname]
            | default([]) }}
   tasks:
-    - name: Create VM
+    - name: Configure VMs
       include_role:
         name: stackhpc.libvirt-vm
       vars:
         libvirt_vm_default_console_log_dir: "{{ log_directory }}"
         # Configure VM definitions for the Libvirt provider.
+        # FIXME(w-miller): Set absent/present in tenks_schedule on a per-node
+        # basis to account for existing allocations, rather than for all nodes
+        # here.
         libvirt_vms: >-
-          {{ nodes | map('set_libvirt_interfaces')
+          {{ nodes | map('combine',
+                         {'state': ('absent' if cmd == 'teardown'
+                                    else 'present')})
+                   | map('set_libvirt_interfaces')
                    | map('set_libvirt_volume_pool')
                    | map('set_libvirt_start_params')
                    | list }}

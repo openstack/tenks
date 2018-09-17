@@ -1,0 +1,45 @@
+---
+# This is an example override file, which can be used as a template for your
+# own override file.
+
+# node_types is a dict that defines different sets of node specifications,
+# keyed by a 'node type name' to associate with each set of specifications.
+node_types:
+  # The type name.
+  type0:
+    # The amount of RAM, in mebibytes.
+    memory_mb: 1024
+    # The number of virtual CPUs.
+    vcpus: 1
+    # A list of volumes, each with a capacity.
+    volumes:
+      - capacity: 2GB
+    # A list of physical network names to connect to. These physical network
+    # names should be keyed in `physnet_mappings` in each hypervisor's host
+    # vars.
+    physical_networks:
+      - physnet0
+
+# specs is a list of configurations of nodes to be created. Each configuration
+# can specify the number of nodes to be created, the type (from `node_types`)
+# of these nodes, and optionally configuration for the Ironic nodes to be
+# enroled from these nodes. If `ironic_config` is not set, Ironic enrolment
+# will be skipped for that spec.
+specs:
+    # The type in `node_types` that this spec refers to. Required.
+  - type: type0
+    # The number of nodes to create of this spec. Required.
+    count: 3
+    # The Ironic configuration for nodes of this spec. Optional.
+    ironic_config:
+      # The resource class that nodes of this spec should use in Ironic.
+      # Required if `ironic_config` has been specified.
+      resource_class: my_rc
+
+# Map physical network names to their source device. This can be either an
+# existing interface or an existing bridge.
+# Remember that if the mappings are specified in this file, they will apply to
+# all hosts unless specific mappings are specified in individual host_vars
+# files.
+physnet_mappings:
+  physnet0: brfoo

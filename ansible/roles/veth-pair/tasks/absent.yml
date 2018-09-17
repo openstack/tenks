@@ -1,0 +1,26 @@
+---
+- name: Unplug veth from source bridge
+  command: >-
+    brctl delif {{ veth_pair_source_bridge }}
+    {{ veth_pair_source_link_name }}
+  register: res
+  failed_when:
+    - res.rc != 0
+    # Case where veth is already unplugged.
+    - not (res.rc == 1 and 'does not exist' in res.stderr)
+  changed_when: res.rc == 0
+  when: veth_pair_plug_into_source | bool
+  become: true
+
+- name: Delete veth pair
+  command: >-
+    ip link del dev {{ veth_pair_ovs_link_name }}
+    type veth
+    peer name {{ veth_pair_source_link_name }}
+  register: res
+  failed_when:
+    - res.rc != 0
+    # Case where veth pair is already absent.
+    - not (res.rc == 1 and 'Cannot find device' in res.stderr)
+  changed_when: res.rc == 0
+  become: true

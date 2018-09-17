@@ -18,7 +18,14 @@
       vars:
         ironic_deploy_kernel_uuid: "{{ deploy_kernel_uuid }}"
         ironic_deploy_ramdisk_uuid: "{{ deploy_ramdisk_uuid }}"
-        ironic_nodes: "{{ alloc.value }}"
+        # FIXME(w-miller): Set absent/present in tenks_schedule on a per-node
+        # basis to account for existing allocations, rather than for all nodes
+        # here.
+        ironic_nodes: >-
+          {{ alloc.value
+               | map('combine', {'state': ('absent' if cmd == 'teardown'
+                                           else 'present')})
+               | list }}
         ironic_hypervisor: "{{ alloc.key }}"
         ironic_virtualenv_path: "{{ virtualenv_path }}"
         ironic_python_upper_constraints_url: >-

@@ -1,12 +1,27 @@
 ---
+- hosts: all
+  tasks:
+    - name: Set command for deployment
+      set_fact:
+        cmd: deploy
+
+- name: Schedule nodes
+  import_playbook: schedule.yml
+
 - name: Perform deployment host configuration
-  import_playbook: deploy_hosts.yml
+  import_playbook: host_setup.yml
 
-- name: Perform deployment node configuration
-  import_playbook: deploy_nodes.yml
+- name: Configure node networking
+  import_playbook: node_networking.yml
 
-- name: Enrol nodes in Ironic
-  import_playbook: enrol_nodes.yml
+- name: Configure node instantiation
+  import_playbook: node_instantiation.yml
+
+- name: Set up virtual node BMCs
+  import_playbook: node_bmc.yml
+
+- name: Perform Ironic node configuration
+  import_playbook: node_enrolment.yml
 
 - name: Register flavors in Nova
-  import_playbook: register_flavors.yml
+  import_playbook: flavor_registration.yml
