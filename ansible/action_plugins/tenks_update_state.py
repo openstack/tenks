@@ -280,8 +280,6 @@ class Scheduler():
             self.hostvars[hostname]['ipmi_port_range_start'] + 1)
         get_idx = (
             lambda n: int(re.match(r'[A-Za-z]*([0-9]+)$', n).group(1)))
-        if hostname not in self.state:
-            self._host_free_idxs[hostname] = all_idxs
         used_idxs = {get_idx(n['name']) for n in self.state[hostname]['nodes']
                      if n.get('state') != 'absent'}
         self._host_free_idxs[hostname] = sorted([i for i in all_idxs
