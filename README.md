@@ -24,7 +24,7 @@ setup on the host where the `ansible-playbook` command is executed
   `localhost`.
 * The `hypervisors` group should not directly contain any hosts. Its sub-groups
   must contain one or more system. Systems in its sub-groups will host a subset
-  of the noides deployed by Tenks.
+  of the nodes deployed by Tenks.
 
     * The `libvirt` group is a sub-group of `hypervisors`. Systems in this
       group will act as hypervisors using the Libvirt provider.
