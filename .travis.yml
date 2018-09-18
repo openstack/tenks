@@ -1,6 +1,5 @@
 ---
 language: python
-python: "2.7"
 
 # Run jobs in VMs - sudo is required by ansible tests.
 sudo: required
@@ -15,12 +14,23 @@ addons:
       - realpath
 
 # Create a build matrix for the different test jobs.
-env:
-  matrix:
-    # Run python style checks.
-    - TOX_ENV=pep8
+matrix:
+  include:
+    # Run Python style checks.
+    - python: 3.5
+      env: TOX_ENV=pep8
     # Run Ansible linting.
-    - TOX_ENV=alint
+    - python: 3.5
+      env: TOX_ENV=alint
+    # Run Python 3.5 tests.
+    - python: 3.5
+      env: TOX_ENV=py35
+    # Run Python 2.7 tests.
+    - python: 2.7
+      env: TOX_ENV=py27
+    # Run coverage checks.
+    - python: 3.5
+      env: TOX_ENV=cover
 
 install:
   # Install tox in a virtualenv to ensure we have an up to date version.
