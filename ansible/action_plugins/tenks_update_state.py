@@ -47,6 +47,9 @@ class ActionModule(ActionBase):
             :state: A dict of existing Tenks state (as produced by a previous
                     run of this module), to be taken into account in this run.
                     Optional.
+            :prune_only: A boolean which, if set, will instruct the plugin to
+                         only remove any nodes with state='absent' from
+                         `state`.
         :returns: A dict of Tenks state for each hypervisor, keyed by the
                   hostname of the hypervisor to which the state refers.
         """
@@ -59,13 +62,24 @@ class ActionModule(ActionBase):
         self.localhost_vars = task_vars['hostvars']['localhost']
         self._validate_args()
 
-        # Modify the state as necessary.
-        self._set_physnet_idxs()
-        self._process_specs()
+        if self.args['prune_only']:
+            self._prune_absent_nodes()
+        else:
+            # Modify the state as necessary.
+            self._set_physnet_idxs()
+            self._process_specs()
 
         # Return the modified state.
         result['result'] = self.args['state']
         return result
+
+    def _prune_absent_nodes(self):
+        """
+        Remove any nodes with state='absent' from the state dict.
+        """
+        for hyp in six.itervalues(self.args['state']):
+            hyp['nodes'] = [n for n in hyp['nodes']
+                            if n.get('state') != 'absent']
 
     def _set_physnet_idxs(self):
         """
@@ -112,10 +126,9 @@ class ActionModule(ActionBase):
         """
         # Iterate through existing nodes, marking for deletion where necessary.
         for hyp in six.itervalues(self.args['state']):
-            # Anything already marked as 'absent' should no longer exist.
-            hyp['nodes'] = [n for n in hyp['nodes']
-                            if n.get('state') != 'absent']
-            for node in hyp['nodes']:
+            # Absent nodes cannot fulfil a spec.
+            for node in [n for n in hyp.get('nodes', [])
+                         if n.get('state') != 'absent']:
                 if ((self.localhost_vars['cmd'] == 'teardown' or
                      not self._tick_off_node(self.args['specs'], node))):
                     # We need to delete this node, since it exists but does not
@@ -204,26 +217,29 @@ class ActionModule(ActionBase):
             # any yet.
             ('state', {}),
             ('vol_name_prefix', 'vol'),
+            ('prune_only', False),
         ]
-        for arg in REQUIRED_ARGS:
-            if arg not in self.args:
-                e = "The parameter '%s' must be specified." % arg
-                raise AnsibleActionFail(to_text(e))
-
         for arg in OPTIONAL_ARGS:
             if arg[0] not in self.args:
                 self.args[arg[0]] = arg[1]
 
-        if not self.args['hypervisor_vars']:
-            e = ("There are no hosts in the 'hypervisors' group to which we "
-                 "can schedule.")
-            raise AnsibleActionFail(to_text(e))
+        # No arguments are required in prune_only mode.
+        if not self.args['prune_only']:
+            for arg in REQUIRED_ARGS:
+                if arg not in self.args:
+                    e = "The parameter '%s' must be specified." % arg
+                    raise AnsibleActionFail(to_text(e))
 
-        for spec in self.args['specs']:
-            if 'type' not in spec or 'count' not in spec:
-                e = ("All specs must contain a `type` and a `count`. "
-                     "Offending spec: %s" % spec)
+            if not self.args['hypervisor_vars']:
+                e = ("There are no hosts in the 'hypervisors' group to which "
+                     "we can schedule.")
                 raise AnsibleActionFail(to_text(e))
+
+            for spec in self.args['specs']:
+                if 'type' not in spec or 'count' not in spec:
+                    e = ("All specs must contain a `type` and a `count`. "
+                         "Offending spec: %s" % spec)
+                    raise AnsibleActionFail(to_text(e))
 
 
 @six.add_metaclass(abc.ABCMeta)

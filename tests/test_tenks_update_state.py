@@ -201,7 +201,7 @@ class TestTenksUpdateState(unittest.TestCase):
         self.assertIn(new_node, self.args['state']['foo']['nodes'])
 
     def test__process_specs_teardown(self):
-        # Create some nodes definitions.
+        # Create some node definitions.
         self.mod._process_specs()
 
         # After teardown, we expected all created definitions to now have an
@@ -210,13 +210,13 @@ class TestTenksUpdateState(unittest.TestCase):
         for node in expected_state['foo']['nodes']:
             node['state'] = 'absent'
         self.mod.localhost_vars['cmd'] = 'teardown'
-        self.mod._process_specs()
-        self.assertEqual(expected_state, self.args['state'])
 
-        # After yet another run, the 'absent' state nodes should be deleted
-        # from state altogether.
-        self.mod._process_specs()
-        self.assertEqual(self.args['state']['foo']['nodes'], [])
+        # After one or more runs, the 'absent' state nodes should still exist,
+        # since they're only removed after completion of deployment in a
+        # playbook.
+        for _ in six.moves.range(3):
+            self.mod._process_specs()
+            self.assertEqual(expected_state, self.args['state'])
 
     def test__process_specs_no_hypervisors(self):
         self.args['hypervisor_vars'] = {}
@@ -243,3 +243,13 @@ class TestTenksUpdateState(unittest.TestCase):
         self.hypervisor_vars['foo']['ipmi_port_range_start'] = 123
         self.hypervisor_vars['foo']['ipmi_port_range_end'] = 123
         self.assertRaises(AnsibleActionFail, self.mod._process_specs)
+
+    def test__prune_absent_nodes(self):
+        # Create some node definitions.
+        self.mod._process_specs()
+        # Set them to be 'absent'.
+        for node in self.args['state']['foo']['nodes']:
+            node['state'] = 'absent'
+        self.mod._prune_absent_nodes()
+        # Ensure they were removed.
+        self.assertEqual(self.args['state']['foo']['nodes'], [])

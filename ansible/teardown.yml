@@ -25,3 +25,6 @@
 
 - name: Perform deployment host deconfiguration
   import_playbook: host_setup.yml
+
+- name: Clean up Tenks state
+  import_playbook: cleanup_state.yml

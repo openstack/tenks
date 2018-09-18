@@ -1,0 +1,20 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Load state from file
+      include_vars:
+        file: "{{ state_file_path }}"
+        name: tenks_state
+
+    - name: Prune absent nodes from state
+      tenks_update_state:
+        prune_only: true
+        state: "{{ tenks_state }}"
+      register: new_state
+
+    - name: Write new state to file
+      copy:
+        # tenks_schedule lookup plugin outputs a dict. Pretty-print this to
+        # persist it in a YAML file.
+        content: "{{ new_state.result | to_nice_yaml }}"
+        dest: "{{ state_file_path }}"
