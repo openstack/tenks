@@ -41,11 +41,10 @@
 - name: Configure physical networks
   include_tasks: physical_network.yml
   vars:
-    network_name: "{{ item.0 }}"
-    tenks_bridge: "{{ bridge_prefix ~ idx }}"
-    source_interface: "{{ item.1 }}"
+    network_name: "{{ pn.key }}"
+    tenks_bridge: "{{ bridge_prefix ~ (pn.key | physnet_name_to_index) }}"
+    source_interface: "{{ pn.value }}"
     state: "{{ 'absent' if cmd == 'teardown' else 'present' }}"
-  # Sort to ensure we always enumerate in the same order.
-  loop: "{{ physnet_mappings | dictsort }}"
+  loop: "{{ query('dict', physnet_mappings) }}"
   loop_control:
-    index_var: idx
+    loop_var: pn

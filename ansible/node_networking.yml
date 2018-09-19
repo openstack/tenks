@@ -1,14 +1,14 @@
 - hosts: localhost
   tasks:
-    - name: Load allocations from file
+    - name: Load state from file
       include_vars:
-        file: "{{ allocations_file_path }}"
-        name: allocations
+        file: "{{ state_file_path }}"
+        name: tenks_state
 
 - hosts: hypervisors
   vars:
     nodes: >-
-      {{ hostvars.localhost.allocations[inventory_hostname]
+      {{ hostvars.localhost.tenks_state[inventory_hostname].nodes
            | default([]) }}
   tasks:
     - name: Configure veth pairs for each node

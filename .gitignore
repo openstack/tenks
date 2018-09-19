@@ -2,8 +2,8 @@
 .*
 # Ansible retry files
 *.retry
-# Tenks allocations file
-allocations.yml
+# Tenks state file
+state.yml
 # Tenks Galaxy roles
 ansible/roles/stackhpc.*
 
@@ -45,6 +45,7 @@ pip-log.txt
 pip-delete-this-directory.txt
 
 # Unit test / coverage reports
+cover/
 htmlcov/
 .tox/
 .coverage
