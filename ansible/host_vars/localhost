@@ -21,6 +21,11 @@
 #     # The Ironic driver for nodes of this type. If not set,
 #     # `default_ironic_driver` will be used.
 #     ironic_driver: ipmi
+#     # If true, log the nodes' console output to files in `log_directory`,
+#     # instead of to a PTY. If false, direct terminal output to a PTY at
+#     # serial port 0. If not set, the stackhpc.libvirt-vm role will handle the
+#     # default behaviour.
+#     console_log_enabled: false
 node_types: {}
 
 # specs is a list of configurations of nodes to be created. Each configuration
