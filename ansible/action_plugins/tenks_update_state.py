@@ -173,6 +173,11 @@ class ActionModule(ActionBase):
                 hostname, idx = scheduler.choose_host(node)
                 # Set node name based on its index.
                 node['name'] = "%s%d" % (self.args['node_name_prefix'], idx)
+                # Sequentially number the volume names.
+                for vol_idx, vol in enumerate(node['volumes']):
+                    vol['name'] = ("%s%s%d"
+                                   % (node['name'],
+                                      self.args['vol_name_prefix'], vol_idx))
                 # Set IPMI port using its index as an offset from the lowest
                 # port.
                 node['ipmi_port'] = (
@@ -196,10 +201,6 @@ class ActionModule(ActionBase):
         )
         # Set the type name, for future reference.
         node['type'] = type_name
-        # Sequentially number the volume names.
-        for vol_idx, vol in enumerate(node['volumes']):
-            vol['name'] = (
-                "%s%d" % (self.args['vol_name_prefix'], vol_idx))
         # Ironic config is not mandatory.
         if ironic_config:
             node['ironic_config'] = ironic_config

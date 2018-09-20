@@ -173,7 +173,7 @@ class TestTenksUpdateState(unittest.TestCase):
         for node in nodes:
             self.assertEqual(len(node['volumes']), 2)
             for n in {'0', '1'}:
-                self.assertIn('test_vol_pfx' + n,
+                self.assertIn(node['name'] + 'test_vol_pfx' + n,
                               [vol['name'] for vol in node['volumes']])
             for c in {'10GB', '20GB'}:
                 self.assertIn(c, [vol['capacity'] for vol in node['volumes']])
