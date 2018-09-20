@@ -31,11 +31,11 @@
       set_fact:
         nics: "{{ nics | union([{'mac': item.split()[4]}]) }}"
       loop: "{{ iflist_res.stdout_lines[2:] }}"
-      when: node.state == 'present'
+      when: (node.state | default('present')) == 'present'
 
   # If the node's state is 'absent', the domain will already have been
   # destroyed.
-  when: node.state == 'present'
+  when: (node.state | default('present')) == 'present'
 
 - name: Configure node in Ironic
   os_ironic:
@@ -54,7 +54,7 @@
     name: "{{ node.name }}"
     # The 'nics' list can be empty without a problem if state is 'absent'.
     nics: "{{ nics | default([]) }}"
-    state: "{{ node.state }}"
+    state: "{{ node.state | default('present') }}"
   vars:
     # This module requires the openstacksdk package, which is installed within
     # our virtualenv.
@@ -109,4 +109,4 @@
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance
           unset '{{ node_res.uuid }}'
 
-  when: node.state == 'present'
+  when: (node.state | default('present')) == 'present'

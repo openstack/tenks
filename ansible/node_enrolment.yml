@@ -12,20 +12,30 @@
           credentials exist in your environment, perhaps by sourcing your RC file.
       when: not lookup('env', 'OS_USERNAME')
 
+    # This command will return the UUIDs, regardless of whether deploy_kernel
+    # and deploy_ramdisk are image UUIDs or names.
+    - name: Get OpenStack deployment image UUIDs
+      command: >-
+        '{{ virtualenv_path }}/bin/openstack' image show
+          '{{ item }}' --format value --column id
+      loop:
+        - "{{ deploy_kernel }}"
+        - "{{ deploy_ramdisk }}"
+      # deploy_kernel/ramdisk default to none. We don't need to know them for
+      # enrolment to continue.
+      when: item is not none
+      register: deploy_image_ids
+      changed_when: false
+
     - name: Perform Ironic enrolment for each hypervisor's nodes
       include_role:
         name: ironic-enrolment
       vars:
-        ironic_deploy_kernel_uuid: "{{ deploy_kernel_uuid }}"
-        ironic_deploy_ramdisk_uuid: "{{ deploy_ramdisk_uuid }}"
-        # FIXME(w-miller): Set absent/present in tenks_schedule on a per-node
-        # basis to account for existing allocations, rather than for all nodes
-        # here.
-        ironic_nodes: >-
-          {{ alloc.value.nodes
-               | map('combine', {'state': ('absent' if cmd == 'teardown'
-                                           else 'present')})
-               | list }}
+        ironic_deploy_kernel_uuid: >-
+          {{ deploy_image_ids.results.0.stdout | default(omit) }}
+        ironic_deploy_ramdisk_uuid: >-
+          {{ deploy_image_ids.results.1.stdout | default(omit) }}
+        ironic_nodes: "{{ alloc.value.nodes }}"
         ironic_hypervisor: "{{ alloc.key }}"
         ironic_virtualenv_path: "{{ virtualenv_path }}"
         ironic_python_upper_constraints_url: >-
