@@ -36,6 +36,20 @@ specs:
       # Required if `ironic_config` has been specified.
       resource_class: my_rc
 
+# nova_flavors is a list of Nova flavors to be created. Each flavor must
+# specify the resource class it is associated with, as well as the Tenks node
+# type whose hardware specs should be used.
+nova_flavors:
+    # Required.
+  - resource_class: my_rc
+    # Required.
+    node_type: type0
+
+# The Glance name or UUID of the image to use for the deployment kernel.
+deploy_kernel: ipa.vmlinuz
+# The Glance name or UUID of the image to use for the deployment ramdisk.
+deploy_ramdisk: ipa.initramfs
+
 # Map physical network names to their source device. This can be either an
 # existing interface or an existing bridge.
 # Remember that if the mappings are specified in this file, they will apply to
