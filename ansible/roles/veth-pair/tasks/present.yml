@@ -10,6 +10,13 @@
   failed_when: res.rc not in [0, 2]
   become: true
 
+- name: Bring each end of veth up
+  command: ip link set {{ item }} up
+  loop:
+    - "{{ veth_pair_ovs_link_name }}"
+    - "{{ veth_pair_source_link_name }}"
+  become: true
+
 - name: Plug veth into OVS bridge
   openvswitch_port:
     bridge: "{{ veth_pair_ovs_bridge }}"
