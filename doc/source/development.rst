@@ -47,6 +47,12 @@ to be implemented in future.
   ``ansible-playbook`` invocation with multiple parameters. It would be less
   clunky to introduce a simple CLI wrapper encapsulating some default commands.
 
+* **Configurable boot modes**. Support for boot modes other than legacy BIOS
+  (for example, UEFI) would be useful. OpenStack Ironic supports configuration
+  of boot modes with the `boot_mode` parameter for certain drivers. The
+  Libvirt/QEMU/KVM stack supports UEFI boot with the `OVMF project
+  <http://www.linux-kvm.org/downloads/lersek/ovmf-whitepaper-c770f8c.txt>`__
+
 Contribution
 ------------
 
