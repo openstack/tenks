@@ -3,6 +3,29 @@
 Installation
 ============
 
+.. _assumptions:
+
+Assumptions
+-----------
+
+Some assumptions that are made about the configuration of your system are noted
+below.
+
+It is assumed that...
+
+* ...you already have an OpenStack cloud deployed, for which...
+
+    * ...the host from which Tenks is executed (*localhost*) has access to the
+      OpenStack APIs. These are used for Ironic node enrolment and Nova flavor
+      registration.
+
+    * ...the OpenStack *OS_\** authentication variables are present in
+      *localhost*'s environment. These can typically be sourced from your
+      *openrc* file.
+
+* ... a distinct network device (interface or bridge) is present for each
+  physical network that a hypervisor is connected to.
+
 Pre-Requisites
 --------------
 
