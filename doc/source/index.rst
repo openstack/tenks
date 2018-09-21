@@ -12,9 +12,9 @@ testing purposes.
 .. toctree::
    :maxdepth: 2
 
-   architecture
    configuration
-   development
    install
-   limitations
    run
+   architecture
+   development
+   limitations

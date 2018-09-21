@@ -26,12 +26,12 @@ Tenks has a concept of 'physical network' which currently must map one-to-one
 to the hardware networks plugged into the hypervisors. It requires device
 mappings to be specified on a hypervisor for each physical network that is to
 be connected to nodes on that hypervisor. This device can be an interface, a
-Linux bridge or an Open vSwitch bridge. For each physical network that is give
+Linux bridge or an Open vSwitch bridge. For each physical network that is given
 a mapping on a hypervisor, a new Tenks-managed Open vSwitch bridge is created.
 If the device mapped to this physnet is an interface, it is plugged directly
 into the new bridge. If the device is an existing Linux bridge, a veth pair is
 created to connect the existing bridge to the new bridge. If the device is an
-existing Open vSwitch bridge, an Open vSwitch patch port is created to link th
+existing Open vSwitch bridge, an Open vSwitch patch port is created to link the
 two bridges.
 
 A new veth pair is created for each physical network that each node on each
