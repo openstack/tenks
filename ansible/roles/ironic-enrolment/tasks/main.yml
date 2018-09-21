@@ -16,12 +16,31 @@
       -c {{ ironic_python_upper_constraints_url }}
     virtualenv: "{{ ironic_virtualenv_path }}"
 
+# This command will return the UUIDs, regardless of whether
+# ironic_deploy_kernel and ironic_deploy_ramdisk are image UUIDs or names.
+- name: Get OpenStack deployment image UUIDs
+  command: >-
+    '{{ ironic_virtualenv_path }}/bin/openstack' image show
+      '{{ item }}' --format value --column id
+  loop:
+    - "{{ ironic_deploy_kernel }}"
+    - "{{ ironic_deploy_ramdisk }}"
+  # ironic_deploy_kernel/ramdisk default to none. We don't need to know them
+  # for enrolment to continue.
+  when: item is not none
+  register: deploy_image_ids
+  changed_when: false
+
 - name: Configure Ironic node enrolment
   include_tasks: node.yml
   vars:
     node: "{{ ironic_node }}"
     ipmi_port: >-
       {{ hostvars[ironic_hypervisor].ipmi_port_range_start + port_offset }}
+    ironic_deploy_kernel_uuid: >-
+      {{ deploy_image_ids.results.0.stdout | default(ironic_deploy_kernel) }}
+    ironic_deploy_ramdisk_uuid: >-
+      {{ deploy_image_ids.results.1.stdout | default(ironic_deploy_ramdisk) }}
   loop: "{{ ironic_nodes | sort(attribute='name') }}"
   loop_control:
     loop_var: ironic_node

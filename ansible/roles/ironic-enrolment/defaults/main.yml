@@ -3,10 +3,10 @@
 ironic_nodes: []
 # The hostname of the hypervisor where these nodes exist.
 ironic_hypervisor:
-# The Glance UUID of the image to use for the deployment kernel.
-ironic_deploy_kernel_uuid:
-# The Glance UUID of the image to use for the deployment ramdisk.
-ironic_deploy_ramdisk_uuid:
+# The Glance name or UUID of the image to use for the deployment kernel.
+ironic_deploy_kernel:
+# The Glance name UUID of the image to use for the deployment ramdisk.
+ironic_deploy_ramdisk:
 # The path to the virtualenv in which to install the OpenStack clients.
 ironic_virtualenv_path:
 # The URL of the upper constraints file to pass to pip when installing Python
