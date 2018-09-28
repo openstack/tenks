@@ -28,6 +28,7 @@
       command: ovs-vsctl list-br
       register: ovs_bridges
       changed_when: false
+      become: true
 
     - name: Register source interface as an Open vSwitch bridge
       set_fact:
