@@ -1,0 +1,4 @@
+---
+
+# path to `ip` from the `iproute2` package
+tenks_ip_path: /sbin/ip

@@ -1,4 +1,15 @@
 ---
+
+- name: Gather os specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+        - "{{ ansible_distribution }}.yml"
+        - "{{ ansible_os_family }}.yml"
+      skip: true
+  tags: vars
+
 - name: Fail if source interface does not exist
   fail:
     msg: >
@@ -13,8 +24,8 @@
     source_type: direct
 
 - name: Get source interface details
-  # NOTE(w-miller): The `ip` command may not be in $PATH, so use the full path.
-  command: /usr/sbin/ip -details link show {{ source_interface }}
+  command: >
+    {{ tenks_ip_path }} -details link show {{ source_interface }}
   register: if_details
   changed_when: false
 
