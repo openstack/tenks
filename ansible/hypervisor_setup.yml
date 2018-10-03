@@ -1,6 +1,6 @@
 ---
 - name: Ensure general system requirements are installed
-  yum:
+  package:
     name: "{{ system_requirements }}"
   become: true
   # Don't uninstall requirements during teardown since they may already have
