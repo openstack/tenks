@@ -1,0 +1,5 @@
+---
+# List of package dependencies to install.
+vbmcd_packages:
+  - gcc
+  - libvirt-devel
