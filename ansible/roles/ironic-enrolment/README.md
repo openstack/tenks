@@ -11,7 +11,7 @@ Requirements
   the shell environment. These can be sourced from an OpenStack RC file, for
   example.
 
-- The `virsh` command-line tool present at `/bin/virsh`.
+- The `virsh` command-line tool present at `/usr/bin/virsh`.
 
 Role Variables
 --------------

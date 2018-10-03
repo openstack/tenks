@@ -12,9 +12,7 @@
       # The output format of this command gives two lines of header, followed by
       # (for each vNIC):
       # <name> <type> <source interface> <model> <MAC>
-      # The VMs will have been created with the virt module, using become: true.
-      # This targets /bin/virsh rather than /usr/bin/virsh.
-      command: /bin/virsh domiflist '{{ node.name }}'
+      command: /usr/bin/virsh domiflist '{{ node.name }}'
       register: iflist_res
       changed_when: false
       become: true
