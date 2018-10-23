@@ -20,7 +20,8 @@
 ### Firstly, some fact gathering.
 # Start off by assuming the source interface is direct, unless proven
 # otherwise.
-- set_fact:
+- name: Set initial value for source_type
+  set_fact:
     source_type: direct
 
 - name: Get source interface details
