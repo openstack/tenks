@@ -40,7 +40,7 @@
     - name: Ensure Open vSwitch is started and enabled
       service:
         name: openvswitch
-        state: running
+        state: started
         enabled: true
       become: true
   # Assume a non-zero return code means the command does not exist. Do this
