@@ -1,0 +1,9 @@
+---
+- job:
+    name: tenks-tox-ansible-lint
+    description: |
+      Tox job that runs ansible-lint
+    parent: openstack-tox
+    vars:
+      tox_envlist: alint
+

@@ -1,9 +1,16 @@
 ---
 - project:
+    templates:
+      - build-openstack-docs-pti
+      - openstack-cover-jobs
+      - openstack-python35-jobs
+      - openstack-python-jobs
     check:
       jobs:
-        - noop
+        - build-openstack-releasenotes
+        - tenks-tox-ansible-lint
     gate:
       queue: tenks
       jobs:
-        - noop
+        - build-openstack-releasenotes
+        - tenks-tox-ansible-lint
