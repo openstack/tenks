@@ -28,5 +28,9 @@
   import_playbook: flavor_registration.yml
   tags: openstack
 
+- name: Wait for resources to become available
+  import_playbook: resource_wait.yml
+  tags: openstack, resource
+
 - name: Clean up Tenks state
   import_playbook: cleanup_state.yml

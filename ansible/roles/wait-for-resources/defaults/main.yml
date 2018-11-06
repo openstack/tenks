@@ -1,0 +1,28 @@
+---
+
+# A list of dictionaries, each with the following keys:
+# * resource_class - the name of the resource class that you want to be
+#   available
+# * traits - a list of traits a provider requires before that provider is
+#   considered to provide that resource
+# * amount - natural number representing the amount of the resource that
+#   should be available. This will be tested against the total resource count
+#   minus the amount that is reserved.
+wait_for_resources_required_resources:
+
+# Virtualenv containing OpenStack client
+wait_for_resources_venv:
+
+# The resources are polled this many times. The delay between each iteration
+# is also configurable, but defaults to 10 seconds
+wait_for_resources_retry_limit: 15
+
+# The delay between each iteration.
+wait_for_resources_delay:
+
+# The URL of the upper constraints file to pass to pip when installing Python
+# packages.
+wait_for_resources_python_upper_constraints_url:
+
+# Path on the remote machine to copy the python requirements file to
+wait_for_resources_python_requirements_path: /tmp/wait-for-python-requirements.txt

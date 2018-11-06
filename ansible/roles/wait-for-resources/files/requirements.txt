@@ -1,0 +1,4 @@
+# This file contains the Python packages that are needed in the
+# what-for-resource virtual env.
+
+osc-placement>=1.3.0 # Apache License 2.0

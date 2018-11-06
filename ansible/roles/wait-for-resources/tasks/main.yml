@@ -1,0 +1,38 @@
+---
+
+# Waits for for the resource tracker to be updated with a given resource
+# class
+
+- name: Validate that the virtualenv variable is set
+  fail:
+    msg: >-
+      You must set the variable, wait_for_resources_venv, to use this role.
+  when: wait_for_resources_venv is none
+
+- name: Validate resources
+  include_tasks: validate.yml
+  vars:
+    wait_for_resources_amount: "{{ item.amount }}"
+    wait_for_resources_resource_class: "{{ item.resource_class }}"
+  loop: "{{ wait_for_resources_required_resources }}"
+
+- name: Copy over requirements file
+  copy:
+    src: requirements.txt
+    dest: "{{ wait_for_resources_python_requirements_path }}"
+
+- name: Install dependencies in supplied venv
+  pip:
+    requirements: "{{ wait_for_resources_python_requirements_path }}"
+    extra_args: >-
+      {%- if wait_for_resources_python_upper_constraints_url -%}
+      -c {{ wait_for_resources_python_upper_constraints_url }}
+      {%- endif -%}
+    virtualenv: "{{ wait_for_resources_venv }}"
+
+- name: Call wait_for_resources module
+  wait_for_resources:
+    venv: "{{ wait_for_resources_venv }}"
+    resources: "{{ wait_for_resources_required_resources }}"
+    delay: "{{ wait_for_resources_delay | default(omit, true) }}"
+    maximum_retries: "{{ wait_for_resources_retry_limit }}"
