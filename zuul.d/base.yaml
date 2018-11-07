@@ -1,0 +1,21 @@
+---
+
+- job:
+    name: tenks-deploy-teardown-base
+    description: |
+      Creates the tenks virtual machines and sets up the virtual BMC daemon.
+      This stops short of enrolling the machines in Ironic. The cluster is
+      then destroyed again.
+    pre-run: playbooks/tenks-deploy-teardown/pre.yml
+    run: playbooks/tenks-deploy-teardown/run.yml
+    post-run: playbooks/tenks-deploy-teardown/post.yml
+    required-projects:
+      - name: openstack/requirements
+    attempts: 1
+    timeout: 1800
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/.*
+      - ^releasenotes/.*
+      - ^setup.cfg$
+      - ^tox.ini$

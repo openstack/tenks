@@ -1,0 +1,13 @@
+---
+- name: tenks-deploy-teardown post run
+  hosts: all
+  pre_tasks:
+    - name: Include common variables
+      include_vars: common.yml
+  roles:
+    - role: tenks-diagnostics
+      tenks_diagnostics_phase: "post"
+      tenks_diagnostics_log_dir: "{{ logs_dir }}"
+      tenks_diagnostics_config_dir: "{{ config_dir }}"
+      tenks_diagnostics_executor_log_dir: "{{ zuul.executor.log_root }}/{{ inventory_hostname }}"
+

@@ -22,9 +22,11 @@
 
 - name: Perform Ironic node configuration
   import_playbook: node_enrolment.yml
+  tags: openstack
 
 - name: Register flavors in Nova
   import_playbook: flavor_registration.yml
+  tags: openstack
 
 - name: Clean up Tenks state
   import_playbook: cleanup_state.yml

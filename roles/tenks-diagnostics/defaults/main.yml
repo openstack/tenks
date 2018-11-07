@@ -1,0 +1,13 @@
+---
+# Job phase - one of 'pre', 'created,  or 'post'. The created phase is
+# designed to called when the virtual machines have been created.
+tenks_diagnostics_phase:
+
+# Directory on the remote host in which to save diagnostics.
+tenks_diagnostics_logs_dir:
+
+# Directory on the remote host in which configuration is stored.
+tenks_diagnostics_config_dir:
+
+# Directory on the executor in which to save logs.
+tenks_diagnostics_executor_log_dir:

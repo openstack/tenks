@@ -1,0 +1,2 @@
+---
+- include: "{{ tenks_diagnostics_phase }}.yml"
