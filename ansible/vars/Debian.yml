@@ -2,3 +2,7 @@
 
 # path to `ip` from the `iproute2` package
 tenks_ip_path: /sbin/ip
+
+# package that provides the Open vSwitch daemon and userspace
+# utilities
+openvswitch_pkg_name: openvswitch-switch
