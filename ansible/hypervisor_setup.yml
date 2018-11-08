@@ -34,12 +34,12 @@
 - block:
     - name: Ensure Open vSwitch package is installed
       package:
-        name: "{{ openvswitch_pkg_name }}"
+        name: "{{ tenks_openvswitch_pkg_name }}"
       become: true
 
     - name: Ensure Open vSwitch is started and enabled
       service:
-        name: openvswitch
+        name: "{{ tenks_openvswitch_service_name }}"
         state: started
         enabled: true
       become: true
