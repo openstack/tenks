@@ -9,8 +9,12 @@
       jobs:
         - build-openstack-releasenotes
         - tenks-tox-ansible-lint
+        - tenks-deploy-teardown-centos
+        - tenks-deploy-teardown-ubuntu
     gate:
       queue: tenks
       jobs:
         - build-openstack-releasenotes
         - tenks-tox-ansible-lint
+        - tenks-deploy-teardown-centos
+        - tenks-deploy-teardown-ubuntu

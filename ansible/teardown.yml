@@ -10,9 +10,11 @@
 
 - name: Deregister flavors in Nova
   import_playbook: flavor_registration.yml
+  tags: openstack
 
 - name: Perform Ironic node deconfiguration
   import_playbook: node_enrolment.yml
+  tags: openstack
 
 - name: Deconfigure virtual node BMCs
   import_playbook: node_bmc.yml

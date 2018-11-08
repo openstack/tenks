@@ -1,0 +1,14 @@
+---
+
+- name: Run diagnostics script
+  script: dump_libvirt_logs.sh
+  register: dump_libvirt_logs_result
+  become: true
+  failed_when: false
+  environment:
+    LOG_DIR: "{{ tenks_diagnostics_log_dir }}"
+    CONFIG_DIR: "{{ tenks_diagnostics_config_dir }}"
+
+- name: Print dump_libvirt_logs.sh output
+  debug:
+    msg: "{{ dump_libvirt_logs_result.stdout }}"

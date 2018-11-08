@@ -7,3 +7,13 @@
     vars:
       tox_envlist: alint
 
+- job:
+    name: tenks-deploy-teardown-centos
+    parent: tenks-deploy-teardown-base
+    nodeset: centos-7
+
+- job:
+    name: tenks-deploy-teardown-ubuntu
+    parent: tenks-deploy-teardown-base
+    nodeset: ubuntu-bionic
+

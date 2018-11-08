@@ -1,0 +1,32 @@
+---
+- hosts: all
+  vars:
+    ansible_playbook_bin: "{{ tenks_venv }}/bin/ansible-playbook"
+  tasks:
+    - name: Include common variables
+      include_vars: common.yml
+
+    - name: Deploy tenks cluster
+      shell:
+        cmd: >-
+          {{ ansible_playbook_bin }} -vvv --skip-tags openstack
+          --inventory ansible/inventory
+          --extra-vars=@{{ tenks_overrides_path }}
+          ansible/deploy.yml > {{ logs_dir }}/ansible/tenks-deploy
+        chdir: "{{ tenks_src_dir }}"
+
+    - name: Get some diagnostic info for the tenks cluster
+      include_role:
+        name: tenks-diagnostics
+      vars:
+        tenks_diagnostics_phase: "created"
+        tenks_diagnostics_log_dir: "{{ logs_dir }}"
+
+    - name: Teardown tenks cluster
+      shell:
+        cmd: >-
+          {{ ansible_playbook_bin }} -vvv --skip-tags openstack
+          --inventory ansible/inventory
+          --extra-vars=@{{ tenks_overrides_path }}
+          ansible/teardown.yml > {{ logs_dir }}/ansible/tenks-teardown
+        chdir: "{{ tenks_src_dir }}"
