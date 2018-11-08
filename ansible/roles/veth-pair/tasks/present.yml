@@ -23,14 +23,17 @@
     port: "{{ veth_pair_ovs_link_name }}"
   become: true
 
-- name: Plug veth into source bridge
-  command: >-
-    brctl addif {{ veth_pair_source_bridge }}
-    {{ veth_pair_source_link_name }}
-  register: res
-  failed_when:
-    - res.rc != 0
-    - "'already a member of a bridge' not in res.stderr"
-  changed_when: "'already a member of a bridge' not in res.stderr"
+- block:
+  - include_tasks: is-attached.yml
+    vars:
+      bridge: "{{ veth_pair_source_bridge }}"
+      interface: "{{ veth_pair_source_link_name }}"
+
+  - name: Plug veth into source bridge
+    command: >-
+      ip link set {{ veth_pair_source_link_name }} master
+      {{ veth_pair_source_bridge }}
+    when:
+      - not veth_pair_is_attached
+    become: true
   when: veth_pair_plug_into_source | bool
-  become: true

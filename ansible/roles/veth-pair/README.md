@@ -15,9 +15,7 @@ This role manages a veth pair. Actions:
 Requirements
 ------------
 
-The host should have the `ip` and `ovs-vsctl` commands accessible. If
-`veth_pair_plug_into_source` is enabled, the command `brctl` must also be
-accessible.
+The host should have the `ip` and `ovs-vsctl` commands accessible.
 
 Role Variables
 --------------

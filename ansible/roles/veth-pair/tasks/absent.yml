@@ -1,16 +1,17 @@
 ---
-- name: Unplug veth from source bridge
-  command: >-
-    brctl delif {{ veth_pair_source_bridge }}
-    {{ veth_pair_source_link_name }}
-  register: res
-  failed_when:
-    - res.rc != 0
-    # Case where veth is already unplugged.
-    - not (res.rc == 1 and 'does not exist' in res.stderr)
-  changed_when: res.rc == 0
+- block:
+  - include_tasks: is-attached.yml
+    vars:
+      bridge: "{{ veth_pair_source_bridge }}"
+      interface: "{{ veth_pair_source_link_name }}"
+
+  - name: Unplug veth from source bridge
+    command: >-
+      ip link set {{ veth_pair_source_link_name }} nomaster
+    when:
+      - veth_pair_is_attached
+    become: true
   when: veth_pair_plug_into_source | bool
-  become: true
 
 - name: Delete veth pair
   command: >-

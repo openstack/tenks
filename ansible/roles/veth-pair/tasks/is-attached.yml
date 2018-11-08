@@ -1,0 +1,22 @@
+---
+
+# This will determine if interface is attached to bridge and set a fact called
+# veth_pair_is_attached containing the result
+
+- name: Set a default value for veth_pair_is_attached
+  set_fact:
+    veth_pair_is_attached: false
+
+- name: Speculatively check {{ interface }}'s master
+  command: >-
+    realpath /sys/class/net/{{ interface }}/master
+  register: master_result
+  failed_when: false
+  changed_when: false
+
+- name: Determine if {{ interface }} is attached to {{ bridge }}
+  vars:
+    master: "{{ master_result.stdout | basename }}"
+  set_fact:
+    veth_pair_is_attached: "{{ master == bridge }}"
+  when: master_result.rc == 0
