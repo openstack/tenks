@@ -29,6 +29,9 @@
                 owner: "{{ libvirt_pool_owner }}"
                 group: "{{ libvirt_pool_group }}"
             libvirt_host_require_vt: "{{ libvirt_require_vt }}"
+            libvirt_host_uri: "{{ libvirt_local_uri }}"
+            libvirt_host_socket_dir: "{{ libvirt_custom_socket_path }}"
+            libvirt_host_pid_path: "{{ libvirt_custom_pid_path }}"
 
         - name: Set up Virtual BMC daemon
           include_role:

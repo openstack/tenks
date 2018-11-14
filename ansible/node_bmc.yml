@@ -28,6 +28,7 @@
         name: virtualbmc-domain
       vars:
         vbmc_domain: "{{ domain }}"
+        vbmc_libvirt_uri: "{{ libvirt_local_uri }}"
         vbmc_ipmi_address: "{{ ipmi_address }}"
         vbmc_ipmi_username: "{{ ipmi_username }}"
         vbmc_ipmi_password: "{{ ipmi_password }}"

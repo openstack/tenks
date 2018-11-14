@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Adds support for setting the libvirt connection uri via the
+    ``libvirt_local_uri`` variable. See
+    `this story <https://storyboard.openstack.org/#!/story/2004344>`_
+    for details.

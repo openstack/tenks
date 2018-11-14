@@ -12,7 +12,12 @@
       # The output format of this command gives two lines of header, followed by
       # (for each vNIC):
       # <name> <type> <source interface> <model> <MAC>
-      command: /usr/bin/virsh domiflist '{{ node.name }}'
+      command: >-
+        /usr/bin/virsh
+        {% if uri %}-c {{ uri }}{% endif %}
+        domiflist '{{ node.name }}'
+      vars:
+        uri: "{{ hostvars[ironic_hypervisor].libvirt_local_uri }}"
       register: iflist_res
       changed_when: false
       become: true
