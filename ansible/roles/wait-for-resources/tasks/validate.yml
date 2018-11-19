@@ -1,0 +1,17 @@
+---
+
+- name: Validate that the target resource class is set
+  fail:
+    msg: >-
+      Each item in the dictionary wait_for_resources_required_resources must contain
+      the key, resource_class.
+  when: wait_for_resources_class is none
+
+- name: Validate expected resource count
+  vars:
+    count: "{{ wait_for_resources_amount | int(default=-1) }}"
+  fail:
+    msg: >-
+      Each item in the dictionary wait_for_resources_required_resources must contain
+      the key, amount.
+  when: wait_for_resources_amount is none or count | int < 0
