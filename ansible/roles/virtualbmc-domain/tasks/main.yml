@@ -45,6 +45,7 @@
       --username '{{ vbmc_ipmi_username }}'
       --password '{{ vbmc_ipmi_password }}'
       --address {{ vbmc_ipmi_address }}
+    {% if vbmc_libvirt_uri %} --libvirt-uri '{{vbmc_libvirt_uri}}'{% endif %}
   when: vbmc_state == 'present'
   become: true
   tags:
