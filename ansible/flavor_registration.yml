@@ -10,3 +10,4 @@
           {{ python_upper_constraints_url }}
         flavors: "{{ nova_flavors }}"
         flavors_state: "{{ 'absent' if cmd == 'teardown' else 'present' }}"
+      when: flavors | length > 0

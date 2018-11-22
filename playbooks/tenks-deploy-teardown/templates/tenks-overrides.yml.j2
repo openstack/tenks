@@ -17,13 +17,8 @@ node_types:
 specs:
   - type: type0
     count: 2
-    ironic_config:
-      resource_class: test-rc
-      network_interface: flat
 
-nova_flavors:
-  - resource_class: test-rc
-    node_type: type0
+nova_flavors: []
 
 physnet_mappings:
   physnet1: breth1

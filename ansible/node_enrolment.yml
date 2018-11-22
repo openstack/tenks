@@ -5,13 +5,6 @@
         file: "{{ state_file_path }}"
         name: tenks_state
 
-    - name: Check that OpenStack credentials exist in the environment
-      fail:
-        msg: >
-          $OS_USERNAME was not found in the environment. Ensure the OpenStack
-          credentials exist in your environment, perhaps by sourcing your RC file.
-      when: not lookup('env', 'OS_USERNAME')
-
     - name: Perform Ironic enrolment for each hypervisor's nodes
       include_role:
         name: ironic-enrolment
@@ -26,3 +19,4 @@
       loop: "{{ query('dict', tenks_state) }}"
       loop_control:
         loop_var: alloc
+      when: ironic_nodes | selectattr('ironic_config', 'defined') | list | length > 0

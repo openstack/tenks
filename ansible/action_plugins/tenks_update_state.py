@@ -156,8 +156,9 @@ class ActionModule(ActionBase):
         # to count as an 'instance' of the spec.
         MATCHING_ATTRS = {'type', 'ironic_config'}
         for spec in specs:
-            if ((all(spec[attr] == node[attr] for attr in MATCHING_ATTRS) and
-                 spec['count'] > 0)):
+            if (all(spec.get(attr) == node.get(attr)
+                    for attr in MATCHING_ATTRS)
+                    and spec['count'] > 0):
                 spec['count'] -= 1
                 return True
         return False
