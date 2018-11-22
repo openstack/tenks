@@ -17,8 +17,8 @@ setup on the host where the ``ansible-playbook`` command is executed
   must contain one or more system. Systems in its sub-groups will host a subset
   of the nodes deployed by Tenks.
 
-    * The ``libvirt`` group is a sub-group of ``hypervisors``. Systems in this
-      group will act as hypervisors using the Libvirt provider.
+  * The ``libvirt`` group is a sub-group of ``hypervisors``. Systems in this
+    group will act as hypervisors using the Libvirt provider.
 
 Variable Configuration
 ----------------------

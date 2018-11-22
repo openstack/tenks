@@ -1,20 +1,19 @@
 ---
 - project:
     templates:
-      - build-openstack-docs-pti
+      - publish-openstack-docs-pti
+      - release-notes-jobs-python3
       - openstack-cover-jobs
       - openstack-python35-jobs
       - openstack-python-jobs
     check:
       jobs:
-        - build-openstack-releasenotes
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-centos
         - tenks-deploy-teardown-ubuntu
     gate:
       queue: tenks
       jobs:
-        - build-openstack-releasenotes
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-centos
         - tenks-deploy-teardown-ubuntu

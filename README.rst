@@ -1,6 +1,9 @@
 Tenks
 =====
 
+.. image:: https://governance.openstack.org/badges/metalsmith.svg
+    :target: https://governance.openstack.org/reference/tags/index.html
+
 Tenks is a utility that manages virtual bare metal clusters for development and
 testing purposes. It offers:
 
@@ -19,8 +22,8 @@ testing purposes. It offers:
 
 To get started with Tenks, see the documentation (linked below).
 
-* Free software: Apache license
-* Documentation: https://tenks.readthedocs.io/
-* Source: https://github.com/stackhpc/tenks/
-* Bugs: https://github.com/stackhpc/tenks/issues
+* License: Apache License, Version 2.0
+* Documentation: https://docs.openstack.org/tenks/
+* Source: https://git.openstack.org/cgit/openstack/tenks/
+* Bugs: https://storyboard.openstack.org/#!/project/openstack/tenks
 * Known issues/limitations: refer to the documentation.

@@ -56,7 +56,10 @@ to be implemented in future.
 Contribution
 ------------
 
-Contribution to Tenks' development is welcomed. Currently, the correct workflow
-is to raise an issue in the `GitHub repository
-<https://github.com/stackhpc/tenks/>`_. Patches should be submitted for review
-using a GitHub pull request.
+Contribution to Tenks' development is welcomed. Tenks uses the `OpenStack
+development processes
+<https://docs.openstack.org/infra/manual/developers.html>`__. Code reviews
+should be submitted to `Gerrit
+<https://review.openstack.org/#/q/project:openstack/tenks>`__, and bugs and
+RFEs submitted to `StoryBoard
+<https://storyboard.openstack.org/#!/project/openstack/tenks>`__.

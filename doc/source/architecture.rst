@@ -16,8 +16,8 @@ red ellipses represent roles and yellow rhombi represent action plugins.
    artifact can be produced.
    https://drive.google.com/file/d/1MlmaTvJ2BPkhrOCLin4GPH265JDJqD1E/view?usp=sharing
 
-.. image:: _static/tenks_ansible_structure.png
-   :target: _static/tenks_ansible_structure.png
+.. image:: images/tenks_ansible_structure.png
+   :width: 100%
 
 Networking
 ----------
@@ -45,5 +45,5 @@ An example of the networking structure of Tenks is shown below. In this
 example, one node was requested to be connected to physnet0 and physnet1, and
 two nodes were requested to be connected just to physnet1.
 
-.. image:: _static/tenks_networking_structure.png
-   :target: _static/tenks_networking_structure.png
+.. image:: images/tenks_networking_structure.png
+   :width: 100%

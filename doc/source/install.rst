@@ -15,13 +15,13 @@ It is assumed that...
 
 * ...you already have an OpenStack cloud deployed, for which...
 
-    * ...the host from which Tenks is executed (*localhost*) has access to the
-      OpenStack APIs. These are used for Ironic node enrolment and Nova flavor
-      registration.
+  * ...the host from which Tenks is executed (*localhost*) has access to the
+    OpenStack APIs. These are used for Ironic node enrolment and Nova flavor
+    registration.
 
-    * ...the OpenStack *OS_\** authentication variables are present in
-      *localhost*'s environment. These can typically be sourced from your
-      *openrc* file.
+  * ...the OpenStack *OS_\** authentication variables are present in
+    *localhost*'s environment. These can typically be sourced from your
+    *openrc* file.
 
 * ... a distinct network device (interface or bridge) is present for each
   physical network that a hypervisor is connected to.
@@ -53,7 +53,7 @@ Activate the virtualenv and update pip::
 
 Obtain the Tenks source code and change into the directory. For example::
 
-  (tenks) $ git clone https://github.com/stackhpc/tenks.git
+  (tenks) $ git clone https://git.openstack.org/openstack/tenks.git
   (tenks) $ cd tenks
 
 Install Tenks and its requirements using the source code checkout::
