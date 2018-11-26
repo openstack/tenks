@@ -8,6 +8,11 @@
   register: uuid
   changed_when: false
 
+- name: Fail if port is not found
+  fail:
+    msg: Ironic port with MAC address {{ mac }} not found
+  when: uuid.stdout == ""
+
 - name: Get physical network name
   set_fact:
     physnet: "{{ source_interface | source_link_to_physnet_name(
