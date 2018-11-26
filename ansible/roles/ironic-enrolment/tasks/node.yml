@@ -42,7 +42,9 @@
 
 - name: Configure node in Ironic
   os_ironic:
-    auth_type: password
+    auth_type: "{{ 'password' if lookup('env', 'OS_USERNAME') else omit }}"
+    cloud: "{{ lookup('env', 'OS_CLOUD') | default(omit, true) }}"
+    ironic_url: "{{ ironic_url | default(omit) }}"
     driver: "{{ node.ironic_driver }}"
     driver_info:
       power:

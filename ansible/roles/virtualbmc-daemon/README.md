@@ -15,3 +15,4 @@ Role Variables
   Virtual BMC.
 - `vbmcd_python_upper_constraints_url`: The URL of the upper constraints file
   to pass to pip when installing Python packages.
+- `vbmcd_args`: Arguments to pass to the Virtual BMC daemon.

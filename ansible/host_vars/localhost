@@ -115,3 +115,8 @@ bmc_emulators:
   pxe_snmp: virtualpdu
   redfish: sushy-tools
   snmp: virtualpdu
+
+# Whether to wait for nodes' resources to be registered in the Placement
+# service. If the Placement service is not in use, for example in standalone
+# ironic installations, this flag should be set to 'false'.
+wait_for_placement: true

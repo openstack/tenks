@@ -57,3 +57,8 @@ deploy_ramdisk: ipa.initramfs
 # files.
 physnet_mappings:
   physnet0: brfoo
+
+# Whether to wait for nodes' resources to be registered in the Placement
+# service. If the Placement service is not in use, for example in standalone
+# ironic installations, this flag should be set to 'false'.
+wait_for_placement: true

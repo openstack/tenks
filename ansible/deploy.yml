@@ -30,6 +30,7 @@
 
 - name: Wait for resources to become available
   import_playbook: resource_wait.yml
+  when: wait_for_placement | bool
   tags: openstack, resource
 
 - name: Clean up Tenks state
