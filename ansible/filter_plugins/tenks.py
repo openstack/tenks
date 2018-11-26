@@ -198,7 +198,10 @@ def _parse_size_string(size):
 def _link_name(context, node, physnet, inventory_hostname=None):
     prefix = _get_hostvar(context, 'veth_prefix',
                           inventory_hostname=inventory_hostname)
-    return (prefix + node['name'] + '-' +
+    # Use up to the first 6 characters of the node name to avoid hitting the
+    # maximum link name length limit (15).
+    name = node['name'][:6]
+    return (prefix + name + '-' +
             str(physnet_name_to_index(context, physnet,
                                       inventory_hostname=inventory_hostname)))
 
