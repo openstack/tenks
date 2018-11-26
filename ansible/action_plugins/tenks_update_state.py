@@ -34,7 +34,7 @@ class ActionModule(ActionBase):
             * Generating indices for physical networks for each hypervisor.
             * Scheduling specifications of nodes by type onto hypervisors.
 
-        The following task vars are accepted:
+        The following task arguments are accepted:
             :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
                               by hypervisor hostname. Required.
             :specs: A list of node specifications to be instantiated. Required.
