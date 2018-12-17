@@ -34,7 +34,9 @@
     - "{{ ironic_deploy_ramdisk }}"
   # ironic_deploy_kernel/ramdisk default to none. We don't need to know them
   # for enrolment to continue.
-  when: item is not none
+  when:
+    - item is not none
+    - item != ""
   register: deploy_image_ids
   changed_when: false
 
