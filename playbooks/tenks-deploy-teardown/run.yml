@@ -9,7 +9,7 @@
     - name: Deploy tenks cluster
       shell:
         cmd: >-
-          {{ ansible_playbook_bin }} -vvv --skip-tags openstack
+          {{ ansible_playbook_bin }} -vvv
           --inventory ansible/inventory
           --extra-vars=@{{ tenks_overrides_path }}
           ansible/deploy.yml > {{ logs_dir }}/ansible/tenks-deploy
@@ -25,7 +25,7 @@
     - name: Teardown tenks cluster
       shell:
         cmd: >-
-          {{ ansible_playbook_bin }} -vvv --skip-tags openstack
+          {{ ansible_playbook_bin }} -vvv
           --inventory ansible/inventory
           --extra-vars=@{{ tenks_overrides_path }}
           ansible/teardown.yml > {{ logs_dir }}/ansible/tenks-teardown

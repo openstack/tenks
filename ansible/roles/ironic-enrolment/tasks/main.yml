@@ -1,4 +1,11 @@
 ---
+- name: Check that OpenStack credentials exist in the environment
+  fail:
+    msg: >
+      $OS_USERNAME was not found in the environment. Ensure the OpenStack
+      credentials exist in your environment, perhaps by sourcing your RC file.
+  when: not lookup('env', 'OS_USERNAME')
+
 # This is useful to get a uniquely generated temporary path.
 - name: Create temporary file for pip requirements
   tempfile:
