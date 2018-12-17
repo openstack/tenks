@@ -35,9 +35,11 @@
     - name: Get updated state
       tenks_update_state:
         hypervisor_vars: "{{ hypervisor_vars }}"
+        node_name_prefix: "{{ node_name_prefix | default(omit) }}"
         node_types: "{{ node_types }}"
         specs: "{{ specs }}"
         state: "{{ current_state | default(omit) }}"
+        vol_name_prefix: "{{ vol_name_prefix | default(omit) }}"
       register: new_state
 
     - name: Write new state to file
