@@ -3,7 +3,7 @@
   include_vars: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
       skip: true
@@ -11,9 +11,11 @@
 
 - name: Ensure package dependencies are installed
   package:
-    name: "{{ item }}"
+    name: "{{ vbmcd_packages }}"
     state: installed
-  loop: "{{ vbmcd_packages }}"
+  register: result
+  until: result is success
+  retries: 3
   become: true
 
 # This is useful to get a uniquely generated temporary path.
@@ -32,6 +34,9 @@
     extra_args: >-
       -c {{ vbmcd_python_upper_constraints_url }}
     virtualenv: "{{ vbmcd_virtualenv_path }}"
+  register: result
+  until: result is success
+  retries: 3
 
 - name: Ensure Virtual BMC systemd service is configured
   template:

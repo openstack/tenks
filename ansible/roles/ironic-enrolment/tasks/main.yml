@@ -22,6 +22,9 @@
     extra_args: >-
       -c {{ ironic_python_upper_constraints_url }}
     virtualenv: "{{ ironic_virtualenv_path }}"
+  register: result
+  until: result is success
+  retries: 3
 
 # This command will return the UUIDs, regardless of whether
 # ironic_deploy_kernel and ironic_deploy_ramdisk are image UUIDs or names.
@@ -36,7 +39,7 @@
   # for enrolment to continue.
   when:
     - item is not none
-    - item != ""
+    - item | length > 0
   register: deploy_image_ids
   changed_when: false
 

@@ -3,7 +3,7 @@
   include_vars: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
         - "{{ ansible_distribution }}.yml"
         - "{{ ansible_os_family }}.yml"
       skip: true
@@ -12,6 +12,9 @@
 - name: Ensure general system requirements are installed
   package:
     name: "{{ system_requirements }}"
+  register: result
+  until: result is success
+  retries: 3
   become: true
   # Don't uninstall requirements during teardown since they may already have
   # been present.
@@ -35,6 +38,9 @@
     - name: Ensure Open vSwitch package is installed
       package:
         name: "{{ tenks_openvswitch_pkg_name }}"
+      register: result
+      until: result is success
+      retries: 3
       become: true
 
     - name: Ensure Open vSwitch is started and enabled
