@@ -11,9 +11,15 @@
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-centos
         - tenks-deploy-teardown-ubuntu
+        # Until we have ironic jobs using tenks, gate on the kayobe overcloud
+        # deploy job, which uses tenks to test bare metal compute provisioning.
+        - kayobe-overcloud-centos
     gate:
       queue: tenks
       jobs:
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-centos
         - tenks-deploy-teardown-ubuntu
+        # Until we have ironic jobs using tenks, gate on the kayobe overcloud
+        # deploy job, which uses tenks to test bare metal compute provisioning.
+        - kayobe-overcloud-centos
