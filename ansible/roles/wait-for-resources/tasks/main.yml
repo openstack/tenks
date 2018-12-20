@@ -29,6 +29,9 @@
       -c {{ wait_for_resources_python_upper_constraints_url }}
       {%- endif -%}
     virtualenv: "{{ wait_for_resources_venv }}"
+  register: result
+  until: result is success
+  retries: 3
 
 - name: Call wait_for_resources module
   wait_for_resources:

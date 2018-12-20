@@ -1,55 +1,58 @@
 ---
-    - name: Ensure Python requirements are installed
-      pip:
-        requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"
-        extra_args: >-
-          -c {{ flavors_python_upper_constraints_url }}
-        virtualenv: "{{ flavors_virtualenv_path }}"
+- name: Ensure Python requirements are installed
+  pip:
+    requirements: "{{ '/'.join([role_path, 'files', 'requirements.txt']) }}"
+    extra_args: >-
+      -c {{ flavors_python_upper_constraints_url }}
+    virtualenv: "{{ flavors_virtualenv_path }}"
+  register: result
+  until: result is success
+  retries: 3
 
-    - name: Configure Nova flavors
-      os_nova_flavor:
-        auth_type: password
-        name: "{{ item.name | default(item.resource_class) }}"
-        # FIXME(w-miller): don't necessarily assume the first disk?
-        disk: "{{ node_types[item.node_type].volumes.0.capacity | default('0')
-                  | size_string_to_gb }}"
-        ram: "{{ node_types[item.node_type].memory_mb }}"
-        vcpus: "{{ node_types[item.node_type].vcpus }}"
-        # NOTE(w-miller): I'm not quite sure whether this is janky or beautiful.
-        #
-        #   * Set hardware specs to zero here for scheduling purposes.
-        #   * Add the resource class name.
-        #   * Add required and forbidden traits.
-        #   * Add any custom specs from the user.
-        extra_specs: >-
-          {{ hw_specs
-               | combine(resource_class)
-               | combine(required_traits)
-               | combine(forbidden_traits)
-               | combine(item.custom_specs | default({}))
-          }}
-        state: "{{ flavors_state }}"
-      vars:
-        hw_specs:
-          "resources:DISK_GB": 0
-          "resources:MEMORY_MB": 0
-          "resources:VCPU": 0
-        resource_class: >-
-          {{ {
-              "resources:CUSTOM_" ~ (
-                item.resource_class | upper
-                  | regex_replace('[^A-Z0-9]', '_')): 1
-             } }}
-        required_traits: >-
-          {{ dict(item.required_traits
-                    | default([])
-                    | map('regex_replace', '(.*)', 'trait:\1')
-                    | zip_longest([], fillvalue='required')) }}
-        forbidden_traits: >-
-          {{ dict(item.forbidden_traits
-                   | default([])
-                   | map('regex_replace', '(.*)', 'trait:\1')
-                   | zip_longest([], fillvalue='forbidden')) }}
-        ansible_python_interpreter: >-
-          {{ '/'.join([flavors_virtualenv_path, 'bin', 'python']) }}
-      loop: "{{ flavors }}"
+- name: Configure Nova flavors
+  os_nova_flavor:
+    auth_type: password
+    name: "{{ item.name | default(item.resource_class) }}"
+    # FIXME(w-miller): don't necessarily assume the first disk?
+    disk: "{{ node_types[item.node_type].volumes.0.capacity | default('0')
+              | size_string_to_gb }}"
+    ram: "{{ node_types[item.node_type].memory_mb }}"
+    vcpus: "{{ node_types[item.node_type].vcpus }}"
+    # NOTE(w-miller): I'm not quite sure whether this is janky or beautiful.
+    #
+    #   * Set hardware specs to zero here for scheduling purposes.
+    #   * Add the resource class name.
+    #   * Add required and forbidden traits.
+    #   * Add any custom specs from the user.
+    extra_specs: >-
+      {{ hw_specs
+           | combine(resource_class)
+           | combine(required_traits)
+           | combine(forbidden_traits)
+           | combine(item.custom_specs | default({}))
+      }}
+    state: "{{ flavors_state }}"
+  vars:
+    hw_specs:
+      "resources:DISK_GB": 0
+      "resources:MEMORY_MB": 0
+      "resources:VCPU": 0
+    resource_class: >-
+      {{ {
+          "resources:CUSTOM_" ~ (
+            item.resource_class | upper
+              | regex_replace('[^A-Z0-9]', '_')): 1
+         } }}
+    required_traits: >-
+      {{ dict(item.required_traits
+                | default([])
+                | map('regex_replace', '(.*)', 'trait:\1')
+                | zip_longest([], fillvalue='required')) }}
+    forbidden_traits: >-
+      {{ dict(item.forbidden_traits
+               | default([])
+               | map('regex_replace', '(.*)', 'trait:\1')
+               | zip_longest([], fillvalue='forbidden')) }}
+    ansible_python_interpreter: >-
+      {{ '/'.join([flavors_virtualenv_path, 'bin', 'python']) }}
+  loop: "{{ flavors }}"

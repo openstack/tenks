@@ -11,7 +11,7 @@
         resource:
           amount: "{{ spec.count | int }}"  # this gets converted back to a string
           resource_class: "{{ 'CUSTOM_' ~ spec.ironic_config.resource_class | upper | replace('-', '_') }}"
-          traits: "{{ spec.ironic_config.traits | default([])}}"
+          traits: "{{ spec.ironic_config.traits | default([]) }}"
       set_fact:
         tenks_expected_resources: >-
           {{ tenks_expected_resources + [resource] }}

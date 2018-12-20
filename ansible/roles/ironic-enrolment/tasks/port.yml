@@ -11,7 +11,7 @@
 - name: Fail if port is not found
   fail:
     msg: Ironic port with MAC address {{ mac }} not found
-  when: uuid.stdout == ""
+  when: not uuid.stdout
 
 - name: Get physical network name
   set_fact:
