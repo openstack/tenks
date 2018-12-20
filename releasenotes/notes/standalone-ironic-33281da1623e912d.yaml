@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds support for standalone Ironic. This includes support for environments
+    without keystone for authentication, and without a placement service.

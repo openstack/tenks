@@ -4,3 +4,5 @@ vbmcd_virtualenv_path:
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
 vbmcd_python_upper_constraints_url:
+# Arguments to pass to Virtual BMC daemon.
+vbmcd_args: --foreground
