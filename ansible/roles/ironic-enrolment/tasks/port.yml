@@ -40,12 +40,14 @@
   command: >-
     '{{ ironic_virtualenv_path }}/bin/openstack' baremetal port set
       {{ uuid.stdout }}
+      {% if supports_port_physnet %}
       --physical-network '{{ physnet }}'
+      {% endif %}
       --local-link-connection switch_id='{{ switch_id }}'
       --local-link-connection switch_info='{{ bridge }}'
       --local-link-connection port_id='{{ port_id }}'
   when: >-
-    port_attributes.physical_network != physnet or
-    port_attributes.local_link_connection.switch_id != switch_id or
-    port_attributes.local_link_connection.switch_info != switch_info or
-    port_attributes.local_link_connection.port_id != port_id
+    (supports_port_physnet and port_attributes.physical_network != physnet) or
+    port_attributes.local_link_connection.get('switch_id') != switch_id or
+    port_attributes.local_link_connection.get('switch_info') != switch_info or
+    port_attributes.local_link_connection.get('port_id') != port_id
