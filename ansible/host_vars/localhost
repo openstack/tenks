@@ -105,7 +105,13 @@ state_file_path: >-
 # The default Ironic driver of a node. Can be overridden per-node.
 default_ironic_driver: ipmi
 
-# Maps BMC emulation tools to the Ironic driver they support.
+# Maps Ironic drivers to the BMC emulation tool they support.
 bmc_emulators:
-  virtualbmc: ipmi
-  sushy-tools: redfish
+  agent_ipmitool: virtualbmc
+  agent_ipmitool_socat: virtualbmc
+  ipmi: virtualbmc
+  pxe_ipmitool: virtualbmc
+  pxe_ipmitool_socat: virtualbmc
+  pxe_snmp: virtualpdu
+  redfish: sushy-tools
+  snmp: virtualpdu

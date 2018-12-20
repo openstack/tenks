@@ -9,10 +9,18 @@
 - name: Perform Virtual BMC configuration
   hosts: libvirt
   vars:
+    # List of ironic drivers that require virtualbmc.
+    vbmc_drivers: >-
+      {{ bmc_emulators.items() |
+         selectattr('1', 'eq', 'virtualbmc') |
+         map(attribute='0') |
+         list }}
+    # List of ironic nodes using drivers that require virtualbmc.
     vbmc_nodes: >-
-      {{ hostvars.localhost.tenks_state[inventory_hostname].nodes
-           | default([]) | selectattr('ironic_driver', 'eq',
-                                      bmc_emulators.virtualbmc) | list }}
+      {{ hostvars.localhost.tenks_state[inventory_hostname].nodes |
+         default([]) |
+         selectattr('ironic_driver', 'in', vbmc_drivers) |
+         list }}
   tasks:
     - name: Check that enough ports are available for Virtual BMC
       fail:
