@@ -4,3 +4,4 @@
 
 pbr>=2.0 # Apache-2.0
 ansible>=2.6.0 # GPLv3
+os-client-config # Apache-2.0
