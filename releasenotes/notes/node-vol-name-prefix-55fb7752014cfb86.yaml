@@ -1,0 +1,10 @@
+---
+features:
+  - |
+    Adds support for setting node and volume name prefixes on a per-spec basis.
+    This allows for different node specifications to use different names, e.g.
+    ``controller`` vs ``compute``
+fixes:
+  - |
+    Fixes an issue where multiple nodes could be given the same name in a
+    multi-hypervisor scenario.

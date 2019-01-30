@@ -184,6 +184,14 @@ class TestTenksUpdateState(unittest.TestCase):
         self.mod._process_specs()
         self.assertEqual(created_state, self.args['state'])
 
+    def test__process_specs_multiple_hosts(self):
+        self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
+        self.mod._process_specs()
+        foo_nodes = self.args['state']['foo']['nodes']
+        bar_nodes = self.args['state']['bar']['nodes']
+        names = {foo_nodes[0]['name'], bar_nodes[0]['name']}
+        self.assertEqual(names, {'test_node_pfx0', 'test_node_pfx1'})
+
     def test__process_specs_unnecessary_node(self):
         # Create some nodes definitions.
         self.mod._process_specs()
@@ -243,6 +251,50 @@ class TestTenksUpdateState(unittest.TestCase):
         self.hypervisor_vars['foo']['ipmi_port_range_start'] = 123
         self.hypervisor_vars['foo']['ipmi_port_range_end'] = 123
         self.assertRaises(AnsibleActionFail, self.mod._process_specs)
+
+    def test__process_specs_node_name_prefix(self):
+        self.specs[0]['node_name_prefix'] = 'foo-prefix'
+        self.mod._process_specs()
+        foo_nodes = self.args['state']['foo']['nodes']
+        self.assertEqual(foo_nodes[0]['name'], 'foo-prefix0')
+        self.assertEqual(foo_nodes[1]['name'], 'foo-prefix1')
+
+    def test__process_specs_node_name_prefix_multiple_specs(self):
+        self.specs[0]['node_name_prefix'] = 'foo-prefix'
+        self.specs.append({
+            'type': 'type0',
+            'count': 1,
+            'ironic_config': {
+                'resource_class': 'testrc',
+            },
+        })
+        self.mod._process_specs()
+        foo_nodes = self.args['state']['foo']['nodes']
+        self.assertEqual(foo_nodes[0]['name'], 'foo-prefix0')
+        self.assertEqual(foo_nodes[1]['name'], 'foo-prefix1')
+        self.assertEqual(foo_nodes[2]['name'], 'test_node_pfx0')
+
+    def test__process_specs_node_name_prefix_multiple_hosts(self):
+        self.specs[0]['node_name_prefix'] = 'foo-prefix'
+        self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
+        self.mod._process_specs()
+        foo_nodes = self.args['state']['foo']['nodes']
+        bar_nodes = self.args['state']['bar']['nodes']
+        names = {foo_nodes[0]['name'], bar_nodes[0]['name']}
+        self.assertEqual(names, {'foo-prefix0', 'foo-prefix1'})
+
+    def test__process_specs_vol_name_prefix(self):
+        self.specs[0]['vol_name_prefix'] = 'foo-prefix'
+        self.mod._process_specs()
+        foo_nodes = self.args['state']['foo']['nodes']
+        self.assertEqual(foo_nodes[0]['volumes'][0]['name'],
+                         'test_node_pfx0foo-prefix0')
+        self.assertEqual(foo_nodes[0]['volumes'][1]['name'],
+                         'test_node_pfx0foo-prefix1')
+        self.assertEqual(foo_nodes[1]['volumes'][0]['name'],
+                         'test_node_pfx1foo-prefix0')
+        self.assertEqual(foo_nodes[1]['volumes'][1]['name'],
+                         'test_node_pfx1foo-prefix1')
 
     def test__prune_absent_nodes(self):
         # Create some node definitions.

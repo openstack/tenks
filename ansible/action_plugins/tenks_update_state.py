@@ -17,7 +17,6 @@ from __future__ import absolute_import
 import abc
 from copy import deepcopy
 import itertools
-import re
 
 from ansible.errors import AnsibleActionFail
 from ansible.module_utils._text import to_text
@@ -143,7 +142,8 @@ class ActionModule(ActionBase):
             # Now create all the required new nodes.
             scheduler = RoundRobinScheduler(self.args['hypervisor_vars'],
                                             self.args['state'])
-            self._create_nodes(scheduler)
+            namer = Namer(self.args['state'])
+            self._create_nodes(scheduler, namer)
 
     def _tick_off_node(self, specs, node):
         """
@@ -163,7 +163,7 @@ class ActionModule(ActionBase):
                 return True
         return False
 
-    def _create_nodes(self, scheduler):
+    def _create_nodes(self, scheduler, namer):
         """
         Create new nodes to fulfil the specs.
         """
@@ -171,19 +171,17 @@ class ActionModule(ActionBase):
         for spec in self.args['specs']:
             for _ in six.moves.range(spec['count']):
                 node = self._gen_node(spec['type'], spec.get('ironic_config'))
-                hostname, idx = scheduler.choose_host(node)
-                # Set node name based on its index.
-                node['name'] = "%s%d" % (self.args['node_name_prefix'], idx)
+                hostname, ipmi_port = scheduler.choose_host(node)
+                node_name_prefix = spec.get('node_name_prefix',
+                                            self.args['node_name_prefix'])
+                node['name'] = namer.get_name(node_name_prefix)
                 # Sequentially number the volume names.
+                vol_name_prefix = spec.get('vol_name_prefix',
+                                           self.args['vol_name_prefix'])
                 for vol_idx, vol in enumerate(node['volumes']):
                     vol['name'] = ("%s%s%d"
-                                   % (node['name'],
-                                      self.args['vol_name_prefix'], vol_idx))
-                # Set IPMI port using its index as an offset from the lowest
-                # port.
-                node['ipmi_port'] = (
-                    self.args['hypervisor_vars'][hostname][
-                        'ipmi_port_range_start'] + idx)
+                                   % (node['name'], vol_name_prefix, vol_idx))
+                node['ipmi_port'] = ipmi_port
                 self.args['state'][hostname]['nodes'].append(node)
 
     def _gen_node(self, type_name, ironic_config=None):
@@ -244,64 +242,89 @@ class ActionModule(ActionBase):
                     raise AnsibleActionFail(to_text(e))
 
 
+class Namer(object):
+    """
+    Helper object for naming nodes with a prefix and index.
+    """
+
+    def __init__(self, state):
+        self.existing_names = {node['name']
+                               for hv_state in state.values()
+                               for node in hv_state['nodes']
+                               if node.get('state') != 'absent'}
+        # Map from node name prefix to the next index to try.
+        self.next_idxs = {}
+
+    def get_name(self, node_name_prefix):
+        """Return the next available name for the given prefix."""
+        idx = self.next_idxs.setdefault(node_name_prefix, 0)
+        while True:
+            candidate = "%s%d" % (node_name_prefix, idx)
+            if candidate not in self.existing_names:
+                self.next_idxs[node_name_prefix] = idx + 1
+                return candidate
+            idx += 1
+
+
+class Host(object):
+    """
+    Class representing a hypervisor host.
+    """
+
+    def __init__(self, hostname, hostvars, state):
+        self.hostname = hostname
+        self.physnet_mappings = hostvars['physnet_mappings']
+        # Keep track of unused IPMI ports in the available range.
+        free_ipmi_ports = set(
+            range(hostvars['ipmi_port_range_start'],
+                  hostvars['ipmi_port_range_end'] + 1))
+        for node in state['nodes']:
+            if node.get('state') != 'absent' and node['ipmi_port']:
+                free_ipmi_ports.remove(node['ipmi_port'])
+        self.free_ipmi_ports = sorted(free_ipmi_ports)
+
+    def reserve(self):
+        """
+        Return the next available IPMI port for a node on this host.
+
+        The port is also removed from the available ports.
+
+        :returns: The next available IPMI port.
+        """
+        return self.free_ipmi_ports.pop(0)
+
+    def host_passes(self, node):
+        """
+        Perform checks to ascertain whether this host can support this node.
+        """
+        # Is there a free IPMI port?
+        if not self.free_ipmi_ports:
+            return False
+        # Check that the host is connected to all physical networks that the
+        # node requires.
+        return all(pn in self.physnet_mappings.keys()
+                   for pn in node['physical_networks'])
+
+
 @six.add_metaclass(abc.ABCMeta)
-class Scheduler():
+class Scheduler(object):
     """
     Abstract class representing a 'method' of scheduling nodes to hosts.
     """
     def __init__(self, hostvars, state):
-        self.hostvars = hostvars
-        self.state = state
-
-        self._host_free_idxs = {}
+        # Dict mapping a hypervisor hostname to a Host object for the
+        # hypervisor.
+        self.hosts = {hostname: Host(hostname, host_hv, state[hostname])
+                      for hostname, host_hv in hostvars.items()}
 
     @abc.abstractmethod
     def choose_host(self, node):
         """Abstract method to choose a host to which we can schedule `node`.
 
-        Returns a tuple of the hostname of the chosen host and the index of
-        this node on the host.
+        Returns a tuple of the hostname of the chosen host and the IPMI port
+        for use by this node on the host.
         """
         raise NotImplementedError()
-
-    def host_next_idx(self, hostname):
-        """
-        Return the next available index for a node on this host.
-
-        If the free indices are not cached for this host, they will be
-        calculated.
-
-        :param hostname: The name of the host in question
-        :returns: The next available index, or None if none is available
-        """
-        if hostname not in self._host_free_idxs:
-            self._calculate_free_idxs(hostname)
-        try:
-            return self._host_free_idxs[hostname].pop(0)
-        except IndexError:
-            return None
-
-    def host_passes(self, node, hostname):
-        """
-        Perform checks to ascertain whether this host can support this node.
-        """
-        # Check that the host is connected to all physical networks that the
-        # node requires.
-        return all(pn in self.hostvars[hostname]['physnet_mappings'].keys()
-                   for pn in node['physical_networks'])
-
-    def _calculate_free_idxs(self, hostname):
-        # The maximum number of nodes this host can have is the number of
-        # IPMI ports it has available.
-        all_idxs = six.moves.range(
-            self.hostvars[hostname]['ipmi_port_range_end'] -
-            self.hostvars[hostname]['ipmi_port_range_start'] + 1)
-        get_idx = (
-            lambda n: int(re.match(r'[A-Za-z]*([0-9]+)$', n).group(1)))
-        used_idxs = {get_idx(n['name']) for n in self.state[hostname]['nodes']
-                     if n.get('state') != 'absent'}
-        self._host_free_idxs[hostname] = sorted([i for i in all_idxs
-                                                 if i not in used_idxs])
 
 
 class RoundRobinScheduler(Scheduler):
@@ -310,21 +333,20 @@ class RoundRobinScheduler(Scheduler):
     """
     def __init__(self, hostvars, state):
         super(RoundRobinScheduler, self).__init__(hostvars, state)
-        self.hostvars = hostvars
-        self._host_cycle = itertools.cycle(hostvars.keys())
+        self._host_cycle = itertools.cycle(self.hosts.keys())
 
     def choose_host(self, node):
-        idx = None
         count = 0
-        while idx is None:
+        while True:
             # Ensure we don't get into an infinite loop if no hosts are
             # available.
-            if count >= len(self.hostvars):
+            if count >= len(self.hosts):
                 e = ("No hypervisors are left that can support the node %s."
                      % node)
                 raise AnsibleActionFail(to_text(e))
             count += 1
             hostname = next(self._host_cycle)
-            if self.host_passes(node, hostname):
-                idx = self.host_next_idx(hostname)
-        return hostname, idx
+            host = self.hosts[hostname]
+            if host.host_passes(node):
+                ipmi_port = host.reserve()
+                return hostname, ipmi_port
