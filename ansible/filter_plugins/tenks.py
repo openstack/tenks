@@ -70,9 +70,12 @@ def set_libvirt_interfaces(context, node):
     """
     node['interfaces'] = []
     for physnet in node.get('physical_networks', []):
+        # Use macvtap 'passthrough' mode, since this does not filter packets
+        # based on MAC address of the interface.
         node['interfaces'].append(
             {'type': 'direct',
-             'source': {'dev': source_link_name(context, node, physnet)}}
+             'source': {'dev': source_link_name(context, node, physnet),
+                        'mode': 'passthrough'}}
         )
     return node
 

@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an issue where deployed VMs can't be reached on a different MAC
+    address than the one originally assigned. See `story 2004906
+    <https://storyboard.openstack.org/#!/story/2004906>`__ for details.
