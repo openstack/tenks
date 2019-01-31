@@ -23,10 +23,7 @@
         # basis to account for existing state, rather than for all nodes
         # here.
         libvirt_vms: >-
-          {{ nodes | map('combine',
-                         {'state': ('absent' if cmd == 'teardown'
-                                    else 'present')})
-                   | map('set_libvirt_interfaces')
+          {{ nodes | map('set_libvirt_interfaces')
                    | map('set_libvirt_volume_pool')
                    | map('set_libvirt_start_params')
                    | list }}

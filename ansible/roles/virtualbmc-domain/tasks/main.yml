@@ -7,7 +7,7 @@
       '{{ vbmc_virtualenv_path }}/bin/vbmc'
         --no-daemon
         {% if vbmc_log_directory is not none %}
-        --log-file '{{ vbmc_log_directory }}/vbmc-{{ domain }}.log'
+        --log-file '{{ vbmc_log_directory }}/vbmc-{{ vbmc_domain }}.log'
         {% endif %}
 
 # Even if the domain is present in VBMC, we can't guarantee that it's
@@ -15,7 +15,7 @@
 # involve minimal downtime.
 - name: Ensure domain is stopped and deleted in VBMC
   command: >-
-    {{ vbmc_cmd }} {{ item }} '{{ domain }}'
+    {{ vbmc_cmd }} {{ item }} '{{ vbmc_domain }}'
   loop:
     - stop
     - delete
@@ -40,7 +40,7 @@
 # the checks.
 - name: Ensure domain is added to VBMC
   command: >-
-    {{ vbmc_cmd }} add '{{ domain }}'
+    {{ vbmc_cmd }} add '{{ vbmc_domain }}'
       --port {{ vbmc_ipmi_port }}
       --username '{{ vbmc_ipmi_username }}'
       --password '{{ vbmc_ipmi_password }}'
@@ -53,7 +53,7 @@
 
 - name: Ensure domain is started in VBMC
   command: >
-    {{ vbmc_cmd }} start '{{ domain }}'
+    {{ vbmc_cmd }} start '{{ vbmc_domain }}'
   register: res
   # Retry a few times in case the VBMC daemon has been slow to process the last
   # few commands.

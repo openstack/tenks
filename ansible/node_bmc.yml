@@ -35,16 +35,15 @@
       include_role:
         name: virtualbmc-domain
       vars:
-        vbmc_domain: "{{ domain }}"
+        vbmc_domain: "{{ domain.name }}"
         vbmc_libvirt_uri: "{{ libvirt_local_uri }}"
         vbmc_ipmi_address: "{{ ipmi_address }}"
         vbmc_ipmi_username: "{{ ipmi_username }}"
         vbmc_ipmi_password: "{{ ipmi_password }}"
-        vbmc_ipmi_port: "{{ ipmi_port_range_start + port_offset }}"
+        vbmc_ipmi_port: "{{ domain.ipmi_port }}"
         vbmc_virtualenv_path: "{{ virtualenv_path }}"
         vbmc_log_directory: "{{ log_directory }}"
-        vbmc_state: "{{ 'absent' if cmd == 'teardown' else 'present' }}"
-      loop: "{{ vbmc_nodes | map(attribute='name') | sort | list }}"
+        vbmc_state: "{{ domain.get('state', 'present') }}"
+      loop: "{{ vbmc_nodes | sort(attribute='name') | list }}"
       loop_control:
         loop_var: domain
-        index_var: port_offset

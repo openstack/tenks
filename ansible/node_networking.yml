@@ -18,7 +18,7 @@
         veth_pair_ovs_bridge: "{{ physnet.1 | bridge_name }}"
         veth_pair_ovs_link_name: "{{ physnet.0 | ovs_link_name(physnet.1) }}"
         veth_pair_source_link_name: "{{ physnet.0 | source_link_name(physnet.1) }}"
-        veth_pair_state: "{{ 'absent' if cmd == 'teardown' else 'present' }}"
+        veth_pair_state: "{{ physnet.0.get('state', 'present') }}"
       # Loop over each physical network for each node allocated to this host.
       # Allocations are stored in localhost's vars.
       loop: >-

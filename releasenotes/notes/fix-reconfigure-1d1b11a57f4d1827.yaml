@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an issue where VMs, virtual ethernet pairs and virtual BMC state is
+    not cleaned up on a reconfiguration. See `story 2004907
+    <https://storyboard.openstack.org/#!/story/2004907>`__ for details.
