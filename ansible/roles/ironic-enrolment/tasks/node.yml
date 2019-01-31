@@ -87,10 +87,21 @@
               --{{ iface }}-interface {{ node.ironic_config[iface + '_interface'] }}
             {% endif %}
           {% endfor %}
-          {% for key, val in (
-               node.ironic_config.properties | default({})).iteritems() %}
+          {% for key, val in properties.iteritems() %}
             --property '{{ key }}={{ val }}'
           {% endfor %}
+      vars:
+        properties: "{{ default_properties | combine(custom_properties) }}"
+        custom_properties: "{{ node.ironic_config.get('properties', {}) }}"
+        # Although properties are not required for scheduling, the os_ironic module
+        # adds silly defaults that cause the validation API call to fail,
+        # preventing deployment.  We add them here because the os_ironic module
+        # uses unusual names (cpus, ram, disk_size) for scheduling properties,
+        # and doesn't support setting other properties.
+        default_properties:
+          cpus: "{{ node.vcpus }}"
+          memory_mb: "{{ node.memory_mb }}"
+          local_gb: "{{ node.volumes[0].capacity | size_string_to_gb if node.volumes | length > 0 else 0 }}"
 
     - name: Add Ironic node traits
       command: >-

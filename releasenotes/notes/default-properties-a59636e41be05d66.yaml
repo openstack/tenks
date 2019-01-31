@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Adds support for setting default properties on ironic nodes. This avoids an
+    issue where nodes are registered with the standard scheduling properties
+    all set to 1, causing ironic validation failures. See `story 2004908
+    <https://storyboard.openstack.org/#!/story/2004908>`__ for details.
