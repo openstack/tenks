@@ -87,6 +87,7 @@
   when:
     - item is not none
     - item | length > 0
+    - item is not match('^http[s]?://')
   register: deploy_image_ids
   changed_when: false
 
