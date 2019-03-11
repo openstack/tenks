@@ -2,4 +2,5 @@
 # List of package dependencies to install.
 vbmcd_packages:
   - gcc
+  - pkgconfig
   - libvirt-devel

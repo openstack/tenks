@@ -16,6 +16,9 @@
     - "{{ veth_pair_ovs_link_name }}"
     - "{{ veth_pair_source_link_name }}"
   become: true
+  # if the interface is already up, this ultimately ends up being a noop, see:
+  # https://github.com/torvalds/linux/blob/63bdf4284c38a48af21745ceb148a087b190cd21/net/core/dev.c#L7563
+  changed_when: false
 
 - name: Plug veth into OVS bridge
   openvswitch_port:
