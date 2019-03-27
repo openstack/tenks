@@ -27,10 +27,11 @@
     - name: Install Ansible Galaxy dependencies
       vars:
         ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
-      command: >-
-        {{ ansible_galaxy_bin }} install -r {{ tenks_src_dir }}/requirements.yml
-        -p {{ tenks_src_dir }}/ansible/roles
-      chdir: "{{ tenks_src_dir }}"
+      command:
+        cmd: >-
+          {{ ansible_galaxy_bin }} install -r {{ tenks_src_dir }}/requirements.yml
+          -p {{ tenks_src_dir }}/ansible/roles
+        chdir: "{{ tenks_src_dir }}"
 
     - name: Ensure network bridge for physnet1 exists
       command: "{{ item }}"
