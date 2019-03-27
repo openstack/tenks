@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  tags:
+    - flavor-registration
   tasks:
     - name: Configure Nova flavors
       include_role:

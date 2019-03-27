@@ -1,4 +1,7 @@
+---
 - hosts: localhost
+  tags:
+    - node-networking
   tasks:
     - name: Load state from file
       include_vars:
@@ -6,6 +9,8 @@
         name: tenks_state
 
 - hosts: hypervisors
+  tags:
+    - node-networking
   vars:
     nodes: >-
       {{ hostvars.localhost.tenks_state[inventory_hostname].nodes

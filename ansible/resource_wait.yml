@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  tags:
+    - resource-wait
   tasks:
     - name: Set default value for expected resources
       set_fact:
