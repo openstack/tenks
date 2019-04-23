@@ -2,8 +2,8 @@
 
 # Variables shared between the playbooks
 
-tenks_src_dir: "{{ ansible_env.HOME ~ '/' ~ zuul.projects['git.openstack.org/openstack/tenks'].src_dir }}"
-upper_constraints_path: "{{ ansible_env.HOME ~ '/' ~ zuul.projects['git.openstack.org/openstack/requirements'].src_dir ~ '/upper-constraints.txt' }}"
+tenks_src_dir: "{{ ansible_env.HOME ~ '/' ~ zuul.projects['opendev.org/openstack/tenks'].src_dir }}"
+upper_constraints_path: "{{ ansible_env.HOME ~ '/' ~ zuul.projects['opendev.org/openstack/requirements'].src_dir ~ '/upper-constraints.txt' }}"
 tenks_venv: "{{ ansible_env.HOME ~ '/' ~ 'venv-tenks' }}"
 config_dir: "{{ ansible_env.HOME ~ '/' ~ 'tenks-config' }}"
 tenks_overrides_path: "{{ config_dir ~ '/' ~ 'tenks-overrides.yml' }}"

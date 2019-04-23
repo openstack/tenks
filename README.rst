@@ -24,6 +24,6 @@ To get started with Tenks, see the documentation (linked below).
 
 * License: Apache License, Version 2.0
 * Documentation: https://docs.openstack.org/tenks/
-* Source: https://git.openstack.org/cgit/openstack/tenks/
+* Source: https://opendev.org/openstack/tenks/
 * Bugs: https://storyboard.openstack.org/#!/project/openstack/tenks
 * Known issues/limitations: refer to the documentation.

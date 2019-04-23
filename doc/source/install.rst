@@ -53,7 +53,7 @@ Activate the virtualenv and update pip::
 
 Obtain the Tenks source code and change into the directory. For example::
 
-  (tenks) $ git clone https://git.openstack.org/openstack/tenks.git
+  (tenks) $ git clone https://opendev.org/openstack/tenks.git
   (tenks) $ cd tenks
 
 Install Tenks and its requirements using the source code checkout::
