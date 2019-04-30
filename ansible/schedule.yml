@@ -1,9 +1,13 @@
 ---
 # Ensure we have facts about all hypervisors before scheduling begins.
 - hosts: hypervisors
+  tags:
+    - schedule
   gather_facts: true
 
 - hosts: localhost
+  tags:
+    - schedule
   tasks:
     - name: Check that all specified node types exist
       fail:

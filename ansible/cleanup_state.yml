@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  tags:
+    - cleanup-state
   tasks:
     - name: Load state from file
       include_vars:

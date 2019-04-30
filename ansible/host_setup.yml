@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  tags:
+    - host-setup
   tasks:
     - name: Load state from file
       include_vars:
@@ -7,6 +9,8 @@
         name: tenks_state
 
 - hosts: hypervisors
+  tags:
+    - host-setup
   vars:
     physnet_indices: >-
       {{ hostvars.localhost.tenks_state[inventory_hostname].physnet_indices }}
@@ -14,6 +18,8 @@
     - include_tasks: hypervisor_setup.yml
 
 - hosts: libvirt
+  tags:
+    - host-setup
   tasks:
     - block:
         - name: Configure host for Libvirt

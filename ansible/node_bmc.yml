@@ -1,5 +1,7 @@
 ---
 - hosts: localhost
+  tags:
+    - node-bmc
   tasks:
     - name: Load state from file
       include_vars:
@@ -8,6 +10,8 @@
 
 - name: Perform Virtual BMC configuration
   hosts: libvirt
+  tags:
+    - node-bmc
   vars:
     # List of ironic drivers that require virtualbmc.
     vbmc_drivers: >-

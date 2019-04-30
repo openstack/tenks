@@ -1,4 +1,8 @@
+---
 - hosts: localhost
+  tags:
+    - node-enrolment
+    - node-enrollment
   tasks:
     - name: Load state from file
       include_vars:
