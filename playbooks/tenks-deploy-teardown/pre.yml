@@ -24,12 +24,28 @@
         requirements: "{{ tenks_src_dir }}/requirements.txt"
         virtualenv: "{{ tenks_venv }}"
 
+    - name: Template requirements overrides
+      template:
+        src: requirements-overrides.yml.j2
+        dest: "{{ tenks_requirements_overrides_path }}"
+
     - name: Install Ansible Galaxy dependencies
       vars:
         ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
       command:
         cmd: >-
           {{ ansible_galaxy_bin }} install -r {{ tenks_src_dir }}/requirements.yml
+          -p {{ tenks_src_dir }}/ansible/roles
+        chdir: "{{ tenks_src_dir }}"
+
+    - name: Override Galaxy dependencies with equivalent modules from the zuul checkout
+      # We override so that as we add more dependenices we won't have to keep two files in
+      # sync
+      vars:
+        ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
+      command:
+        cmd: >-
+          {{ ansible_galaxy_bin }} install -f -r "{{ tenks_requirements_overrides_path }}"
           -p {{ tenks_src_dir }}/ansible/roles
         chdir: "{{ tenks_src_dir }}"
 

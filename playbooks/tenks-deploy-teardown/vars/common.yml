@@ -3,8 +3,13 @@
 # Variables shared between the playbooks
 
 tenks_src_dir: "{{ ansible_env.HOME ~ '/' ~ zuul.projects['opendev.org/openstack/tenks'].src_dir }}"
+stackhpc_libvirt_host_src_dir: >-
+  {{ ansible_env.HOME ~ '/' ~ zuul.projects['github.com/stackhpc/ansible-role-libvirt-host'].src_dir }}
+stackhpc_libvirt_vm_src_dir: >-
+  {{ ansible_env.HOME ~ '/' ~ zuul.projects['github.com/stackhpc/ansible-role-libvirt-vm'].src_dir }}
 upper_constraints_path: "{{ ansible_env.HOME ~ '/' ~ zuul.projects['opendev.org/openstack/requirements'].src_dir ~ '/upper-constraints.txt' }}"
 tenks_venv: "{{ ansible_env.HOME ~ '/' ~ 'venv-tenks' }}"
 config_dir: "{{ ansible_env.HOME ~ '/' ~ 'tenks-config' }}"
 tenks_overrides_path: "{{ config_dir ~ '/' ~ 'tenks-overrides.yml' }}"
+tenks_requirements_overrides_path: "{{ tenks_src_dir }}/requirements-overrides.yml"
 logs_dir: "/tmp/logs"
