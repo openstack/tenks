@@ -239,12 +239,11 @@ def are_resources_available(module, specifiers, expected):
     """
     providers_raw = get_providers(module)
     providers = []
-    nova_internal_traits = {'COMPUTE_NET_ATTACH_INTERFACE'}
     for provider in providers_raw:
         uuid = provider["uuid"]
         traits = get_traits(module, uuid)
         # Don't include traits assigned by the nova compute driver.
-        traits = traits - nova_internal_traits
+        traits = {t for t in traits if not t.startswith('COMPUTE_')}
         inventory = get_inventory(module, uuid)
         provider = Provider(
             uuid=uuid,
