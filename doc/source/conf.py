@@ -26,6 +26,8 @@ try:
 except ImportError:
     openstackdocstheme = None
 
+repository_name = 'openstack/tenks'
+use_storyboard = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -40,7 +42,6 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Tenks'
 copyright = u'OpenStack Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -72,7 +73,7 @@ else:
     html_theme = 'default'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = '%sdoc' % project
+htmlhelp_basename = 'tenksdoc'
 
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -81,8 +82,8 @@ htmlhelp_basename = '%sdoc' % project
 latex_documents = [
     (
         master_doc,
-        '%s.tex' % project,
-        u'%s Documentation' % project,
+        'doc-tenks.tex',
+        u'Tenks Documentation',
         u'OpenStack Foundation',
         'manual'
     ),
