@@ -1,0 +1,10 @@
+---
+
+# Override these ansible roles to point to the zuul source checkout
+# so that we can rely on Depends-On: syntax
+
+- src: git+{{ stackhpc_libvirt_host_src_dir }}/.git
+  name: stackhpc.libvirt-host
+
+- src: git+{{ stackhpc_libvirt_vm_src_dir }}/.git
+  name: stackhpc.libvirt-vm
