@@ -192,7 +192,7 @@ def merge(x, y, f):
     return merged
 
 
-def collect(specifiers, provider):
+def collect(module, specifiers, provider):
     """Given a specifier and a provider, gets the amount of resource that is
      available for that given provider"""
     inventory = {}
@@ -201,18 +201,29 @@ def collect(specifiers, provider):
     for item in provider.inventory_list:
         inventory[item["resource_class"]] = item
     result = {}
+    module.debug("Collecting from a provider with the following traits: {}"
+                 .format(provider.traits))
     for specifier in specifiers:
         if specifier.traits != provider.traits:
+            module.debug("Provider can't provide {}, as the following traits"
+                         "did not fully match: {}"
+                         .format(specifier.name, specifier.traits))
             continue
         if specifier.name in inventory:
             reserved = inventory[specifier.name]["reserved"]
             total_available = inventory[specifier.name]["total"]
-            result[specifier] = total_available - reserved
+            excess = total_available - reserved
+            result[specifier] = excess
+            module.debug("Excess resources for {}: {}".format(specifier.name,
+                                                              excess))
             break
+        else:
+            module.debug("{} not in inventory for provider: {}"
+                         .format(specifier.name, provider.uuid))
     return result
 
 
-def get_totals(specifiers, providers):
+def get_totals(module, specifiers, providers):
     """Loops over the providers adding up all of the resources that
     are available"""
     totals = {}
@@ -222,7 +233,7 @@ def get_totals(specifiers, providers):
         totals[specifier] = 0
 
     for provider in providers:
-        current = collect(specifiers, provider)
+        current = collect(module, specifiers, provider)
         totals = merge(totals, current, lambda x, y: x + y)
 
     return totals
@@ -251,7 +262,7 @@ def are_resources_available(module, specifiers, expected):
             traits=traits
         )
         providers.append(provider)
-    actual = get_totals(specifiers, providers)
+    actual = get_totals(module, specifiers, providers)
     return meets_criteria(actual, expected)
 
 
