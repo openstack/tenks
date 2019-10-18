@@ -8,3 +8,7 @@
 
 - src: git+{{ stackhpc_libvirt_vm_src_dir }}/.git
   name: stackhpc.libvirt-vm
+
+# Roles for CI only
+- src: https://github.com/stackhpc/ansible-roles-openvswitch-install
+  name: fkautz.openvswitch-install

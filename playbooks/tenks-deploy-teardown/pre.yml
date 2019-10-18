@@ -38,9 +38,10 @@
           -p {{ tenks_src_dir }}/ansible/roles
         chdir: "{{ tenks_src_dir }}"
 
-    - name: Override Galaxy dependencies with equivalent modules from the zuul checkout
-      # We override so that as we add more dependenices we won't have to keep two files in
-      # sync
+    - name: Install dependencies for CI
+      # We install roles specifc to CI over the existing ones. This means that we
+      # don't have to keep the two requirements files in sync, as we just override
+      # some of them.
       vars:
         ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
       command:

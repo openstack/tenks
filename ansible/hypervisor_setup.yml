@@ -34,24 +34,12 @@
   failed_when: false
   changed_when: false
 
-- block:
-    - name: Ensure Open vSwitch package is installed
-      package:
-        name: "{{ tenks_openvswitch_pkg_name }}"
-      register: result
-      until: result is success
-      retries: 3
-      become: true
-
-    - name: Ensure Open vSwitch is started and enabled
-      service:
-        name: "{{ tenks_openvswitch_service_name }}"
-        state: started
-        enabled: true
-      become: true
-  # Assume a non-zero return code means the command does not exist. Do this
-  # check to avoid installing Open vSwitch system-wide if the command already
-  # exists as a link to a containerised version of OVS.
+- name: Fail when Open vSwitch is not installed
+  fail:
+    msg: >-
+      Tenks requires openvswitch to be installed and running. Please install
+      openvswitch. If it is installed, please report this as a bug.
+  # Assume a non-zero return code means that openvswitch is not installed.
   when: ovs_vsctl_check.rc != 0
 
 - name: Configure physical networks

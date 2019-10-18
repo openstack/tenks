@@ -6,6 +6,17 @@
     - name: Include common variables
       include_vars: common.yml
 
+    - name: Install Open vSwitch
+      shell:
+        cmd: >-
+          {{ ansible_playbook_bin }} -vvv
+          --inventory ansible/inventory
+          --extra-vars=@{{ tenks_overrides_path }}
+          playbooks/openvswitch.yml > {{ logs_dir }}/ansible/tenks-deploy
+        chdir: "{{ tenks_src_dir }}"
+      environment:
+        ANSIBLE_ROLES_PATH: "{{ tenks_src_dir }}/ansible/roles"
+
     - name: Deploy tenks cluster
       shell:
         cmd: >-

@@ -1,0 +1,49 @@
+---
+- hosts: hypervisors
+  vars:
+    ansible_become: true
+  tasks:
+    # Workaround for:
+    # http://mirror.ord.rax.opendev.org/epel/7/SRPMS/repodata/repomd.xml: [Errno 14] HTTP Error 404 - Not Found
+    # See: https://zuul.opendev.org/t/openstack/build/1fa5b2f895c54e7a81a064a2fff5f838/log/centos-7/ansible/tenks-deploy#501
+    - block:
+        - name: Install epel release
+          package:
+            name: epel-release
+
+        - name: Switch the broken mirror
+          ini_file:
+            path: /etc/yum.repos.d/epel.repo
+            section: epel-source
+            option: baseurl
+            value: http://download.fedoraproject.org/pub/epel/$releasever/SRPMS/
+
+        - name: Make sure metalink does not exist
+          ini_file:
+            path: /etc/yum.repos.d/epel.repo
+            section: epel-source
+            option: metalink
+            state: absent
+
+        - name: Install Open vSwitch
+          include_role:
+            name: fkautz.openvswitch-install
+      when: ansible_os_family == "RedHat"
+
+    - block:
+        - name: Install packages
+          package:
+            name: "{{ item }}"
+          register: result
+          until: result is success
+          retries: 3
+          with_items:
+            - openvswitch-switch
+            - openvswitch-common
+
+        - name: Start openvswitch service
+          service:
+            name: openvswitch-switch
+            state: started
+      when: ansible_os_family == "Debian"
+

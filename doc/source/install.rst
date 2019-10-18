@@ -39,6 +39,10 @@ installed with a command such as::
 
  $ yum install --assumeyes python-virtualenv git
 
+ Open vSwitch must be installed and running. Please see the
+ `Open vSwitch docs <https://docs.openvswitch.org/en/latest/intro/install/>`_
+ for more details.
+
 Tenks Installation
 ------------------
 

@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    Tenks no longer installs Open vSwitch. Please use your preferred method to
+    install Open vSwitch prior to running Tenks.

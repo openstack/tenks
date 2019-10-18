@@ -2,10 +2,3 @@
 
 # path to `ip` from the `iproute2` package
 tenks_ip_path: /sbin/ip
-
-# package that provides the Open vSwitch daemon and userspace
-# utilities
-tenks_openvswitch_pkg_name: openvswitch-switch
-
-# service name of Open vSwitch daemon (as passed the Ansible service module)
-tenks_openvswitch_service_name: openvswitch-switch
