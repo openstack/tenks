@@ -205,7 +205,7 @@ def collect(module, specifiers, provider):
                  .format(provider.traits))
     for specifier in specifiers:
         if specifier.traits != provider.traits:
-            module.debug("Provider can't provide {}, as the following traits"
+            module.debug("Provider can't provide {}, as the following traits "
                          "did not fully match: {}"
                          .format(specifier.name, specifier.traits))
             continue
