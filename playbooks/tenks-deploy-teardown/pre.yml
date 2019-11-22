@@ -19,10 +19,16 @@
         src: tenks-overrides.yml.j2
         dest: "{{ tenks_overrides_path }}"
 
+    - name: Install python3
+      become: true
+      package:
+        name: python3
+
     - name: Create virtualenv for tenks
       pip:
         requirements: "{{ tenks_src_dir }}/requirements.txt"
         virtualenv: "{{ tenks_venv }}"
+        virtualenv_python: python3
 
     - name: Template requirements overrides
       template:
