@@ -8,12 +8,17 @@
       tox_envlist: alint
 
 - job:
-    name: tenks-deploy-teardown-centos
+    name: tenks-deploy-teardown-centos7
     parent: tenks-deploy-teardown-base
     nodeset: centos-7
     required-projects:
       - name: openstack/requirements
         override-checkout: stable/train
+
+- job:
+    name: tenks-deploy-teardown-centos8
+    parent: tenks-deploy-teardown-base
+    nodeset: centos-8
 
 - job:
     name: tenks-deploy-teardown-ubuntu

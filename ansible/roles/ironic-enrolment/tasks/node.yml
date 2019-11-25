@@ -87,7 +87,7 @@
               --{{ iface }}-interface {{ node.ironic_config[iface + '_interface'] }}
             {% endif %}
           {% endfor %}
-          {% for key, val in properties.iteritems() %}
+          {% for key, val in properties.items() %}
             --property '{{ key }}={{ val }}'
           {% endfor %}
       vars:

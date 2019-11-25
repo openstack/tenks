@@ -4,7 +4,7 @@
 physnet_mappings: {}
 
 system_requirements:
-  - python-virtualenv
+  - "python{% if ansible_python.version.major == 3 %}3{% endif %}-virtualenv"
 
 # Naming scheme for bridges created by tenks for physical networks is
 # {{ bridge_prefix + i }}, where `i` is the index of the physical network in
