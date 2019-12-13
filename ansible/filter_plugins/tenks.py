@@ -17,7 +17,6 @@ import re
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils._text import to_text
 from jinja2 import contextfilter
-import six
 
 
 class FilterModule(object):
@@ -239,6 +238,6 @@ def physnet_index_to_name(context, idx, inventory_hostname=None):
     state = _get_hostvar(context, 'tenks_state',
                          inventory_hostname='localhost')
     # We should have exactly one physnet with this index.
-    for k, v in six.iteritems(state[inventory_hostname]['physnet_indices']):
+    for k, v in state[inventory_hostname]['physnet_indices'].items():
         if v == idx:
             return k

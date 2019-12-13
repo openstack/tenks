@@ -12,22 +12,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from __future__ import absolute_import
-
 import copy
 import imp
 import os
 import unittest
 
 from ansible.errors import AnsibleActionFail
-import six
-
-
-# Python 2/3 compatibility.
-try:
-    from unittest.mock import MagicMock
-except ImportError:
-    from mock import MagicMock # noqa
 
 
 # Import method lifted from kolla_ansible's test_merge_config.py
@@ -122,10 +112,9 @@ class TestTenksUpdateState(unittest.TestCase):
         })
         self.mod._set_physnet_idxs()
         for host in {'foo', 'bar'}:
-            idxs = list(six.itervalues(
-                self.args['state'][host]['physnet_indices']))
+            idxs = list(self.args['state'][host]['physnet_indices'].values())
             # Check all physnets have different IDs on the same host.
-            six.assertCountEqual(self, idxs, set(idxs))
+            self.assertCountEqual(idxs, set(idxs))
 
     def test_set_physnet_idxs__idx_maintained_after_removal(self):
         self.mod.hypervisor_vars['foo']['physnet_mappings'].update({
@@ -222,7 +211,7 @@ class TestTenksUpdateState(unittest.TestCase):
         # After one or more runs, the 'absent' state nodes should still exist,
         # since they're only removed after completion of deployment in a
         # playbook.
-        for _ in six.moves.range(3):
+        for _ in range(3):
             self.mod._process_specs()
             self.assertEqual(expected_state, self.args['state'])
 

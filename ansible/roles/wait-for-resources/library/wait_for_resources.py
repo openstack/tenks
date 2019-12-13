@@ -66,7 +66,6 @@ iterations:
 # Need to disable PEP8, as it wants all imports at top of file
 from ansible.module_utils.basic import AnsibleModule  # noqa
 from collections import namedtuple  # noqa
-import six  # noqa
 import os  # noqa
 import time  # noqa
 
@@ -185,10 +184,10 @@ def merge(x, y, f):
     """ Merges two dictionaries. If a key appears in both dictionaries, the
     common values are merged using the function ``f``"""
     # Start with symmetric difference; keys either in A or B, but not both
-    merged = {k: x.get(k, y.get(k)) for k in six.viewkeys(x) ^ six.viewkeys(y)}
+    merged = {k: x.get(k, y.get(k)) for k in x.keys() ^ y.keys()}
     # Update with `f()` applied to the intersection
     merged.update(
-        {k: f(x[k], y[k]) for k in six.viewkeys(x) & six.viewkeys(y)})
+        {k: f(x[k], y[k]) for k in x.keys() & y.keys()})
     return merged
 
 

@@ -13,8 +13,6 @@
 # under the License.
 
 # Avoid shadowing of system copy module by copy action plugin.
-from __future__ import absolute_import
-
 import abc
 from copy import deepcopy
 import itertools
@@ -22,7 +20,6 @@ import itertools
 from ansible.errors import AnsibleActionFail
 from ansible.module_utils._text import to_text
 from ansible.plugins.action import ActionBase
-import six
 
 
 class ActionModule(ActionBase):
@@ -80,7 +77,7 @@ class ActionModule(ActionBase):
         """
         Remove any nodes with state='absent' from the state dict.
         """
-        for hyp in six.itervalues(self.args['state']):
+        for hyp in self.args['state'].values():
             hyp['nodes'] = [n for n in hyp['nodes']
                             if n.get('state') != 'absent']
 
@@ -92,7 +89,7 @@ class ActionModule(ActionBase):
         ensure the generated indices are consistent.
         """
         state = self.args['state']
-        for hostname, hostvars in six.iteritems(self.hypervisor_vars):
+        for hostname, hostvars in self.hypervisor_vars.items():
             # The desired mappings given in the Tenks configuration. These do
             # not include IDXs which are an implementation detail of Tenks.
             specified_mappings = hostvars['physnet_mappings']
@@ -105,8 +102,8 @@ class ActionModule(ActionBase):
                 old_idxs = {}
             new_idxs = {}
             next_idx = 0
-            used_idxs = list(six.itervalues(old_idxs))
-            for name, dev in six.iteritems(specified_mappings):
+            used_idxs = list(old_idxs.values())
+            for name, dev in specified_mappings.items():
                 try:
                     # We need to re-use the IDXs of any existing physnets.
                     idx = old_idxs[name]
@@ -128,7 +125,7 @@ class ActionModule(ActionBase):
         `specs`.
         """
         # Iterate through existing nodes, marking for deletion where necessary.
-        for hyp in six.itervalues(self.args['state']):
+        for hyp in self.args['state'].values():
             # Absent nodes cannot fulfil a spec.
             for node in [n for n in hyp.get('nodes', [])
                          if n.get('state') != 'absent']:
@@ -173,7 +170,7 @@ class ActionModule(ActionBase):
         """
         # Anything left in specs needs to be created.
         for spec in self.args['specs']:
-            for _ in six.moves.range(spec['count']):
+            for _ in range(spec['count']):
                 node = self._gen_node(spec['type'], spec.get('ironic_config'))
                 hostname, ipmi_port = scheduler.choose_host(node)
                 node_name_prefix = spec.get('node_name_prefix',
@@ -310,8 +307,7 @@ class Host(object):
                    for pn in node['physical_networks'])
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Scheduler(object):
+class Scheduler(object, metaclass=abc.ABCMeta):
     """
     Abstract class representing a 'method' of scheduling nodes to hosts.
     """

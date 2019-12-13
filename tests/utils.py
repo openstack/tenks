@@ -1,14 +1,9 @@
 import json
 import unittest
+from unittest.mock import patch
 
 from ansible.module_utils import basic
 from ansible.module_utils._text import to_bytes
-
-# Python 2/3 compatibility.
-try:
-    from unittest.mock import MagicMock, patch
-except ImportError:
-    from mock import MagicMock, patch  # noqa
 
 
 def set_module_args(args):
@@ -44,11 +39,6 @@ class ModuleTestCase(unittest.TestCase):
 
     def __init__(self, *args, **kwargs):
         super(ModuleTestCase, self).__init__(*args, **kwargs)
-        # Python 2 / 3 compatibility. assertRaisesRegexp was renamed to
-        # assertRaisesRegex in python 3.1.
-        if hasattr(self, 'assertRaisesRegexp') and \
-                not hasattr(self, 'assertRaisesRegex'):
-            self.assertRaisesRegex = self.assertRaisesRegexp
 
     def setUp(self):
         self.mock_module = patch.multiple(basic.AnsibleModule,

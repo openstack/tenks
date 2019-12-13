@@ -12,24 +12,18 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from __future__ import absolute_import
-
 import copy
 import imp
 import json
 import os
 import random
 from itertools import repeat, chain, cycle
+from unittest.mock import patch
 
 from ansible.module_utils import basic
 from tests.utils import ModuleTestCase, set_module_args, AnsibleExitJson, \
     AnsibleFailJson
 
-# Python 2/3 compatibility.
-try:
-    from unittest.mock import MagicMock, patch
-except ImportError:
-    from mock import MagicMock, patch  # noqa
 
 # Import method lifted from kolla_ansible's test_merge_config.py
 PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
@@ -49,36 +43,36 @@ Specifier = wait_for.Specifier
 
 inventory_list_out = """[
   {
-    "allocation_ratio": 1.0, 
-    "total": 1, 
-    "reserved": 0, 
-    "resource_class": "CUSTOM_TEST_RC", 
-    "step_size": 1, 
-    "min_unit": 1, 
+    "allocation_ratio": 1.0,
+    "total": 1,
+    "reserved": 0,
+    "resource_class": "CUSTOM_TEST_RC",
+    "step_size": 1,
+    "min_unit": 1,
     "max_unit": 1
   }
 ]"""  # noqa
 
 inventory_custom_b_out = """[
   {
-    "allocation_ratio": 1.0, 
-    "total": 1, 
-    "reserved": 0, 
-    "resource_class": "CUSTOM_B", 
-    "step_size": 1, 
-    "min_unit": 1, 
+    "allocation_ratio": 1.0,
+    "total": 1,
+    "reserved": 0,
+    "resource_class": "CUSTOM_B",
+    "step_size": 1,
+    "min_unit": 1,
     "max_unit": 1
   }
 ]"""  # noqa
 
 inventory_reserved_out = """[
   {
-    "allocation_ratio": 1.0, 
-    "total": 1, 
-    "reserved": 1, 
-    "resource_class": "CUSTOM_TEST_RC", 
-    "step_size": 1, 
-    "min_unit": 1, 
+    "allocation_ratio": 1.0,
+    "total": 1,
+    "reserved": 1,
+    "resource_class": "CUSTOM_TEST_RC",
+    "step_size": 1,
+    "min_unit": 1,
     "max_unit": 1
   }
 ]""" # noqa
@@ -93,18 +87,18 @@ inventory_list = [{'allocation_ratio': 1.0,
 
 resource_provider_list_out = """[
   {
-    "generation": 2, 
-    "uuid": "657c4ab0-de82-4def-b7b0-d13ce672bfd0", 
+    "generation": 2,
+    "uuid": "657c4ab0-de82-4def-b7b0-d13ce672bfd0",
     "name": "kayobe-will-master"
-  }, 
+  },
   {
-    "generation": 1, 
-    "uuid": "e2e78f98-d3ec-466a-862b-42d7ef5dca7d", 
+    "generation": 1,
+    "uuid": "e2e78f98-d3ec-466a-862b-42d7ef5dca7d",
     "name": "e2e78f98-d3ec-466a-862b-42d7ef5dca7d"
-  }, 
+  },
   {
-    "generation": 1, 
-    "uuid": "07072aea-cc2b-4135-a7e2-3a4dd3a9f629", 
+    "generation": 1,
+    "uuid": "07072aea-cc2b-4135-a7e2-3a4dd3a9f629",
     "name": "07072aea-cc2b-4135-a7e2-3a4dd3a9f629"
   }
 ]""" # noqa
@@ -121,49 +115,49 @@ resource_provider_list = [{'generation': 2, 'name': 'kayobe-will-master',
 resource_provider_traits_out = """[
   {
     "name": "HW_CPU_X86_SSE2"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_CLMUL"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_SSE"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_ABM"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_MMX"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_AVX2"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_SSE41"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_SSE42"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_AESNI"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_AVX"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_VMX"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_BMI2"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_FMA3"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_SSSE3"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_F16C"
-  }, 
+  },
   {
     "name": "HW_CPU_X86_BMI"
   }
