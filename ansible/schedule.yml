@@ -50,5 +50,7 @@
       copy:
         # tenks_schedule lookup plugin outputs a dict. Pretty-print this to
         # persist it in a YAML file.
-        content: "{{ new_state.result | to_nice_yaml }}"
+        # NOTE(mgoddard): Use .get to avoid a nasty error in ansible-lint
+        # (cannot represent an object).
+        content: "{{ new_state.get('result') | to_nice_yaml }}"
         dest: "{{ state_file_path }}"

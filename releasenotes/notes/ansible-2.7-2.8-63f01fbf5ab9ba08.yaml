@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Updates the minimum allowed version of Ansible from 2.6 to 2.7, and the
+    maximum allowed version from 2.7.x to 2.9.x.
