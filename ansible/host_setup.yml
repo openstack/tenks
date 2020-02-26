@@ -43,7 +43,12 @@
           include_role:
             name: virtualbmc-daemon
           vars:
-            vbmcd_virtualenv_path: "{{ virtualenv_path }}"
+            # NOTE(mgoddard): On CentOS 8 if SELinux is enabled, install
+            # virtualbmc to the system rather than a virtualenv. SELinux
+            # prevents systemd from accessing files in users' home directories.
+            selinux_enabled: "{{ ansible_selinux.status | default('disabled') == 'enabled' }}"
+            is_centos8: "{{ ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 8 }}"
+            vbmcd_virtualenv_path: "{{ '' if is_centos8 and selinux_enabled else virtualenv_path }}"
             vbmcd_python_upper_constraints_url: >-
               {{ python_upper_constraints_url }}
 

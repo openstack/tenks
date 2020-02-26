@@ -1,7 +1,12 @@
+{% if vbmcd_virtualenv_path %}
+{% set vbmcd_path = vbmcd_virtualenv_path ~ '/bin/vbmcd' %}
+{% else %}
+{% set vbmcd_path = '/usr/local/bin/vbmcd' %}
+{% endif %}
 [Unit]
 Description=Virtual BMC daemon
 
 [Service]
 Type=simple
 Restart=on-failure
-ExecStart="{{ vbmcd_virtualenv_path }}/bin/vbmcd" {{ vbmcd_args }}
+ExecStart="{{ vbmcd_path }}" {{ vbmcd_args }}

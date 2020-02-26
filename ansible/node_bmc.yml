@@ -45,7 +45,12 @@
         vbmc_ipmi_username: "{{ ipmi_username }}"
         vbmc_ipmi_password: "{{ ipmi_password }}"
         vbmc_ipmi_port: "{{ domain.ipmi_port }}"
-        vbmc_virtualenv_path: "{{ virtualenv_path }}"
+        # NOTE(mgoddard): On CentOS 8 if SELinux is enabled, install virtualbmc
+        # to the system rather than a virtualenv. SELinux prevents systemd from
+        # accessing files in users' home directories.
+        selinux_enabled: "{{ ansible_selinux.status | default('disabled') == 'enabled' }}"
+        is_centos8: "{{ ansible_os_family == 'RedHat' and ansible_distribution_major_version | int == 8 }}"
+        vbmc_virtualenv_path: "{{ '' if is_centos8 and selinux_enabled else virtualenv_path }}"
         vbmc_log_directory: "{{ log_directory }}"
         vbmc_state: "{{ domain.get('state', 'present') }}"
       loop: "{{ vbmc_nodes | sort(attribute='name') | list }}"

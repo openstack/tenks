@@ -12,7 +12,7 @@ Role Variables
 --------------
 
 - `vbmcd_virtualenv_path`: The path to the virtualenv in which to install
-  Virtual BMC.
+  Virtual BMC. Optional.
 - `vbmcd_python_upper_constraints_url`: The URL of the upper constraints file
   to pass to pip when installing Python packages.
 - `vbmcd_args`: Arguments to pass to the Virtual BMC daemon.

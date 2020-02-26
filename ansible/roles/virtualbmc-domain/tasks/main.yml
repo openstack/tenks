@@ -1,10 +1,15 @@
 ---
 - name: Set VBMC command string
+  vars:
+    vbmc_path: >-
+      {{ vbmc_virtualenv_path ~ '/bin/vbmc'
+         if vbmc_virtualenv_path
+         else '/usr/local/bin/vbmc' }}
   set_fact:
     # vbmcd should already be running, so --no-daemon stops vbmc from spawning
     # another instance of the daemon.
     vbmc_cmd: >-
-      '{{ vbmc_virtualenv_path }}/bin/vbmc'
+      '{{ vbmc_path }}'
         --no-daemon
         {% if vbmc_log_directory is not none %}
         --log-file '{{ vbmc_log_directory }}/vbmc-{{ vbmc_domain }}.log'

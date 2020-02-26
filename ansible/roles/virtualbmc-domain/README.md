@@ -16,7 +16,7 @@ Role Variables
 
 - `vbmc_domain`: The name of the Libvirt domain to be added to Virtual BMC.
 - `vbmc_virtualenv_path`: The path to the virtualenv in which Virtual BMC is
-  installed.
+  installed. Optional.
 - `vbmc_ipmi_address`: The address on which Virtual BMC will listen for IPMI
   traffic.
 - `vbmc_ipmi_port`: The port on which Virtual BMC will listen for IPMI traffic.

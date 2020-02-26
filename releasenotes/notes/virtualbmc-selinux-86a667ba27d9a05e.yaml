@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an issue with virtual BMC on systems where SELinux is enabled. In
+    this case the virtual BMC Python package is installed to the system rather
+    than the virtual environment.
