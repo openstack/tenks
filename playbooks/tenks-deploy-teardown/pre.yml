@@ -23,12 +23,13 @@
       become: true
       package:
         name: python3
+      when: ansible_python.version.major == 3
 
     - name: Create virtualenv for tenks
       pip:
         requirements: "{{ tenks_src_dir }}/requirements.txt"
         virtualenv: "{{ tenks_venv }}"
-        virtualenv_python: python3
+        virtualenv_python: "{{ ansible_python.executable }}"
 
     - name: Template requirements overrides
       template:
