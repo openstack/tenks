@@ -35,11 +35,11 @@ class FilterModule(object):
         return {
             # Network name filters.
             'bridge_name': bridge_name,
-            'ovs_link_name': ovs_link_name,
+            'peer_link_name': peer_link_name,
             'physnet_index_to_name': physnet_index_to_name,
             'physnet_name_to_index': physnet_name_to_index,
             'source_link_name': source_link_name,
-            'source_to_ovs_link_name': source_to_ovs_link_name,
+            'source_to_peer_link_name': source_to_peer_link_name,
             'source_link_to_physnet_name': source_link_to_physnet_name,
 
             # Libvirt filters.
@@ -104,7 +104,7 @@ def set_libvirt_start_params(node):
 
 @contextfilter
 def bridge_name(context, physnet, inventory_hostname=None):
-    """Get the Tenks OVS bridge name from a physical network name.
+    """Get the Tenks bridge name from a physical network name.
     """
     return (_get_hostvar(context, 'bridge_prefix',
                          inventory_hostname=inventory_hostname) +
@@ -123,22 +123,22 @@ def source_link_name(context, node, physnet, inventory_hostname=None):
 
 
 @contextfilter
-def ovs_link_name(context, node, physnet, inventory_hostname=None):
-    """Get the OVS veth link name for a node/physnet combination.
+def peer_link_name(context, node, physnet, inventory_hostname=None):
+    """Get the peer veth link name for a node/physnet combination.
     """
     return (_link_name(context, node, physnet,
                        inventory_hostname=inventory_hostname) +
-            _get_hostvar(context, 'veth_node_ovs_suffix',
+            _get_hostvar(context, 'veth_node_peer_suffix',
                          inventory_hostname=inventory_hostname))
 
 
 @contextfilter
-def source_to_ovs_link_name(context, source, inventory_hostname=None):
-    """Get the corresponding OVS link name for a source link name.
+def source_to_peer_link_name(context, source, inventory_hostname=None):
+    """Get the corresponding peer link name for a source link name.
     """
     base = source[:-len(_get_hostvar(context, 'veth_node_source_suffix',
                                      inventory_hostname=inventory_hostname))]
-    return base + _get_hostvar(context, 'veth_node_ovs_suffix',
+    return base + _get_hostvar(context, 'veth_node_peer_suffix',
                                inventory_hostname=inventory_hostname)
 
 

@@ -20,8 +20,9 @@
       include_role:
         name: veth-pair
       vars:
-        veth_pair_ovs_bridge: "{{ physnet.1 | bridge_name }}"
-        veth_pair_ovs_link_name: "{{ physnet.0 | ovs_link_name(physnet.1) }}"
+        veth_pair_peer_bridge_type: "{{ bridge_type }}"
+        veth_pair_peer_bridge: "{{ physnet.1 | bridge_name }}"
+        veth_pair_peer_link_name: "{{ physnet.0 | peer_link_name(physnet.1) }}"
         veth_pair_source_link_name: "{{ physnet.0 | source_link_name(physnet.1) }}"
         veth_pair_state: "{{ physnet.0.get('state', 'present') }}"
       # Loop over each physical network for each node allocated to this host.

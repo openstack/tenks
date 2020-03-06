@@ -21,3 +21,15 @@
       - ^releasenotes/.*
       - ^setup.cfg$
       - ^tox.ini$
+
+- job:
+    name: tenks-deploy-teardown-ovs-base
+    parent: tenks-deploy-teardown-base
+    vars:
+      bridge_type: openvswitch
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-base
+    parent: tenks-deploy-teardown-base
+    vars:
+      bridge_type: linuxbridge

@@ -16,6 +16,7 @@
         chdir: "{{ tenks_src_dir }}"
       environment:
         ANSIBLE_ROLES_PATH: "{{ tenks_src_dir }}/ansible/roles"
+      when: bridge_type == 'openvswitch'
 
     - name: Deploy tenks cluster
       shell:

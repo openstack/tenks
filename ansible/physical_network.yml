@@ -32,7 +32,7 @@
 
 - name: Register source interface as a Linux bridge
   set_fact:
-    source_type: linux_bridge
+    source_type: linuxbridge
   when: if_details.stdout_lines[-1].split()[0] == 'bridge'
 
 - block:
@@ -44,7 +44,7 @@
 
     - name: Register source interface as an Open vSwitch bridge
       set_fact:
-        source_type: ovs_bridge
+        source_type: openvswitch
       when: source_interface in ovs_bridges.stdout_lines
 
   when: if_details.stdout_lines[-1].split()[0] == 'openvswitch'
@@ -56,15 +56,44 @@
     bridge: "{{ tenks_bridge }}"
     state: "{{ state }}"
   become: true
+  when: bridge_type == "openvswitch"
+
+- block:
+    - name: Check if Tenks bridge exists
+      stat:
+        path: /sys/class/net/{{ tenks_bridge }}
+      register: stat_result
+
+    - name: Ensure Tenks bridge exists
+      vars:
+        link_operation: "{{ 'add' if state == 'present' else 'del' }}"
+      command: >-
+        {{ tenks_ip_path }} link {{ link_operation }} {{ tenks_bridge }} type bridge
+      changed_when: true
+      become: true
+      when: >-
+        state == 'present' and not stat_result.stat.exists or
+        state == 'absent' and stat_result.stat.exists
+
+    - name: Ensure Tenks bridge is up
+      command: >-
+        {{ tenks_ip_path }} link set {{ tenks_bridge }} up
+      changed_when: true
+      become: true
+      when:
+        - state == 'present'
+        - not stat_result.stat.exists
+  when: bridge_type == "linuxbridge"
 
 - name: Configure existing Linux bridge
-  when: source_type == 'linux_bridge'
+  when: source_type == 'linuxbridge'
   include_role:
     name: veth-pair
   vars:
-    veth_pair_ovs_bridge: "{{ tenks_bridge }}"
-    veth_pair_ovs_link_name: >-
-      {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
+    veth_pair_peer_bridge_type: "{{ bridge_type }}"
+    veth_pair_peer_bridge: "{{ tenks_bridge }}"
+    veth_pair_peer_link_name: >-
+      {{ veth_prefix + tenks_bridge + veth_bridge_peer_suffix }}
     veth_pair_source_bridge: "{{ source_interface }}"
     veth_pair_source_link_name: >-
       {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
@@ -72,16 +101,16 @@
     veth_pair_state: "{{ state }}"
 
 - name: Configure existing Open vSwitch bridge
-  when: source_type == 'ovs_bridge'
+  when: source_type == 'openvswitch'
   block:
     - name: Configure patch port on Tenks bridge
       openvswitch_port:
         bridge: "{{ tenks_bridge }}"
-        port: "{{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}"
+        port: "{{ veth_prefix + tenks_bridge + veth_bridge_peer_suffix }}"
         # Despite the module documentation, `set` will happily take multiple
         # properties.
         set: >-
-          Interface {{ veth_prefix + tenks_bridge + veth_bridge_ovs_suffix }}
+          Interface {{ veth_prefix + tenks_bridge + veth_bridge_peer_suffix }}
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
                             veth_bridge_source_suffix }}
@@ -98,7 +127,7 @@
           Interface {{ veth_prefix + tenks_bridge + veth_bridge_source_suffix }}
             type=patch
             options:peer={{ veth_prefix + tenks_bridge +
-                            veth_bridge_ovs_suffix }}
+                            veth_bridge_peer_suffix }}
         state: "{{ state }}"
       become: true
 
@@ -108,6 +137,28 @@
     port: "{{ source_interface }}"
     state: "{{ state }}"
   when:
+    - bridge_type == 'openvswitch'
+    - source_type == 'direct'
+    # If 'absent', we've already deleted the bridge earlier, so no need to
+    # unplug the interface.
+    - state != 'absent'
+  become: true
+
+- block:
+    - name: Speculatively check interface's master
+      command: >-
+        realpath /sys/class/net/{{ source_interface }}/master
+      register: master_result
+      failed_when: false
+      changed_when: false
+
+    - name: Plug source interface into Tenks bridge
+      command: >-
+        {{ tenks_ip_path }} link set dev {{ source_interface }} master {{ tenks_bridge }}
+      changed_when: true
+      when: master_result.rc != 0
+  when:
+    - bridge_type == 'linuxbridge'
     - source_type == 'direct'
     # If 'absent', we've already deleted the bridge earlier, so no need to
     # unplug the interface.
