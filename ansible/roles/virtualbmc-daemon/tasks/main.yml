@@ -18,19 +18,10 @@
   retries: 3
   become: true
 
-# This is useful to get a uniquely generated temporary path.
-- name: Create temporary file for pip requirements
-  tempfile:
-  register: req_file
-
-- name: Copy requirements file to temporary location
-  copy:
-    src: requirements.txt
-    dest: "{{ req_file.path }}"
-
 - name: Ensure Python requirements are installed
   pip:
-    requirements: "{{ req_file.path }}"
+    name:
+      - "virtualbmc>=1.4.0{% if ansible_python.version.major == 2 %},<2{% endif %}"
     extra_args: >-
       -c {{ vbmcd_python_upper_constraints_url }}
     virtualenv: "{{ vbmcd_virtualenv_path or omit }}"

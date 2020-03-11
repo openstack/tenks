@@ -6,4 +6,4 @@ virtualenv_path: "{{ '/'.join([ansible_env['HOME'], 'tenks-venv']) }}"
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
 python_upper_constraints_url: >-
-  https://opendev.org/openstack/requirements/raw/branch/master/upper-constraints.txt
+  https://releases.openstack.org/constraints/upper/{% if ansible_python.version.major == 2 %}train{% else %}master{% endif %}
