@@ -14,7 +14,8 @@
         - tenks-deploy-teardown-ubuntu
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
-        - kayobe-overcloud-centos
+        # FIXME(mgoddard): Kayobe CentOS 7 jobs no longer working. Replace with C8.
+        # - kayobe-overcloud-centos
     gate:
       queue: tenks
       jobs:
@@ -23,4 +24,5 @@
         - tenks-deploy-teardown-ubuntu
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
-        - kayobe-overcloud-centos
+        # FIXME(mgoddard): Kayobe CentOS 7 jobs no longer working. Replace with C8.
+        # - kayobe-overcloud-centos

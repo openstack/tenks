@@ -11,9 +11,14 @@
     name: tenks-deploy-teardown-centos
     parent: tenks-deploy-teardown-base
     nodeset: centos-7
+    required-projects:
+      - name: openstack/requirements
+        override-checkout: stable/train
 
 - job:
     name: tenks-deploy-teardown-ubuntu
     parent: tenks-deploy-teardown-base
     nodeset: ubuntu-bionic
-
+    required-projects:
+      - name: openstack/requirements
+        override-checkout: stable/train
