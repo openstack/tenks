@@ -50,8 +50,6 @@ copy_logs() {
     done
 
     chmod -R 777 ${LOG_DIR}
-    find ${LOG_DIR}/{system_logs,libvirt_logs} -iname '*.txt' -execdir gzip -f -9 {} \+
-    find ${LOG_DIR}/{system_logs,libvirt_logs} -iname '*.json' -execdir gzip -f -9 {} \+
 }
 
 copy_logs
