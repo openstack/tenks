@@ -1,69 +1,13 @@
 ---
-- name: Set VBMC command string
-  vars:
-    vbmc_path: >-
-      {{ vbmc_virtualenv_path ~ '/bin/vbmc'
-         if vbmc_virtualenv_path
-         else '/usr/local/bin/vbmc' }}
-  set_fact:
-    # vbmcd should already be running, so --no-daemon stops vbmc from spawning
-    # another instance of the daemon.
-    vbmc_cmd: >-
-      '{{ vbmc_path }}'
-        --no-daemon
-        {% if vbmc_log_directory is not none %}
-        --log-file '{{ vbmc_log_directory }}/vbmc-{{ vbmc_domain }}.log'
-        {% endif %}
-
-# Even if the domain is present in VBMC, we can't guarantee that it's
-# configured correctly. It's easiest to delete and re-add it; this should
-# involve minimal downtime.
-- name: Ensure domain is stopped and deleted in VBMC
-  command: >-
-    {{ vbmc_cmd }} {{ item }} '{{ vbmc_domain }}'
-  loop:
-    - stop
-    - delete
-  register: res
-  changed_when: res.rc == 0
-  failed_when:
-    - res.rc != 0
-    - "'No domain with matching name' not in res.stderr"
+- name: Ensure domain {{ vbmc_domain }} is configured
+  virtualbmc_domain:
+    domain: "{{ vbmc_domain }}"
+    ipmi_address: "{{ vbmc_ipmi_address }}"
+    ipmi_port: "{{ vbmc_ipmi_port }}"
+    ipmi_username: "{{ vbmc_ipmi_username }}"
+    ipmi_password: "{{ vbmc_ipmi_password }}"
+    libvirt_uri: "{{ vbmc_libvirt_uri | default(omit, true) }}"
+    log_directory: "{{ vbmc_log_directory | default(omit, true) }}"
+    state: "{{ vbmc_state }}"
+    virtualenv: "{{ vbmc_virtualenv_path | default(omit, true) }}"
   become: true
-
-# The commands above tend to return before the daemon has completed the action.
-# Check here to be safe.
-- name: Wait to ensure socket is closed
-  wait_for:
-    host: "{{ vbmc_ipmi_address }}"
-    port: "{{ vbmc_ipmi_port }}"
-    state: stopped
-    timeout: 15
-
-# These tasks will trigger ansible lint rule ANSIBLE0012 because they are not
-# idempotent (we always delete and recreate the domain). Use a tag to suppress
-# the checks.
-- name: Ensure domain is added to VBMC
-  command: >-
-    {{ vbmc_cmd }} add '{{ vbmc_domain }}'
-      --port {{ vbmc_ipmi_port }}
-      --username '{{ vbmc_ipmi_username }}'
-      --password '{{ vbmc_ipmi_password }}'
-      --address {{ vbmc_ipmi_address }}
-    {% if vbmc_libvirt_uri %} --libvirt-uri '{{ vbmc_libvirt_uri }}'{% endif %}
-  when: vbmc_state == 'present'
-  become: true
-  tags:
-    - skip_ansible_lint
-
-- name: Ensure domain is started in VBMC
-  command: >
-    {{ vbmc_cmd }} start '{{ vbmc_domain }}'
-  register: res
-  # Retry a few times in case the VBMC daemon has been slow to process the last
-  # few commands.
-  until: res is succeeded
-  when: vbmc_state == 'present'
-  become: true
-  tags:
-    - skip_ansible_lint
