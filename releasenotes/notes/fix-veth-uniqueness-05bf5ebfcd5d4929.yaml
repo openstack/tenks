@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes an issue where virtual Ethernet link names might not be unique. This
+    would cause nodes to fail to start. See `story 2007431
+    <https://storyboard.openstack.org/#!/story/2007431>`__ for details.
