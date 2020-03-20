@@ -1,0 +1,5 @@
+---
+fixes:
+  - |
+    Fixes an issue with node scheduling when Ansible hostvars contain a pipe
+    (``|``) character.

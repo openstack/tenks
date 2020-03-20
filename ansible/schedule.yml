@@ -17,14 +17,6 @@
       when: item.type not in node_types
       loop: "{{ specs }}"
 
-    # Creates a dict mapping each hypervisor's hostname to its hostvars, to be
-    # used during scheduling.
-    - name: Collect hypervisor hostvars
-      set_fact:
-        hypervisor_vars: >-
-          {{ hypervisor_vars | default({}) | combine({item: hostvars[item]}) }}
-      loop: "{{ groups['hypervisors'] }}"
-
     - name: Check if an existing state file exists
       stat:
         path: "{{ state_file_path }}"
@@ -38,7 +30,6 @@
 
     - name: Get updated state
       tenks_update_state:
-        hypervisor_vars: "{{ hypervisor_vars }}"
         node_name_prefix: "{{ node_name_prefix | default(omit) }}"
         node_types: "{{ node_types }}"
         specs: "{{ specs }}"

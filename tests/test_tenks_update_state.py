@@ -73,7 +73,7 @@ class TestTenksUpdateState(unittest.TestCase):
                 },
             },
         ]
-        self.hypervisor_vars = {
+        self.mod.hypervisor_vars = {
             'foo': {
                 'physnet_mappings': {
                     'physnet0': 'dev0',
@@ -83,7 +83,6 @@ class TestTenksUpdateState(unittest.TestCase):
             },
         }
         self.mod.args = {
-            'hypervisor_vars': self.hypervisor_vars,
             'node_types': self.node_types,
             'node_name_prefix': 'test_node_pfx',
             'specs': self.specs,
@@ -102,7 +101,7 @@ class TestTenksUpdateState(unittest.TestCase):
                          expected_indices)
 
     def test__set_physnet_idxs_no_state_two_hosts(self):
-        self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
+        self.mod.hypervisor_vars['bar'] = self.mod.hypervisor_vars['foo']
         self.mod._set_physnet_idxs()
         expected_indices = {
             'physnet0': 0,
@@ -112,12 +111,12 @@ class TestTenksUpdateState(unittest.TestCase):
                              expected_indices)
 
     def test_set_physnet_idxs__no_state_two_hosts_different_nets(self):
-        self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
-        self.hypervisor_vars['foo']['physnet_mappings'].update({
+        self.mod.hypervisor_vars['bar'] = self.mod.hypervisor_vars['foo']
+        self.mod.hypervisor_vars['foo']['physnet_mappings'].update({
             'physnet1': 'dev1',
             'physnet2': 'dev2',
         })
-        self.hypervisor_vars['bar']['physnet_mappings'].update({
+        self.mod.hypervisor_vars['bar']['physnet_mappings'].update({
             'physnet2': 'dev2',
         })
         self.mod._set_physnet_idxs()
@@ -128,12 +127,12 @@ class TestTenksUpdateState(unittest.TestCase):
             six.assertCountEqual(self, idxs, set(idxs))
 
     def test_set_physnet_idxs__idx_maintained_after_removal(self):
-        self.hypervisor_vars['foo']['physnet_mappings'].update({
+        self.mod.hypervisor_vars['foo']['physnet_mappings'].update({
             'physnet1': 'dev1',
         })
         self.mod._set_physnet_idxs()
         physnet1_idx = self.args['state']['foo']['physnet_indices']['physnet1']
-        del self.hypervisor_vars['foo']['physnet_mappings']['physnet0']
+        del self.mod.hypervisor_vars['foo']['physnet_mappings']['physnet0']
         self.mod._set_physnet_idxs()
         self.assertEqual(
             physnet1_idx,
@@ -159,11 +158,11 @@ class TestTenksUpdateState(unittest.TestCase):
         for node in nodes:
             self.assertGreaterEqual(
                 node['ipmi_port'],
-                self.hypervisor_vars['foo']['ipmi_port_range_start']
+                self.mod.hypervisor_vars['foo']['ipmi_port_range_start']
             )
             self.assertLessEqual(
                 node['ipmi_port'],
-                self.hypervisor_vars['foo']['ipmi_port_range_end']
+                self.mod.hypervisor_vars['foo']['ipmi_port_range_end']
             )
             self.assertNotIn(node['ipmi_port'], used_ipmi_ports)
             used_ipmi_ports.add(node['ipmi_port'])
@@ -185,7 +184,7 @@ class TestTenksUpdateState(unittest.TestCase):
         self.assertEqual(created_state, self.args['state'])
 
     def test__process_specs_multiple_hosts(self):
-        self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
+        self.mod.hypervisor_vars['bar'] = self.mod.hypervisor_vars['foo']
         self.mod._process_specs()
         foo_nodes = self.args['state']['foo']['nodes']
         bar_nodes = self.args['state']['bar']['nodes']
@@ -227,7 +226,7 @@ class TestTenksUpdateState(unittest.TestCase):
             self.assertEqual(expected_state, self.args['state'])
 
     def test__process_specs_no_hypervisors(self):
-        self.args['hypervisor_vars'] = {}
+        self.mod.hypervisor_vars = {}
         self.assertRaises(AnsibleActionFail, self.mod._process_specs)
 
     def test__process_specs_no_hypervisors_on_physnet(self):
@@ -236,9 +235,10 @@ class TestTenksUpdateState(unittest.TestCase):
 
     def test__process_specs_one_hypervisor_on_physnet(self):
         self.node_types['type0']['physical_networks'].append('another_pn')
-        self.hypervisor_vars['bar'] = copy.deepcopy(
-            self.hypervisor_vars['foo'])
-        self.hypervisor_vars['bar']['physnet_mappings']['another_pn'] = 'dev1'
+        self.mod.hypervisor_vars['bar'] = copy.deepcopy(
+            self.mod.hypervisor_vars['foo'])
+        self.mod.hypervisor_vars['bar']['physnet_mappings']['another_pn'] = (
+            'dev1')
         self.mod._process_specs()
 
         # Check all nodes were scheduled to the hypervisor connected to the
@@ -248,8 +248,8 @@ class TestTenksUpdateState(unittest.TestCase):
 
     def test__process_specs_not_enough_ports(self):
         # Give 'foo' only a single IPMI port to allocate.
-        self.hypervisor_vars['foo']['ipmi_port_range_start'] = 123
-        self.hypervisor_vars['foo']['ipmi_port_range_end'] = 123
+        self.mod.hypervisor_vars['foo']['ipmi_port_range_start'] = 123
+        self.mod.hypervisor_vars['foo']['ipmi_port_range_end'] = 123
         self.assertRaises(AnsibleActionFail, self.mod._process_specs)
 
     def test__process_specs_node_name_prefix(self):
@@ -276,7 +276,7 @@ class TestTenksUpdateState(unittest.TestCase):
 
     def test__process_specs_node_name_prefix_multiple_hosts(self):
         self.specs[0]['node_name_prefix'] = 'foo-prefix'
-        self.hypervisor_vars['bar'] = self.hypervisor_vars['foo']
+        self.mod.hypervisor_vars['bar'] = self.mod.hypervisor_vars['foo']
         self.mod._process_specs()
         foo_nodes = self.args['state']['foo']['nodes']
         bar_nodes = self.args['state']['bar']['nodes']

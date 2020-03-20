@@ -34,8 +34,6 @@ class ActionModule(ActionBase):
             * Scheduling specifications of nodes by type onto hypervisors.
 
         The following task arguments are accepted:
-            :hypervisor_vars: A dict of hostvars for each hypervisor, keyed
-                              by hypervisor hostname. Required.
             :specs: A list of node specifications to be instantiated. Required.
             :node_types: A dict mapping node type names to a dict of properties
                          of that type.
@@ -59,6 +57,11 @@ class ActionModule(ActionBase):
 
         self.args = self._task.args
         self.localhost_vars = task_vars['hostvars']['localhost']
+        self.hypervisor_vars = {
+            hv: hv_hostvars
+            for hv, hv_hostvars in task_vars['hostvars'].items()
+            if hv in task_vars['groups']['hypervisors']
+        }
         self._validate_args()
 
         if self.args['prune_only']:
@@ -88,7 +91,7 @@ class ActionModule(ActionBase):
         ensure the generated indices are consistent.
         """
         state = self.args['state']
-        for hostname, hostvars in six.iteritems(self.args['hypervisor_vars']):
+        for hostname, hostvars in six.iteritems(self.hypervisor_vars):
             # The desired mappings given in the Tenks configuration. These do
             # not include IDXs which are an implementation detail of Tenks.
             specified_mappings = hostvars['physnet_mappings']
@@ -136,11 +139,11 @@ class ActionModule(ActionBase):
 
         if self.localhost_vars['cmd'] != 'teardown':
             # Ensure all hosts exist in state.
-            for hostname in self.args['hypervisor_vars']:
+            for hostname in self.hypervisor_vars:
                 self.args['state'].setdefault(hostname, {})
                 self.args['state'][hostname].setdefault('nodes', [])
             # Now create all the required new nodes.
-            scheduler = RoundRobinScheduler(self.args['hypervisor_vars'],
+            scheduler = RoundRobinScheduler(self.hypervisor_vars,
                                             self.args['state'])
             namer = Namer(self.args['state'])
             self._create_nodes(scheduler, namer)
@@ -209,7 +212,7 @@ class ActionModule(ActionBase):
         if self.args is None:
             self.args = {}
 
-        REQUIRED_ARGS = {'hypervisor_vars', 'specs', 'node_types'}
+        REQUIRED_ARGS = {'specs', 'node_types'}
         # Var names and their defaults.
         OPTIONAL_ARGS = [
             ('node_name_prefix', 'tk'),
@@ -230,7 +233,7 @@ class ActionModule(ActionBase):
                     e = "The parameter '%s' must be specified." % arg
                     raise AnsibleActionFail(to_text(e))
 
-            if not self.args['hypervisor_vars']:
+            if not self.hypervisor_vars:
                 e = ("There are no hosts in the 'hypervisors' group to which "
                      "we can schedule.")
                 raise AnsibleActionFail(to_text(e))
