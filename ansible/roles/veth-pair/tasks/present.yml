@@ -1,7 +1,7 @@
 ---
 - name: Create veth pair
   command: >-
-    ip link add dev {{ veth_pair_ovs_link_name }}
+    ip link add dev {{ veth_pair_peer_link_name }}
     type veth
     peer name {{ veth_pair_source_link_name }}
   register: res
@@ -13,7 +13,7 @@
 - name: Bring each end of veth up
   command: ip link set {{ item }} up
   loop:
-    - "{{ veth_pair_ovs_link_name }}"
+    - "{{ veth_pair_peer_link_name }}"
     - "{{ veth_pair_source_link_name }}"
   become: true
   # if the interface is already up, this ultimately ends up being a noop, see:
@@ -22,9 +22,25 @@
 
 - name: Plug veth into OVS bridge
   openvswitch_port:
-    bridge: "{{ veth_pair_ovs_bridge }}"
-    port: "{{ veth_pair_ovs_link_name }}"
+    bridge: "{{ veth_pair_peer_bridge }}"
+    port: "{{ veth_pair_peer_link_name }}"
+  when: veth_pair_peer_bridge_type == "openvswitch"
   become: true
+
+- block:
+    - include_tasks: is-attached.yml
+      vars:
+        bridge: "{{ veth_pair_peer_bridge }}"
+        interface: "{{ veth_pair_peer_link_name }}"
+
+    - name: Plug veth into source bridge
+      command: >-
+        ip link set {{ veth_pair_peer_link_name }} master
+        {{ veth_pair_peer_bridge }}
+      when:
+        - not veth_pair_is_attached
+      become: true
+  when: veth_pair_peer_bridge_type == "linuxbridge"
 
 - block:
   - include_tasks: is-attached.yml

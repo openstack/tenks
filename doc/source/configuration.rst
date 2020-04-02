@@ -49,6 +49,11 @@ are required for different hosts, you will need to individually specify them in
 an inventory host_vars file: for a host with hostname *myhost*, set
 ``physnet_mappings`` within the file ``ansible/inventory/host_vars/myhost``.
 
+Another variable that may be useful is ``bridge_type``. This may be either
+``openvswitch`` (default) or ``linuxbridge``, and defines the type of bridges
+created by Tenks. This may be different from the type of interfaces or bridges
+in ``physnet_mappings``.
+
 Standalone Ironic
 -----------------
 

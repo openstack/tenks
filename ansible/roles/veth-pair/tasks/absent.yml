@@ -15,7 +15,7 @@
 
 - name: Delete veth pair
   command: >-
-    ip link del dev {{ veth_pair_ovs_link_name }}
+    ip link del dev {{ veth_pair_peer_link_name }}
     type veth
     peer name {{ veth_pair_source_link_name }}
   register: res

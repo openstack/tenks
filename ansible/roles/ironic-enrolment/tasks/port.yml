@@ -36,7 +36,7 @@
     switch_info: "{{ bridge }}"
     port_id: >-
       {{ source_interface
-        | source_to_ovs_link_name(inventory_hostname=ironic_hypervisor) }}
+        | source_to_peer_link_name(inventory_hostname=ironic_hypervisor) }}
   command: >-
     '{{ ironic_virtualenv_path }}/bin/openstack' baremetal port set
       {{ uuid.stdout }}

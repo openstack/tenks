@@ -6,6 +6,11 @@ physnet_mappings: {}
 system_requirements:
   - "python{% if ansible_python.version.major == 3 %}3{% endif %}-virtualenv"
 
+# Tenks bridge type. Options are "openvswitch", "linuxbridge".  Default is
+# "openvswitch". Note that this relates to bridges created by Tenks, not the
+# source devices in physnet_mappings.
+bridge_type: "openvswitch"
+
 # Naming scheme for bridges created by tenks for physical networks is
 # {{ bridge_prefix + i }}, where `i` is the index of the physical network in
 # physnet_mappings (sorted alphabetically by key).
@@ -14,13 +19,13 @@ bridge_prefix: brtenks
 # Prefix for all veth links.
 veth_prefix: 'p-'
 
-# Suffix for veth links attached to a Tenks OVS bridge.
-veth_bridge_ovs_suffix: '-ovs'
+# Suffix for veth links attached to a Tenks bridge.
+veth_bridge_peer_suffix: '-{% if bridge_type == "openvswitch" %}ovs{% else %}br{% endif %}'
 # Suffix for veth links attached to a source Linux bridge.
 veth_bridge_source_suffix: '-phy'
 
-# Suffix for veth links attached to a Tenks OVS bridge.
-veth_node_ovs_suffix: '-ovs'
+# Suffix for veth links attached to a Tenks bridge.
+veth_node_peer_suffix: '-{% if bridge_type == "openvswitch" %}ovs{% else %}br{% endif %}'
 # Suffix for veth links attached to a node. Nodes aren't physical so '-phy'
 # doesn't seem right.
 veth_node_source_suffix: '-tap'
