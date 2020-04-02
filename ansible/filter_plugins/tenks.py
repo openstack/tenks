@@ -201,9 +201,17 @@ def _parse_size_string(size):
 def _link_name(context, node, physnet, inventory_hostname=None):
     prefix = _get_hostvar(context, 'veth_prefix',
                           inventory_hostname=inventory_hostname)
-    # Use up to the first 6 characters of the node name to avoid hitting the
-    # maximum link name length limit (15).
-    name = node['name'][:6]
+    # Use up to 6 characters of the node name to avoid hitting the maximum link
+    # name length limit (15). Node names consist of a prefix and an index.
+    # Ensure we include the index to keep link names unique.
+    m = re.search(r'\d+$', node['name'])
+    trailing_digits = m.group()
+    if len(trailing_digits) > 6:
+        msg = ("Cannot ensure uniqueness of link names for node %s" %
+               node['name'])
+        raise AnsibleFilterError(to_text(msg))
+    name_prefix = node['name'][:6 - len(trailing_digits)]
+    name = name_prefix + trailing_digits
     return (prefix + name + '-' +
             str(physnet_name_to_index(context, physnet,
                                       inventory_hostname=inventory_hostname)))
