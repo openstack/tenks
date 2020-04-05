@@ -6,4 +6,4 @@ pbr>=2.0 # Apache-2.0
 # NOTE(mgoddard): Ansible 2.8.0 breaks ansible-lint.
 ansible>=2.7.0,<2.10.0 # GPLv3
 os-client-config # Apache-2.0
-selinux;python_version>='3' # MIT
+selinux # MIT
