@@ -6,4 +6,5 @@ Tenks Release Notes
    :maxdepth: 1
 
    unreleased
+   1.0
 

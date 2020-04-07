@@ -1,0 +1,6 @@
+========================
+1.0 Series Release Notes
+========================
+
+.. release-notes::
+   :branch: stable/1.0
