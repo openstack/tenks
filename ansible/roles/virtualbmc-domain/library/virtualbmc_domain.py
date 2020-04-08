@@ -31,15 +31,13 @@ INTERVAL = 0.5
 
 
 def _vbmc_command(module, args):
-    path_prefix = ("%s/bin" % module.params["virtualenv"]
-                   if module.params["virtualenv"] else None)
-    cmd = ["vbmc", "--no-daemon"]
+    cmd = [module.params["vbmc_path"], "--no-daemon"]
     if module.params["log_directory"]:
         log_file = os.path.join(module.params["log_directory"],
                                 "vbmc-%s.log" % module.params["domain"])
         cmd += ["--log-file", log_file]
     cmd += args
-    result = module.run_command(cmd, check_rc=True, path_prefix=path_prefix)
+    result = module.run_command(cmd, check_rc=True)
     rc, out, err = result
     return out
 
@@ -150,7 +148,7 @@ def main():
             log_directory=dict(type='str'),
             state=dict(type=str, default='present',
                        choices=['present', 'absent']),
-            virtualenv=dict(type='str'),
+            vbmc_path=dict(type='str'),
         ),
         supports_check_mode=True,
     )

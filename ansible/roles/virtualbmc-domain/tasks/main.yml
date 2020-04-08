@@ -9,5 +9,5 @@
     libvirt_uri: "{{ vbmc_libvirt_uri | default(omit, true) }}"
     log_directory: "{{ vbmc_log_directory | default(omit, true) }}"
     state: "{{ vbmc_state }}"
-    virtualenv: "{{ vbmc_virtualenv_path | default(omit, true) }}"
+    vbmc_path: "{{ vbmc_virtualenv_path | default('/usr/local', true) ~ '/bin/vbmc' }}"
   become: true
