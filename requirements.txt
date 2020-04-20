@@ -5,4 +5,7 @@
 pbr>=2.0 # Apache-2.0
 # NOTE(mgoddard): Ansible 2.8.0 breaks ansible-lint.
 ansible>=2.6.0,<2.8.0 # GPLv3
+# NOTE(priteau): We don't depend directly on openstacksdk but os-client-config
+# does. openstacksdk isn't compatible with Python 2 since version 0.44.0.
+openstacksdk<0.44.0;python_version<'3.0' # Apache-2.0
 os-client-config # Apache-2.0
