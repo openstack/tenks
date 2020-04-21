@@ -1,5 +1,4 @@
 import json
-
 import unittest
 
 from ansible.module_utils import basic

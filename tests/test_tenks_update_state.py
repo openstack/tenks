@@ -13,13 +13,14 @@
 # under the License.
 
 from __future__ import absolute_import
+
 import copy
 import imp
 import os
+import unittest
 
 from ansible.errors import AnsibleActionFail
 import six
-import unittest
 
 
 # Python 2/3 compatibility.

@@ -13,6 +13,7 @@
 # under the License.
 
 from __future__ import absolute_import
+
 import copy
 import imp
 import json
@@ -21,7 +22,6 @@ import random
 from itertools import repeat, chain, cycle
 
 from ansible.module_utils import basic
-
 from tests.utils import ModuleTestCase, set_module_args, AnsibleExitJson, \
     AnsibleFailJson
 

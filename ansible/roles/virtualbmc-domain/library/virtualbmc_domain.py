@@ -12,11 +12,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-from ansible.module_utils.basic import AnsibleModule # noqa
-
 import json
 import os.path
 import time
+
+from ansible.module_utils.basic import AnsibleModule # noqa
 
 
 DOCUMENTATION = '''
