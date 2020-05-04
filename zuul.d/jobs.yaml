@@ -8,14 +8,6 @@
       tox_envlist: alint
 
 - job:
-    name: tenks-deploy-teardown-ovs-centos7
-    parent: tenks-deploy-teardown-ovs-base
-    nodeset: centos-7
-    required-projects:
-      - name: openstack/requirements
-        override-checkout: stable/train
-
-- job:
     name: tenks-deploy-teardown-ovs-centos8
     parent: tenks-deploy-teardown-ovs-base
     nodeset: centos-8
@@ -26,14 +18,6 @@
     nodeset: ubuntu-bionic
 
 - job:
-    name: tenks-deploy-teardown-linuxbridge-centos7
-    parent: tenks-deploy-teardown-linuxbridge-base
-    nodeset: centos-7
-    required-projects:
-      - name: openstack/requirements
-        override-checkout: stable/train
-
-- job:
     name: tenks-deploy-teardown-linuxbridge-centos8
     parent: tenks-deploy-teardown-linuxbridge-base
     nodeset: centos-8
@@ -42,4 +26,3 @@
     name: tenks-deploy-teardown-linuxbridge-ubuntu
     parent: tenks-deploy-teardown-linuxbridge-base
     nodeset: ubuntu-bionic
-

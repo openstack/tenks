@@ -9,10 +9,8 @@
     check:
       jobs:
         - tenks-tox-ansible-lint
-        - tenks-deploy-teardown-ovs-centos7
         - tenks-deploy-teardown-ovs-centos8
         - tenks-deploy-teardown-ovs-ubuntu
-        - tenks-deploy-teardown-linuxbridge-centos7
         - tenks-deploy-teardown-linuxbridge-centos8
         - tenks-deploy-teardown-linuxbridge-ubuntu
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
@@ -22,10 +20,8 @@
       queue: tenks
       jobs:
         - tenks-tox-ansible-lint
-        - tenks-deploy-teardown-ovs-centos7
         - tenks-deploy-teardown-ovs-centos8
         - tenks-deploy-teardown-ovs-ubuntu
-        - tenks-deploy-teardown-linuxbridge-centos7
         - tenks-deploy-teardown-linuxbridge-centos8
         - tenks-deploy-teardown-linuxbridge-ubuntu
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
