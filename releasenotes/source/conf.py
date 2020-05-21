@@ -58,6 +58,10 @@ master_doc = 'index'
 project = u'Tenks Release Notes'
 copyright = u'{year}, The Tenks team'.format(year=datetime.date.today().year)
 
+openstackdocs_repo_name = 'openstack/tenks'
+openstackdocs_auto_name = False
+openstackdocs_use_storyboard = True
+
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
@@ -97,7 +101,7 @@ exclude_patterns = []
 # show_authors = False
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = 'sphinx'
+pygments_style = 'native'
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
