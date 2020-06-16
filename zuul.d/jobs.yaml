@@ -6,6 +6,9 @@
     parent: openstack-tox
     vars:
       tox_envlist: alint
+    required-projects:
+      - name: openstack/requirements
+        override-checkout: stable/train
 
 - job:
     name: tenks-deploy-teardown-centos
