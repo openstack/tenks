@@ -12,3 +12,12 @@
       command: yum-config-manager --enable epel
   when: ansible_os_family == 'RedHat'
   become: true
+
+- name: Install Python3 modules
+  become: true
+  package:
+    name:
+      - python3-pip
+      - python3-setuptools
+      - python3-wheel
+      - "{% if ansible_os_family == 'Debian' %}virtualenv{% else %}python3-virtualenv{% endif %}"
