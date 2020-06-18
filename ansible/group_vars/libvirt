@@ -30,3 +30,7 @@ libvirt_local_uri: >-
   {%- if libvirt_custom_socket_path -%}
   qemu+unix:///system?socket={{ libvirt_custom_socket_path }}/libvirt-sock
   {%- endif %}
+
+# Whether to trust the receive filters of Tenks VMs. This gets mapped to the
+# trustGuestRxFilters' attribute of VM interfaces.
+libvirt_vm_trust_guest_rx_filters: true
