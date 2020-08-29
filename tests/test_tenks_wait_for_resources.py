@@ -13,7 +13,7 @@
 # under the License.
 
 import copy
-import imp
+from importlib import util as imp_util
 import json
 import os
 import random
@@ -25,13 +25,22 @@ from tests.utils import ModuleTestCase, set_module_args, AnsibleExitJson, \
     AnsibleFailJson
 
 
+def load_module(name, path):
+    module_spec = imp_util.spec_from_file_location(
+        name, path
+    )
+    module = imp_util.module_from_spec(module_spec)
+    module_spec.loader.exec_module(module)
+    return module
+
+
 # Import method lifted from kolla_ansible's test_merge_config.py
 PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 PLUGIN_FILE = os.path.join(PROJECT_DIR,
                            'ansible/roles/wait-for-resources/library'
                            '/wait_for_resources.py')
 
-wait_for = imp.load_source('wait_for_resources', PLUGIN_FILE)
+wait_for = load_module('wait_for_resources', PLUGIN_FILE)
 
 meets_criteria = wait_for.meets_criteria
 get_providers = wait_for.get_providers

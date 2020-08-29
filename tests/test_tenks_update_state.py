@@ -13,11 +13,20 @@
 # under the License.
 
 import copy
-import imp
+from importlib import util as imp_util
 import os
 import unittest
 
 from ansible.errors import AnsibleActionFail
+
+
+def load_module(name, path):
+    module_spec = imp_util.spec_from_file_location(
+        name, path
+    )
+    module = imp_util.module_from_spec(module_spec)
+    module_spec.loader.exec_module(module)
+    return module
 
 
 # Import method lifted from kolla_ansible's test_merge_config.py
@@ -25,7 +34,7 @@ PROJECT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '../'))
 PLUGIN_FILE = os.path.join(PROJECT_DIR,
                            'ansible/action_plugins/tenks_update_state.py')
 
-tus = imp.load_source('tenks_update_state', PLUGIN_FILE)
+tus = load_module('tenks_update_state', PLUGIN_FILE)
 
 
 class TestTenksUpdateState(unittest.TestCase):
