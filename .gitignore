@@ -1,5 +1,3 @@
-# All dot-files
-.*
 # Ansible retry files
 *.retry
 # Tenks state file
@@ -112,3 +110,6 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# tests
+.stestr/
