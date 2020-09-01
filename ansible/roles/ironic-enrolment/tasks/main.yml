@@ -18,6 +18,7 @@
   copy:
     src: requirements.txt
     dest: "{{ req_file.path }}"
+    mode: preserve
 
 - name: Ensure Python requirements are installed
   pip:

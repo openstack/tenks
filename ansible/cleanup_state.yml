@@ -22,3 +22,4 @@
         # (cannot represent an object).
         content: "{{ new_state.get('result') | to_nice_yaml }}"
         dest: "{{ state_file_path }}"
+        mode: preserve

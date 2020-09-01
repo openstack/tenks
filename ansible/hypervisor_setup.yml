@@ -24,6 +24,7 @@
   file:
     path: "{{ log_directory }}"
     state: directory
+    mode: 0755
   become: true
   # Don't remove log directory during teardown to preserve historical logs.
   when: cmd != 'teardown'

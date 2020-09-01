@@ -20,6 +20,7 @@
   copy:
     src: requirements.txt
     dest: "{{ wait_for_resources_python_requirements_path }}"
+    mode: preserve
 
 - name: Install dependencies in supplied venv
   pip:
