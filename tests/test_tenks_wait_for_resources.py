@@ -344,7 +344,7 @@ def create_run_cmd(providers, inventories, traits):
         elif "resource provider inventory list" in args[1]:
             return pop_output(inventories)
         else:
-            raise ValueError("{} not expected", args)
+            raise ValueError("{} not expected" % args)
 
     return dummy_run_command
 
