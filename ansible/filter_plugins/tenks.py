@@ -56,7 +56,7 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
     if inventory_hostname is None:
         namespace = context
     else:
-        if inventory_hostname not in context['hostvars']:
+        if inventory_hostname not in context.get('hostvars', []):
             raise AnsibleFilterError(
                 "Inventory hostname '%s' not in hostvars" % inventory_hostname)
         namespace = context['hostvars'][inventory_hostname]
