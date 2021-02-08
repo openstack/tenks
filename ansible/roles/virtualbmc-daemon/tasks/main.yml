@@ -18,12 +18,25 @@
   retries: 3
   become: true
 
+# NOTE(priteau): We need a recent pip to install the latest cryptography
+# library. See https://github.com/pyca/cryptography/issues/5753
+- name: Ensure a recent version of pip is installed
+  pip:
+    name: "pip>=19.1.1"
+    virtualenv: "{{ vbmcd_virtualenv_path or omit }}"
+  become: "{{ not vbmcd_virtualenv_path }}"
+
 - name: Ensure Python requirements are installed
   pip:
     name:
       - "virtualbmc>=1.4.0{% if ansible_python.version.major == 2 %},<2{% endif %}"
+    # NOTE(priteau): Ignore PyYAML when installing system-wide to avoid the
+    # following error: Cannot uninstall 'PyYAML'. It is a distutils installed
+    # project and thus we cannot accurately determine which files belong to it
+    # which would lead to only a partial uninstall.
     extra_args: >-
       -c {{ vbmcd_python_upper_constraints_url }}
+      {% if not vbmcd_virtualenv_path %}--ignore-installed PyYAML{% endif %}
     virtualenv: "{{ vbmcd_virtualenv_path or omit }}"
   register: result
   until: result is success

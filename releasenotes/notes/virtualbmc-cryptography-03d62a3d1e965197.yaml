@@ -1,0 +1,6 @@
+---
+fixes:
+  - |
+    Fixes system-wide installation of virtualbmc following the release of
+    version 3.4 of the cryptography package. See `story 2008607
+    <https://storyboard.openstack.org/#!/story/2008607>`__ for details.
