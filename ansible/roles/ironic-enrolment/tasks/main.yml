@@ -9,6 +9,17 @@
     - not lookup('env', 'OS_USERNAME')
     - not lookup('env', 'OS_CLOUD')
 
+- name: Ensure the latest versions of pip and setuptools are installed
+  pip:
+    name: "{{ item.name }}"
+    state: latest # noqa package-latest
+    virtualenv: "{{ ironic_virtualenv_path }}"
+    extra_args: >-
+      -c {{ ironic_python_upper_constraints_url }}
+  with_items:
+    - { name: pip }
+    - { name: setuptools }
+
 # This is useful to get a uniquely generated temporary path.
 - name: Create temporary file for pip requirements
   tempfile:
