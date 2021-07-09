@@ -34,9 +34,13 @@
     # following error: Cannot uninstall 'PyYAML'. It is a distutils installed
     # project and thus we cannot accurately determine which files belong to it
     # which would lead to only a partial uninstall.
+    # NOTE(priteau): Use --no-binary to avoid installing libvirt-python from
+    # wheel. There is a problem with the 7.5.0 wheel resulting in the error:
+    # The `libvirt` module is not importable. Check the requirements.
     extra_args: >-
       -c {{ vbmcd_python_upper_constraints_url }}
       {% if not vbmcd_virtualenv_path %}--ignore-installed PyYAML{% endif %}
+      --no-binary libvirt-python
     virtualenv: "{{ vbmcd_virtualenv_path or omit }}"
   register: result
   until: result is success
