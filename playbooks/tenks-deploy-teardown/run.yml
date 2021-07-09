@@ -27,6 +27,15 @@
           ansible/deploy.yml > {{ logs_dir }}/ansible/tenks-deploy
         chdir: "{{ tenks_src_dir }}"
 
+    - name: Test idempotence of deploy
+      shell:
+        cmd: >-
+          {{ ansible_playbook_bin }} -vvv
+          --inventory ansible/inventory
+          --extra-vars=@{{ tenks_overrides_path }}
+          ansible/deploy.yml > {{ logs_dir }}/ansible/tenks-deploy-idempotence
+        chdir: "{{ tenks_src_dir }}"
+
     - name: Get some diagnostic info for the tenks cluster
       include_role:
         name: tenks-diagnostics
@@ -41,4 +50,13 @@
           --inventory ansible/inventory
           --extra-vars=@{{ tenks_overrides_path }}
           ansible/teardown.yml > {{ logs_dir }}/ansible/tenks-teardown
+        chdir: "{{ tenks_src_dir }}"
+
+    - name: Test idempotence of teardown
+      shell:
+        cmd: >-
+          {{ ansible_playbook_bin }} -vvv
+          --inventory ansible/inventory
+          --extra-vars=@{{ tenks_overrides_path }}
+          ansible/teardown.yml > {{ logs_dir }}/ansible/tenks-teardown-idempotence
         chdir: "{{ tenks_src_dir }}"
