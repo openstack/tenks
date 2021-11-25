@@ -2,12 +2,16 @@
 - project:
     templates:
       - openstack-cover-jobs
-      - openstack-python3-victoria-jobs
       - publish-openstack-docs-pti
       - release-notes-jobs-python3
 
     check:
       jobs:
+        - openstack-tox-pep8
+        - openstack-tox-py36
+        - openstack-tox-py37
+        - openstack-tox-py38
+        - openstack-tox-py39
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-centos8
         - tenks-deploy-teardown-ovs-ubuntu
@@ -19,6 +23,11 @@
     gate:
       queue: tenks
       jobs:
+        - openstack-tox-pep8
+        - openstack-tox-py36
+        - openstack-tox-py37
+        - openstack-tox-py38
+        - openstack-tox-py39
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-centos8
         - tenks-deploy-teardown-ovs-ubuntu
