@@ -8,9 +8,9 @@
       tox_envlist: alint
 
 - job:
-    name: tenks-deploy-teardown-ovs-centos8
+    name: tenks-deploy-teardown-ovs-centos8s
     parent: tenks-deploy-teardown-ovs-base
-    nodeset: centos-8
+    nodeset: centos-8-stream
 
 - job:
     name: tenks-deploy-teardown-ovs-ubuntu
@@ -18,9 +18,9 @@
     nodeset: ubuntu-bionic
 
 - job:
-    name: tenks-deploy-teardown-linuxbridge-centos8
+    name: tenks-deploy-teardown-linuxbridge-centos8s
     parent: tenks-deploy-teardown-linuxbridge-base
-    nodeset: centos-8
+    nodeset: centos-8-stream
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-ubuntu
