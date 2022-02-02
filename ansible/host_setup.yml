@@ -38,6 +38,13 @@
             libvirt_host_uri: "{{ libvirt_local_uri }}"
             libvirt_host_socket_dir: "{{ libvirt_custom_socket_path }}"
             libvirt_host_pid_path: "{{ libvirt_custom_pid_path }}"
+            libvirt_host_enable_efi_support: >-
+              {{ hostvars.localhost.tenks_state[inventory_hostname].nodes |
+                 default([]) |
+                 map('set_libvirt_boot_firmware') |
+                 selectattr('boot_firmware', 'equalto', 'efi') |
+                 list |
+                 length > 0 }}
 
         - name: Set up Virtual BMC daemon
           include_role:

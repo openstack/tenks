@@ -54,6 +54,11 @@ Another variable that may be useful is ``bridge_type``. This may be either
 created by Tenks. This may be different from the type of interfaces or bridges
 in ``physnet_mappings``.
 
+The default boot mode is legacy BIOS. This may be changed to UEFI by setting
+``default_boot_mode`` to ``uefi`` in a variable file. The boot mode for nodes
+may be set individually via ``ironic_config.properties.capabilities.boot_mode``
+in the ``specs`` list.
+
 Standalone Ironic
 -----------------
 

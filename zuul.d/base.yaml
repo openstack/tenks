@@ -23,13 +23,15 @@
       - ^tox.ini$
 
 - job:
-    name: tenks-deploy-teardown-ovs-base
+    name: tenks-deploy-teardown-ovs-bios-base
     parent: tenks-deploy-teardown-base
     vars:
       bridge_type: openvswitch
+      boot_mode: bios
 
 - job:
-    name: tenks-deploy-teardown-linuxbridge-base
+    name: tenks-deploy-teardown-linuxbridge-uefi-base
     parent: tenks-deploy-teardown-base
     vars:
       bridge_type: linuxbridge
+      boot_mode: uefi

@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds support for UEFI boot mode. The default boot mode may be set via
+    ``default_boot_mode``. The default boot mode remains legacy BIOS, although
+    this may change.

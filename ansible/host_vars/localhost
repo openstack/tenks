@@ -111,6 +111,10 @@ state_file_path: >-
 # The default Ironic driver of a node. Can be overridden per-node.
 default_ironic_driver: ipmi
 
+# The default boot mode of a node. One of 'bios' or 'uefi'. Can be
+# overridden per-node via properties.capabilities.boot_mode.
+default_boot_mode: bios
+
 # Maps Ironic drivers to the BMC emulation tool they support.
 bmc_emulators:
   agent_ipmitool: virtualbmc

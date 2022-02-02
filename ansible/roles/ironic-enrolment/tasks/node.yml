@@ -102,11 +102,11 @@
           cpus: "{{ node.vcpus }}"
           memory_mb: "{{ node.memory_mb }}"
           local_gb: "{{ node.volumes[0].capacity | size_string_to_gb if node.volumes | length > 0 else 0 }}"
-          # Since we currently only support legacy BIOS boot mode, set it
-          # explicitly here. This is especially important since Ironic changed
-          # the default boot mode to UEFI in Yoga. If the capabilities field is
-          # provided, the boot_mode should be set explicitly.
-          capabilities: "boot_mode:bios"
+          # Set the boot mode explicitly here, since we cannot rely on a stable
+          # default in Ironic (it changed from legacy BIOS to UEFI in Yoga).
+          # If the capabilities field is provided, the boot_mode should be set
+          # explicitly.
+          capabilities: "boot_mode:{{ default_boot_mode }}"
 
     - name: Add Ironic node traits
       command: >-

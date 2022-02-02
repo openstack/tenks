@@ -45,6 +45,7 @@ class FilterModule(object):
             'set_libvirt_interfaces': set_libvirt_interfaces,
             'set_libvirt_start_params': set_libvirt_start_params,
             'set_libvirt_volume_pool': set_libvirt_volume_pool,
+            'set_libvirt_boot_firmware': set_libvirt_boot_firmware,
 
             # Miscellaneous filters.
             'size_string_to_gb': size_string_to_gb,
@@ -86,6 +87,54 @@ def set_libvirt_volume_pool(context, node):
     pool = _get_hostvar(context, 'libvirt_pool_name')
     for vol in node.get('volumes', []):
         vol['pool'] = pool
+    return node
+
+
+# The following function has been adapted from Ironic:
+# https://opendev.org/openstack/ironic/src/commit/5f6d753b2c334e4f404818d5e94a145b60244736/ironic/drivers/utils.py#L229
+
+def _capabilities_to_dict(capabilities):
+    """Parse the capabilities string into a dictionary
+
+    :param capabilities: the capabilities of the node as a formatted string.
+    :raises: InvalidParameterValue if capabilities is not an string or has a
+             malformed value
+    """
+    capabilities_dict = {}
+    if capabilities:
+        if not isinstance(capabilities, str):
+            raise AnsibleFilterError(
+                "Value of 'capabilities' must be string. Got %s"
+                % type(capabilities))
+        try:
+            for capability in capabilities.split(','):
+                key, value = capability.split(':')
+                capabilities_dict[key] = value
+        except ValueError:
+            raise AnsibleFilterError(
+                "Malformed capabilities value: %s" % capability
+            )
+
+    return capabilities_dict
+
+
+@contextfilter
+def set_libvirt_boot_firmware(context, node):
+    """Set the boot firmware for a node."""
+    default_boot_mode = _get_hostvar(context, 'default_boot_mode',
+                                     inventory_hostname='localhost')
+    properties = node.get('ironic_config', {}).get('properties', {})
+    caps = properties.get('capabilities', '')
+    caps_dict = _capabilities_to_dict(caps)
+    boot_mode = caps_dict.get('boot_mode', default_boot_mode)
+    if boot_mode not in ['bios', 'uefi']:
+        raise AnsibleFilterError(
+            "Unexpected boot firmware. Must be one of 'bios' or 'uefi'. Got "
+            "'%s'" % boot_mode
+        )
+    boot_mode_to_firmware = {'uefi': 'efi', 'bios': 'bios'}
+    node['boot_firmware'] = boot_mode_to_firmware[boot_mode]
+
     return node
 
 
