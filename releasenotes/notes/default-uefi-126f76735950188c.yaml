@@ -1,0 +1,5 @@
+---
+upgrade:
+  - |
+    Changes the default boot mode to UEFI. The previous default of legacy BIOS
+    may be restored by setting ``default_boot_mode`` to ``bios``.
