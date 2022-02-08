@@ -29,7 +29,10 @@ It is assumed that...
 Pre-Requisites
 --------------
 
-Currently, Tenks supports CentOS 7.5.
+Currently, Tenks supports the following OS distributions on the hypervisor:
+
+* CentOS Stream 8
+* Ubuntu Focal 20.04
 
 To avoid conflicts with Python packages installed by the system package manager
 it is recommended to install Tenks in a virtualenv. Ensure that the
@@ -39,9 +42,9 @@ installed with a command such as::
 
  $ yum install --assumeyes python-virtualenv git
 
- Open vSwitch must be installed and running. Please see the
- `Open vSwitch docs <https://docs.openvswitch.org/en/latest/intro/install/>`_
- for more details.
+If using Open vSwitch for networking, it must be installed and running. Please
+see the `Open vSwitch docs
+<https://docs.openvswitch.org/en/latest/intro/install/>`_ for more details.
 
 Tenks Installation
 ------------------
