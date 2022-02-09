@@ -21,7 +21,7 @@
 - job:
     name: tenks-deploy-teardown-ovs-bios-ubuntu
     parent: tenks-deploy-teardown-ovs-bios-base
-    nodeset: ubuntu-bionic
+    nodeset: ubuntu-focal
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos8s
@@ -31,4 +31,4 @@
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: ubuntu-bionic
+    nodeset: ubuntu-focal
