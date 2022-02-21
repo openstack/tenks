@@ -17,10 +17,15 @@
     timeout: 1800
     irrelevant-files:
       - ^.*\.rst$
-      - ^doc/.*
-      - ^releasenotes/.*
-      - ^setup.cfg$
-      - ^tox.ini$
+      - ^doc/
+      - ^releasenotes/
+      - ^setup\.cfg$
+      - ^setup\.py$
+      - ^tenks/
+      - ^test-requirements\.txt$
+      - ^tests/
+      - ^tox\.ini$
+      - ^zuul\.d/
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-base

@@ -6,6 +6,12 @@
     parent: openstack-tox
     vars:
       tox_envlist: alint
+    irrelevant-files:
+      - ^.*\.rst$
+      - ^doc/
+      - ^releasenotes/
+      - ^tests/
+      - ^zuul\.d/
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-centos8s
