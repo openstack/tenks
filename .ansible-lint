@@ -2,5 +2,6 @@ skip_list:
   - '106'  # Role name {} does not match ``^[a-z][a-z0-9_]+$`` pattern'
 
 warn_list:
-  - experimental
   - no-changed-when
+  - command-instead-of-shell  # Use shell only when shell functionality is required
+  - experimental  # all rules tagged as experimental

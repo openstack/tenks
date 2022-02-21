@@ -32,7 +32,7 @@
 - name: Set Ironic port attributes
   vars:
     port_attributes: "{{ port_attributes_output.stdout | from_json }}"
-    switch_id: "{{ hostvars[ironic_hypervisor]['ansible_' + bridge].macaddress }}"
+    switch_id: "{{ hostvars[ironic_hypervisor].ansible_facts[bridge].macaddress }}"
     switch_info: "{{ bridge }}"
     port_id: >-
       {{ source_interface
