@@ -19,6 +19,11 @@
     nodeset: centos-8-stream
 
 - job:
+    name: tenks-deploy-teardown-ovs-bios-debian
+    parent: tenks-deploy-teardown-ovs-bios-base
+    nodeset: debian-bullseye
+
+- job:
     name: tenks-deploy-teardown-ovs-bios-ubuntu
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: ubuntu-focal
@@ -27,6 +32,11 @@
     name: tenks-deploy-teardown-linuxbridge-uefi-centos8s
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: centos-8-stream
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-debian
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: debian-bullseye
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu

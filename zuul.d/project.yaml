@@ -14,8 +14,10 @@
         - openstack-tox-py39
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos8s
+        - tenks-deploy-teardown-ovs-bios-debian
         - tenks-deploy-teardown-ovs-bios-ubuntu
         - tenks-deploy-teardown-linuxbridge-uefi-centos8s
+        - tenks-deploy-teardown-linuxbridge-uefi-debian
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
@@ -30,8 +32,10 @@
         - openstack-tox-py39
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos8s
+        - tenks-deploy-teardown-ovs-bios-debian
         - tenks-deploy-teardown-ovs-bios-ubuntu
         - tenks-deploy-teardown-linuxbridge-uefi-centos8s
+        - tenks-deploy-teardown-linuxbridge-uefi-debian
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
