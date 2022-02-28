@@ -1,9 +1,9 @@
 ---
 # Path to virtualenv used to install Python requirements. If a virtualenv does
 # not exist at this location, one will be created.
-virtualenv_path: "{{ '/'.join([ansible_env['HOME'], 'tenks-venv']) }}"
+virtualenv_path: "{{ '/'.join([ansible_facts.env['HOME'], 'tenks-venv']) }}"
 
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
 python_upper_constraints_url: >-
-  https://releases.openstack.org/constraints/upper/{% if ansible_python.version.major == 2 %}train{% else %}master{% endif %}
+  https://releases.openstack.org/constraints/upper/{% if ansible_facts.python.version.major == 2 %}train{% else %}master{% endif %}

@@ -1,0 +1,7 @@
+[defaults]
+# Ensure that facts are referenced via ansible_facts.<fact>.
+inject_facts_as_vars = False
+
+[ssh_connection]
+pipelining = True
+retries = 3

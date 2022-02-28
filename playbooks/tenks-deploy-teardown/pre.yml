@@ -23,13 +23,25 @@
       become: true
       package:
         name: python3
-      when: ansible_python.version.major == 3
+      when: ansible_facts.python.version.major == 3
 
     - name: Create virtualenv for tenks
       pip:
         requirements: "{{ tenks_src_dir }}/requirements.txt"
         virtualenv: "{{ tenks_venv }}"
-        virtualenv_python: "{{ ansible_python.executable }}"
+        virtualenv_python: "{{ ansible_facts.python.executable }}"
+
+    - name: Ensure /etc/ansible exists
+      file:
+        path: /etc/ansible
+        state: directory
+      become: true
+
+    - name: Template ansible.cfg
+      template:
+        src: "ansible.cfg.j2"
+        dest: /etc/ansible/ansible.cfg
+      become: true
 
     - name: Template requirements overrides
       template:
