@@ -7,9 +7,9 @@ Hosts
 -----
 
 Tenks uses Ansible inventory to manage hosts. A multi-host setup is therefore
-supported, although the default hosts configuration will deploy an all-in-one
-setup on the host where the ``ansible-playbook`` command is executed
-(*localhost*).
+supported, although the default hosts configuration in ``ansible/inventory/``
+will deploy an all-in-one setup on the host where the ``ansible-playbook``
+command is executed (*localhost*).
 
 * Configuration management of the Tenks cluster is always performed on
   *localhost*.
