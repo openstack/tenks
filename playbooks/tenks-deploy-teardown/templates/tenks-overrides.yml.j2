@@ -1,7 +1,4 @@
 ---
-# Use python3 on Ubuntu remote hosts.
-ansible_python_interpreter: "{{ '/usr/bin/python3' if ansible_facts.python.version.major == 3 else '/usr/bin/python2' }}"
-
 # This file holds the config given to Tenks when running the zuul job,
 # tenks-deploy-teardown. It assumes the existence of the bridge `breth1`.
 
