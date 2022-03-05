@@ -1,7 +1,7 @@
 Tenks
 =====
 
-.. image:: https://governance.openstack.org/badges/metalsmith.svg
+.. image:: https://governance.openstack.org/badges/tenks.svg
     :target: https://governance.openstack.org/reference/tags/index.html
 
 Tenks is a utility that manages virtual bare metal clusters for development and
