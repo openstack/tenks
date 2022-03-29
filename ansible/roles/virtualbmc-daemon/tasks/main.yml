@@ -62,7 +62,7 @@
 - name: Ensure Virtual BMC systemd service is started and enabled
   systemd:
     name: "{{ service }}"
-    enabled: yes
+    enabled: true
     state: started
     daemon_reload: "{{ service_file.changed }}"
   become: true

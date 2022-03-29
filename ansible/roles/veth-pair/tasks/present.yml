@@ -43,16 +43,16 @@
   when: veth_pair_peer_bridge_type == "linuxbridge"
 
 - block:
-  - include_tasks: is-attached.yml
-    vars:
-      bridge: "{{ veth_pair_source_bridge }}"
-      interface: "{{ veth_pair_source_link_name }}"
+    - include_tasks: is-attached.yml
+      vars:
+        bridge: "{{ veth_pair_source_bridge }}"
+        interface: "{{ veth_pair_source_link_name }}"
 
-  - name: Plug veth into source bridge
-    command: >-
-      ip link set {{ veth_pair_source_link_name }} master
-      {{ veth_pair_source_bridge }}
-    when:
-      - not veth_pair_is_attached
-    become: true
+    - name: Plug veth into source bridge
+      command: >-
+        ip link set {{ veth_pair_source_link_name }} master
+        {{ veth_pair_source_bridge }}
+      when:
+        - not veth_pair_is_attached
+      become: true
   when: veth_pair_plug_into_source | bool

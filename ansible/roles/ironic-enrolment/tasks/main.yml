@@ -11,14 +11,14 @@
 
 - name: Ensure the latest versions of pip and setuptools are installed
   pip:
-    name: "{{ item.name }}"
+    name: "{{ item }}"
     state: latest # noqa package-latest
     virtualenv: "{{ ironic_virtualenv_path }}"
     extra_args: >-
       -c {{ ironic_python_upper_constraints_url }}
   with_items:
-    - { name: pip }
-    - { name: setuptools }
+    - pip
+    - setuptools
 
 # This is useful to get a uniquely generated temporary path.
 - name: Create temporary file for pip requirements
@@ -45,25 +45,25 @@
 # argument to the os_ironic module, due to a quirk in its implementation.
 # Grab the endpoint from the file.
 - block:
-  - name: Query clouds.yaml
-    os_client_config:
-      clouds: "{{ lookup('env', 'OS_CLOUD') }}"
-    delegate_to: localhost
-    vars:
-      ansible_python_interpreter: >-
-        {{ lookup('env', 'VIRTUAL_ENV') | default('/usr', true) ~ '/bin/python' }}
+    - name: Query clouds.yaml
+      os_client_config:
+        clouds: "{{ lookup('env', 'OS_CLOUD') }}"
+      delegate_to: localhost
+      vars:
+        ansible_python_interpreter: >-
+          {{ lookup('env', 'VIRTUAL_ENV') | default('/usr', true) ~ '/bin/python' }}
 
-  - name: Fail if the cloud was not found
-    fail:
-      msg: >
-        Cloud {{ lookup('env', 'OS_CLOUD') }} was not found in clouds.yaml
-    when: >-
-      openstack.clouds | length == 0 or
-      not openstack.clouds[0].get('auth', {}).get('endpoint')
+    - name: Fail if the cloud was not found
+      fail:
+        msg: >
+          Cloud {{ lookup('env', 'OS_CLOUD') }} was not found in clouds.yaml
+      when: >-
+        openstack.clouds | length == 0 or
+        not openstack.clouds[0].get('auth', {}).get('endpoint')
 
-  - name: Set a fact about the ironic API endpoint
-    set_fact:
-      ironic_url: "{{ openstack.clouds[0].auth.endpoint }}"
+    - name: Set a fact about the ironic API endpoint
+      set_fact:
+        ironic_url: "{{ openstack.clouds[0].auth.endpoint }}"
   when: lookup('env', 'OS_CLOUD') | length > 0
 
 - name: Detect ironic API version

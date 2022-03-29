@@ -16,7 +16,11 @@ import re
 
 from ansible.errors import AnsibleFilterError
 from ansible.module_utils._text import to_text
-from jinja2 import contextfilter
+# NOTE: jinja2 3.1.0 dropped contextfilter in favour of pass_context.
+try:
+    from jinja2 import pass_context
+except ImportError:
+    from jinja2 import contextfilter as pass_context
 
 
 class FilterModule(object):
@@ -64,7 +68,7 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
     return namespace.get(var_name)
 
 
-@contextfilter
+@pass_context
 def set_libvirt_interfaces(context, node):
     """Set interfaces for a node's specified physical networks.
     """
@@ -80,7 +84,7 @@ def set_libvirt_interfaces(context, node):
     return node
 
 
-@contextfilter
+@pass_context
 def set_libvirt_volume_pool(context, node):
     """Set the Libvirt volume pool for each volume.
     """
@@ -118,7 +122,7 @@ def _capabilities_to_dict(capabilities):
     return capabilities_dict
 
 
-@contextfilter
+@pass_context
 def set_libvirt_boot_firmware(context, node):
     """Set the boot firmware for a node."""
     default_boot_mode = _get_hostvar(context, 'default_boot_mode',
@@ -150,7 +154,7 @@ def set_libvirt_start_params(node):
     return node
 
 
-@contextfilter
+@pass_context
 def bridge_name(context, physnet, inventory_hostname=None):
     """Get the Tenks bridge name from a physical network name.
     """
@@ -160,7 +164,7 @@ def bridge_name(context, physnet, inventory_hostname=None):
                                       inventory_hostname=inventory_hostname)))
 
 
-@contextfilter
+@pass_context
 def source_link_name(context, node, physnet, inventory_hostname=None):
     """Get the source veth link name for a node/physnet combination.
     """
@@ -170,7 +174,7 @@ def source_link_name(context, node, physnet, inventory_hostname=None):
                          inventory_hostname=inventory_hostname))
 
 
-@contextfilter
+@pass_context
 def peer_link_name(context, node, physnet, inventory_hostname=None):
     """Get the peer veth link name for a node/physnet combination.
     """
@@ -180,7 +184,7 @@ def peer_link_name(context, node, physnet, inventory_hostname=None):
                          inventory_hostname=inventory_hostname))
 
 
-@contextfilter
+@pass_context
 def source_to_peer_link_name(context, source, inventory_hostname=None):
     """Get the corresponding peer link name for a source link name.
     """
@@ -190,7 +194,7 @@ def source_to_peer_link_name(context, source, inventory_hostname=None):
                                inventory_hostname=inventory_hostname)
 
 
-@contextfilter
+@pass_context
 def source_link_to_physnet_name(context, source, inventory_hostname=None):
     """ Get the physical network name that a source veth link is connected to.
     """
@@ -265,7 +269,7 @@ def _link_name(context, node, physnet, inventory_hostname=None):
                                       inventory_hostname=inventory_hostname)))
 
 
-@contextfilter
+@pass_context
 def physnet_name_to_index(context, physnet, inventory_hostname=None):
     """Get the ID of this physical network on the hypervisor.
     """
@@ -277,7 +281,7 @@ def physnet_name_to_index(context, physnet, inventory_hostname=None):
     return state[inventory_hostname]['physnet_indices'][physnet]
 
 
-@contextfilter
+@pass_context
 def physnet_index_to_name(context, idx, inventory_hostname=None):
     """Get the name of this physical network on the hypervisor.
     """

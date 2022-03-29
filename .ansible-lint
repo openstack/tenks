@@ -5,3 +5,4 @@ warn_list:
   - no-changed-when
   - command-instead-of-shell  # Use shell only when shell functionality is required
   - experimental  # all rules tagged as experimental
+  - fqcn-builtins  # Use FQCN for builtin actions.
