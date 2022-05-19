@@ -23,7 +23,6 @@
         # deploy job, which uses tenks to test bare metal compute provisioning.
         - kayobe-overcloud-centos8s
     gate:
-      queue: tenks
       jobs:
         - openstack-tox-pep8
         - openstack-tox-py36
