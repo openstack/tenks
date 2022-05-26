@@ -17,6 +17,10 @@
     name: tenks-deploy-teardown-ovs-bios-centos8s
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: centos-8-stream
+    required-projects:
+      # NOTE(mgoddard): CentOS 8 uses Python 3.6 which is not supported in Zed.
+      - name: openstack/requirements
+        override-checkout: stable/yoga
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-debian
@@ -32,6 +36,10 @@
     name: tenks-deploy-teardown-linuxbridge-uefi-centos8s
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: centos-8-stream
+    required-projects:
+      # NOTE(mgoddard): CentOS 8 uses Python 3.6 which is not supported in Zed.
+      - name: openstack/requirements
+        override-checkout: stable/yoga
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-debian
