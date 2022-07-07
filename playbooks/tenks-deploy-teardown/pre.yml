@@ -23,7 +23,6 @@
       become: true
       package:
         name: python3
-      when: ansible_facts.python.version.major == 3
 
     - name: Create virtualenv for tenks
       pip:
