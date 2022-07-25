@@ -28,9 +28,14 @@
     nodeset: debian-bullseye
 
 - job:
-    name: tenks-deploy-teardown-ovs-bios-ubuntu
+    name: tenks-deploy-teardown-ovs-bios-ubuntu-focal
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: ubuntu-focal
+
+- job:
+    name: tenks-deploy-teardown-ovs-bios-ubuntu-jammy
+    parent: tenks-deploy-teardown-ovs-bios-base
+    nodeset: ubuntu-jammy
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos8s
@@ -47,6 +52,11 @@
     nodeset: debian-bullseye
 
 - job:
-    name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu
+    name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-focal
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: ubuntu-focal
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: ubuntu-jammy

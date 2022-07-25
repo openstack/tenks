@@ -4,3 +4,4 @@ vbmcd_packages:
   - gcc
   - libvirt-dev
   - pkg-config
+  - libzmq5

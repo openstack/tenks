@@ -11,13 +11,16 @@
         - openstack-tox-py36
         - openstack-tox-py38
         - openstack-tox-py39
+        - openstack-tox-py310
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos8s
         - tenks-deploy-teardown-ovs-bios-debian
-        - tenks-deploy-teardown-ovs-bios-ubuntu
+        - tenks-deploy-teardown-ovs-bios-ubuntu-focal
+        - tenks-deploy-teardown-ovs-bios-ubuntu-jammy
         - tenks-deploy-teardown-linuxbridge-uefi-centos8s
         - tenks-deploy-teardown-linuxbridge-uefi-debian
-        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu
+        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-focal
+        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
         - kayobe-overcloud-centos8s
@@ -27,13 +30,16 @@
         - openstack-tox-py36
         - openstack-tox-py38
         - openstack-tox-py39
+        - openstack-tox-py310
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos8s
         - tenks-deploy-teardown-ovs-bios-debian
-        - tenks-deploy-teardown-ovs-bios-ubuntu
+        - tenks-deploy-teardown-ovs-bios-ubuntu-focal
+        - tenks-deploy-teardown-ovs-bios-ubuntu-jammy
         - tenks-deploy-teardown-linuxbridge-uefi-centos8s
         - tenks-deploy-teardown-linuxbridge-uefi-debian
-        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu
+        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-focal
+        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
         - kayobe-overcloud-centos8s

@@ -34,6 +34,7 @@ Currently, Tenks supports the following OS distributions on the hypervisor:
 * CentOS Stream 8
 * Debian Bullseye (11)
 * Ubuntu Focal 20.04
+* Ubuntu Jammy 22.04
 
 To avoid conflicts with Python packages installed by the system package manager
 it is recommended to install Tenks in a virtualenv. Ensure that the
