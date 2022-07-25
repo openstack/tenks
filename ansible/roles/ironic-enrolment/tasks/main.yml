@@ -44,7 +44,8 @@
 # If using clouds.yaml for authentication we need to pass in the ironic_url
 # argument to the os_ironic module, due to a quirk in its implementation.
 # Grab the endpoint from the file.
-- block:
+- name: Set ironic_url for os_ironic module
+  block:
     - name: Query clouds.yaml
       os_client_config:
         clouds: "{{ lookup('env', 'OS_CLOUD') }}"

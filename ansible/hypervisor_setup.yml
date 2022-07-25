@@ -29,7 +29,8 @@
   # Don't remove log directory during teardown to preserve historical logs.
   when: cmd != 'teardown'
 
-- block:
+- name: Check if OVS is installed
+  block:
     - name: Check if ovs-vsctl command is present
       command: ovs-vsctl --version
       register: ovs_vsctl_check

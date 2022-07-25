@@ -1,16 +1,17 @@
 ---
-- block:
-  - include_tasks: is-attached.yml
-    vars:
-      bridge: "{{ veth_pair_source_bridge }}"
-      interface: "{{ veth_pair_source_link_name }}"
+- name: Unplug veth from source bridge
+  block:
+    - include_tasks: is-attached.yml
+      vars:
+        bridge: "{{ veth_pair_source_bridge }}"
+        interface: "{{ veth_pair_source_link_name }}"
 
-  - name: Unplug veth from source bridge
-    command: >-
-      ip link set {{ veth_pair_source_link_name }} nomaster
-    when:
-      - veth_pair_is_attached
-    become: true
+    - name: Unplug veth from source bridge
+      command: >-
+        ip link set {{ veth_pair_source_link_name }} nomaster
+      when:
+        - veth_pair_is_attached
+      become: true
   when: veth_pair_plug_into_source | bool
 
 - name: Delete veth pair

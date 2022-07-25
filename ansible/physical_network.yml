@@ -35,7 +35,8 @@
     source_type: linuxbridge
   when: if_details.stdout_lines[-1].split()[0] == 'bridge'
 
-- block:
+- name: Register source interface as an Open vSwitch bridge
+  block:
     - name: Get list of OVS bridges
       command: ovs-vsctl list-br
       register: ovs_bridges
@@ -58,7 +59,8 @@
   become: true
   when: bridge_type == "openvswitch"
 
-- block:
+- name: Create Tenks bridge
+  block:
     - name: Check if Tenks bridge exists
       stat:
         path: /sys/class/net/{{ tenks_bridge }}
@@ -131,7 +133,7 @@
         state: "{{ state }}"
       become: true
 
-- name: Plug source interface into Tenks bridge
+- name: Plug source interface into Tenks OVS bridge
   openvswitch_port:
     bridge: "{{ tenks_bridge }}"
     port: "{{ source_interface }}"
@@ -144,7 +146,8 @@
     - state != 'absent'
   become: true
 
-- block:
+- name: Plug source interface into Tenks Linux bridge
+  block:
     - name: Speculatively check interface's master
       command: >-
         realpath /sys/class/net/{{ source_interface }}/master
@@ -152,7 +155,7 @@
       failed_when: false
       changed_when: false
 
-    - name: Plug source interface into Tenks bridge
+    - name: Plug source interface into Tenks Linux bridge
       command: >-
         {{ tenks_ip_path }} link set dev {{ source_interface }} master {{ tenks_bridge }}
       changed_when: true

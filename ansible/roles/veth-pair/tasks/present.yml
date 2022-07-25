@@ -27,7 +27,8 @@
   when: veth_pair_peer_bridge_type == "openvswitch"
   become: true
 
-- block:
+- name: Plug veth into source bridge
+  block:
     - include_tasks: is-attached.yml
       vars:
         bridge: "{{ veth_pair_peer_bridge }}"
@@ -42,7 +43,8 @@
       become: true
   when: veth_pair_peer_bridge_type == "linuxbridge"
 
-- block:
+- name: Plug veth into source bridge
+  block:
     - include_tasks: is-attached.yml
       vars:
         bridge: "{{ veth_pair_source_bridge }}"

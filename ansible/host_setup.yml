@@ -21,7 +21,8 @@
   tags:
     - host-setup
   tasks:
-    - block:
+    - name: Set up host
+      block:
         - name: Configure host for Libvirt
           include_role:
             name: stackhpc.libvirt-host

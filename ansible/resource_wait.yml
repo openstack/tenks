@@ -22,7 +22,8 @@
       loop_control:
         loop_var: spec
 
-    - block:
+    - name: Include the wait-for-resources role
+      block:
         - name: Check that OpenStack credentials exist in the environment
           fail:
             msg: >
