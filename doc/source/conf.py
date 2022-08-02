@@ -43,7 +43,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-copyright = u'OpenStack Foundation'
+copyright = 'OpenStack Foundation'
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'native'
@@ -73,8 +73,8 @@ latex_documents = [
     (
         master_doc,
         'doc-tenks.tex',
-        u'Tenks Documentation',
-        u'OpenStack Foundation',
+        'Tenks Documentation',
+        'OpenStack Foundation',
         'manual'
     ),
 ]
