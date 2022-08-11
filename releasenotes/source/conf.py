@@ -55,8 +55,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Tenks Release Notes'
-copyright = u'{year}, The Tenks team'.format(year=datetime.date.today().year)
+project = 'Tenks Release Notes'
+copyright = '{year}, The Tenks team'.format(year=datetime.date.today().year)
 
 openstackdocs_repo_name = 'openstack/tenks'
 openstackdocs_auto_name = False
@@ -214,8 +214,8 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     ('index', 'TenksReleaseNotes.tex',
-     u'Tenks Release Notes Documentation',
-     u'Tenks Developers', 'manual'),
+     'Tenks Release Notes Documentation',
+     'Tenks Developers', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -245,8 +245,8 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'tenksreleasenotes',
-     u'Tenks Release Notes Documentation',
-     [u'Tenks Developers'], 1)
+     'Tenks Release Notes Documentation',
+     ['Tenks Developers'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -260,8 +260,8 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     ('index', 'TenksReleaseNotes',
-     u'Tenks Release Notes Documentation',
-     u'Tenks Developers',
+     'Tenks Release Notes Documentation',
+     'Tenks Developers',
      'tenksreleasenotes',
      'Deployment of virtual bare metal clusters',
      'Miscellaneous'),
