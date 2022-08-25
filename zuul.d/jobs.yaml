@@ -23,9 +23,19 @@
         override-checkout: stable/yoga
 
 - job:
+    name: tenks-deploy-teardown-ovs-bios-centos9s
+    parent: tenks-deploy-teardown-ovs-bios-base
+    nodeset: centos-9-stream
+
+- job:
     name: tenks-deploy-teardown-ovs-bios-debian
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: debian-bullseye
+
+- job:
+    name: tenks-deploy-teardown-ovs-bios-rocky-9
+    parent: tenks-deploy-teardown-ovs-bios-base
+    nodeset: rockylinux-9
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-ubuntu-focal
@@ -47,9 +57,19 @@
         override-checkout: stable/yoga
 
 - job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-centos9s
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: centos-9-stream
+
+- job:
     name: tenks-deploy-teardown-linuxbridge-uefi-debian
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: debian-bullseye
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-rocky-9
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: rockylinux-9
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-focal

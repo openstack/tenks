@@ -58,8 +58,8 @@
             # virtualbmc to the system rather than a virtualenv. SELinux
             # prevents systemd from accessing files in users' home directories.
             selinux_enabled: "{{ ansible_facts.selinux.status | default('disabled') == 'enabled' }}"
-            is_centos8: "{{ ansible_facts.os_family == 'RedHat' and ansible_facts.distribution_major_version | int == 8 }}"
-            vbmcd_virtualenv_path: "{{ '' if is_centos8 and selinux_enabled else virtualenv_path }}"
+            is_redhat: "{{ ansible_facts.os_family == 'RedHat' }}"
+            vbmcd_virtualenv_path: "{{ '' if is_redhat and selinux_enabled else virtualenv_path }}"
             vbmcd_python_upper_constraints_url: >-
               {{ python_upper_constraints_url }}
 

@@ -38,8 +38,8 @@
             url: "{{ item }}"
             dest: /etc/yum.repos.d/
           with_items:
-            - https://trunk.rdoproject.org/centos8-master/consistent/delorean.repo
-            - https://trunk.rdoproject.org/centos8-master/delorean-deps.repo
+            - "https://trunk.rdoproject.org/centos{{ ansible_facts.distribution_major_version }}-master/consistent/delorean.repo"
+            - "https://trunk.rdoproject.org/centos{{ ansible_facts.distribution_major_version }}-master/delorean-deps.repo"
 
         - name: Install Open vSwitch
           package:
