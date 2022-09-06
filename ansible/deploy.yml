@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Deploy Tenks
+  hosts: all
   tags:
     - always
   tasks:

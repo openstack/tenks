@@ -6,3 +6,4 @@ warn_list:
   - command-instead-of-shell  # Use shell only when shell functionality is required
   - experimental  # all rules tagged as experimental
   - fqcn-builtins  # Use FQCN for builtin actions.
+  - jinja[spacing] # Jinja2 spacing could be improved

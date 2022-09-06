@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Cleanup Tenks state
+  hosts: localhost
   tags:
     - cleanup-state
   tasks:

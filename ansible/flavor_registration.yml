@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Register Nova flavors
+  hosts: localhost
   tags:
     - flavor-registration
   tasks:

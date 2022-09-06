@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Enroll nodes in Ironic
+  hosts: localhost
   tags:
     - node-enrolment
     - node-enrollment

@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Load current Tenks state
+  hosts: localhost
   tags:
     - node-networking
   tasks:
@@ -8,7 +9,8 @@
         file: "{{ state_file_path }}"
         name: tenks_state
 
-- hosts: hypervisors
+- name: Configure hypervisor networking
+  hosts: hypervisors
   tags:
     - node-networking
   vars:

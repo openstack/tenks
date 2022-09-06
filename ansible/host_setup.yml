@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Load current Tenks state
+  hosts: localhost
   tags:
     - host-setup
   tasks:
@@ -8,7 +9,8 @@
         file: "{{ state_file_path }}"
         name: tenks_state
 
-- hosts: hypervisors
+- name: Run hypervisor setup
+  hosts: hypervisors
   tags:
     - host-setup
   vars:
@@ -17,7 +19,8 @@
   tasks:
     - include_tasks: hypervisor_setup.yml
 
-- hosts: libvirt
+- name: Set up libvirt and vbmc
+  hosts: libvirt
   tags:
     - host-setup
   tasks:

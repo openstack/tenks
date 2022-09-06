@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Load current Tenks state
+  hosts: localhost
   tags:
     - node-instantiation
   tasks:
@@ -8,7 +9,8 @@
         file: "{{ state_file_path }}"
         name: tenks_state
 
-- hosts: libvirt
+- name: Instantiate libvirt VMs
+  hosts: libvirt
   tags:
     - node-instantiation
   vars:

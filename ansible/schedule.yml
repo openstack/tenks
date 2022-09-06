@@ -1,11 +1,12 @@
 ---
-# Ensure we have facts about all hypervisors before scheduling begins.
-- hosts: hypervisors
+- name: Ensure we have facts about all hypervisors before scheduling begins.
+  hosts: hypervisors
   tags:
     - schedule
   gather_facts: true
 
-- hosts: localhost
+- name: Update Tenks state
+  hosts: localhost
   tags:
     - schedule
   tasks:
