@@ -1,4 +1,28 @@
 ---
+- name: Create Tenks venv
+  hosts: all
+  tags:
+    - host-setup
+  tasks:
+    - name: Ensure Tenks venv is properly set up
+      block:
+
+        - name: Init Tenks venv and upgrade pip
+          pip:
+            name: pip
+            state: latest  # noqa package-latest
+            virtualenv: "{{ virtualenv_path }}"
+            virtualenv_command: "{{ ansible_facts.python.executable }} -m venv"
+            virtualenv_site_packages: true
+
+        - name: Upgrade setuptools
+          pip:
+            name: setuptools
+            state: latest  # noqa package-latest
+            virtualenv: "{{ virtualenv_path }}"
+
+      when: virtualenv_path
+
 - name: Load current Tenks state
   hosts: localhost
   tags:
@@ -54,12 +78,8 @@
           include_role:
             name: virtualbmc-daemon
           vars:
-            # NOTE(mgoddard): On CentOS 8 if SELinux is enabled, install
-            # virtualbmc to the system rather than a virtualenv. SELinux
-            # prevents systemd from accessing files in users' home directories.
             selinux_enabled: "{{ ansible_facts.selinux.status | default('disabled') == 'enabled' }}"
-            is_redhat: "{{ ansible_facts.os_family == 'RedHat' }}"
-            vbmcd_virtualenv_path: "{{ '' if is_redhat and selinux_enabled else virtualenv_path }}"
+            vbmcd_virtualenv_path: "{{ virtualenv_path }}"
             vbmcd_python_upper_constraints_url: >-
               {{ python_upper_constraints_url }}
 

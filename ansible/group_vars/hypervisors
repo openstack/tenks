@@ -4,7 +4,7 @@
 physnet_mappings: {}
 
 system_requirements:
-  - "python3-virtualenv"
+  - python3-libvirt
 
 # Tenks bridge type. Options are "openvswitch", "linuxbridge".  Default is
 # "openvswitch". Note that this relates to bridges created by Tenks, not the

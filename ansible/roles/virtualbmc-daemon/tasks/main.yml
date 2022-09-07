@@ -26,26 +26,58 @@
     virtualenv: "{{ vbmcd_virtualenv_path or omit }}"
   become: "{{ not vbmcd_virtualenv_path }}"
 
+- name: Create the temporary u-c file
+  tempfile:
+    state: file
+    suffix: u-c
+  register: u_c_file
+
+- name: Download u-c
+  get_url:
+    url: "{{ vbmcd_python_upper_constraints_url }}"
+    dest: "{{ u_c_file.path }}"
+
+# NOTE(yoctozepto): It is preferable to use the libvirt python binding that
+# is delivered with the distribution as it is guaranteed to work with the
+# deployed daemon (and the accompanying Python).
+- name: Remove libvirt-python from u-c
+  lineinfile:
+    path: "{{ u_c_file.path }}"
+    state: absent
+    regexp: '^libvirt-python'
+
 - name: Ensure Python requirements are installed
   pip:
-    name:
-      - "virtualbmc>=1.4.0"
-    # NOTE(priteau): Ignore PyYAML when installing system-wide to avoid the
-    # following error: Cannot uninstall 'PyYAML'. It is a distutils installed
-    # project and thus we cannot accurately determine which files belong to it
-    # which would lead to only a partial uninstall.
-    # NOTE(priteau): Use --no-binary to avoid installing libvirt-python from
-    # wheel. There is a problem with the 7.5.0 wheel resulting in the error:
-    # The `libvirt` module is not importable. Check the requirements.
-    extra_args: >-
-      -c {{ vbmcd_python_upper_constraints_url }}
-      {% if not vbmcd_virtualenv_path %}--ignore-installed PyYAML{% endif %}
-      --no-binary libvirt-python
+    name: virtualbmc
+    extra_args: -c {{ u_c_file.path }}
     virtualenv: "{{ vbmcd_virtualenv_path or omit }}"
   register: result
   until: result is success
   retries: 3
   become: "{{ not vbmcd_virtualenv_path }}"
+
+- name: Remove the temporary u-c file
+  file:
+    path: "{{ u_c_file.path }}"
+    state: absent
+
+- name: "[selinux] Allow systemd to start vbmcd from venv"
+  block:
+
+    - name: "[selinux] Allow systemd to start vbmcd from venv - sefcontext"
+      become: true
+      sefcontext:
+        target: "{{ vbmcd_virtualenv_path }}/bin(/.*)?"
+        setype: bin_t
+        state: present
+      register: sefcontext
+
+    - name: "[selinux] Allow systemd to start vbmcd from venv - restorecon"
+      become: true
+      command: "restorecon -r {{ vbmcd_virtualenv_path }}/bin"
+      when: sefcontext.changed
+
+  when: selinux_enabled and vbmcd_virtualenv_path
 
 - name: Ensure Virtual BMC systemd service is configured
   template:

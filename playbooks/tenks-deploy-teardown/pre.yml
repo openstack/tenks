@@ -7,7 +7,6 @@
     - role: tenks-diagnostics
       tenks_diagnostics_phase: "pre"
       tenks_diagnostics_log_dir: "{{ logs_dir }}"
-    - role: tenks-ci-prep
   tasks:
     - name: Ensure config directory exists
       file:
@@ -22,13 +21,28 @@
     - name: Install python3
       become: true
       package:
-        name: python3
+        name:
+          - python3
+          - python3-pip
+          - python3-setuptools
 
-    - name: Create virtualenv for tenks
+    - name: Create venv for tenks and upgrade pip
+      pip:
+        name: pip
+        state: latest  # noqa package-latest
+        virtualenv: "{{ tenks_venv }}"
+        virtualenv_command: "{{ ansible_facts.python.executable }} -m venv"
+
+    - name: Upgrade setuptools
+      pip:
+        name: setuptools
+        state: latest  # noqa package-latest
+        virtualenv: "{{ tenks_venv }}"
+
+    - name: Install tenks deps
       pip:
         requirements: "{{ tenks_src_dir }}/requirements.txt"
         virtualenv: "{{ tenks_venv }}"
-        virtualenv_python: "{{ ansible_facts.python.executable }}"
 
     - name: Ensure /etc/ansible exists
       file:
