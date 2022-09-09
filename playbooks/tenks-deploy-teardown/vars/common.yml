@@ -13,3 +13,5 @@ config_dir: "{{ ansible_facts.env.HOME ~ '/' ~ 'tenks-config' }}"
 tenks_overrides_path: "{{ config_dir ~ '/' ~ 'tenks-overrides.yml' }}"
 tenks_requirements_overrides_path: "{{ tenks_src_dir }}/requirements-overrides.yml"
 logs_dir: "/tmp/logs"
+
+openvswitch_service_name: "{{ openvswitch_package_name }}"
