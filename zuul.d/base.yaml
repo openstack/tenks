@@ -17,6 +17,7 @@
     timeout: 1800
     irrelevant-files:
       - ^.*\.rst$
+      - ^\.ansible-lint$
       - ^doc/
       - ^releasenotes/
       - ^setup\.cfg$
