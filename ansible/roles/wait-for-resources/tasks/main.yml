@@ -22,7 +22,7 @@
     dest: "{{ wait_for_resources_python_requirements_path }}"
     mode: preserve
 
-- name: Install dependencies in supplied venv
+- name: Install dependencies in supplied venv  # noqa jinja[spacing]
   pip:
     requirements: "{{ wait_for_resources_python_requirements_path }}"
     extra_args: >-
