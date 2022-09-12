@@ -1,6 +1,6 @@
 ---
 - name: Create Tenks venv
-  hosts: all
+  hosts: localhost:hypervisors
   tags:
     - host-setup
   tasks:
@@ -78,7 +78,6 @@
           include_role:
             name: virtualbmc-daemon
           vars:
-            selinux_enabled: "{{ ansible_facts.selinux.status | default('disabled') == 'enabled' }}"
             vbmcd_virtualenv_path: "{{ virtualenv_path }}"
             vbmcd_python_upper_constraints_url: >-
               {{ python_upper_constraints_url }}

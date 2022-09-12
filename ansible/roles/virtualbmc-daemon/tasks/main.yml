@@ -76,8 +76,11 @@
       become: true
       command: "restorecon -r {{ vbmcd_virtualenv_path }}/bin"
       when: sefcontext.changed
+      changed_when: true
 
-  when: selinux_enabled and vbmcd_virtualenv_path
+  when:
+    - ansible_facts.selinux.status | default('disabled') == 'enabled'
+    - vbmcd_virtualenv_path
 
 - name: Ensure Virtual BMC systemd service is configured
   template:
