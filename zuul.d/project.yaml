@@ -41,11 +41,15 @@
         - openstack-tox-py310
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos8s
+        - tenks-deploy-teardown-ovs-bios-centos9s
         - tenks-deploy-teardown-ovs-bios-debian
+        - tenks-deploy-teardown-ovs-bios-rocky-9
         - tenks-deploy-teardown-ovs-bios-ubuntu-focal
         - tenks-deploy-teardown-ovs-bios-ubuntu-jammy
         - tenks-deploy-teardown-linuxbridge-uefi-centos8s
+        - tenks-deploy-teardown-linuxbridge-uefi-centos9s
         - tenks-deploy-teardown-linuxbridge-uefi-debian
+        - tenks-deploy-teardown-linuxbridge-uefi-rocky-9
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-focal
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
