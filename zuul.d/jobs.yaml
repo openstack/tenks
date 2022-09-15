@@ -28,7 +28,7 @@
     nodeset: centos-9-stream
 
 - job:
-    name: tenks-deploy-teardown-ovs-bios-debian
+    name: tenks-deploy-teardown-ovs-bios-debian-bullseye
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: debian-bullseye
 
@@ -62,7 +62,7 @@
     nodeset: centos-9-stream
 
 - job:
-    name: tenks-deploy-teardown-linuxbridge-uefi-debian
+    name: tenks-deploy-teardown-linuxbridge-uefi-debian-bullseye
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: debian-bullseye
 
