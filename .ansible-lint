@@ -4,4 +4,3 @@ skip_list:
 warn_list:
   - no-changed-when
   - experimental  # all rules tagged as experimental
-  - jinja[spacing] # Jinja2 spacing could be improved

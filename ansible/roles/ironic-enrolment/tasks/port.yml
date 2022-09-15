@@ -15,8 +15,9 @@
 
 - name: Get physical network name
   set_fact:
-    physnet: "{{ source_interface | source_link_to_physnet_name(
-                   inventory_hostname=ironic_hypervisor) }}"
+    physnet: >-
+      {{ source_interface |
+         source_link_to_physnet_name(inventory_hostname=ironic_hypervisor) }}
 
 - name: Get bridge name
   set_fact:
