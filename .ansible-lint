@@ -1,6 +1,11 @@
 skip_list:
-  - fqcn-builtins  # Use FQCN for builtin actions.
+  # NOTE(yoctozepto): skip various fqcn and name checks for now to avoid unnecessary big style changes
+  - fqcn[action-core]
+  - fqcn[action]
+  - name[missing]
+  - name[template]
 
 warn_list:
   - no-changed-when
   - experimental  # all rules tagged as experimental
+  - jinja[invalid]  # NOTE(yoctozepto): it tends to misbehave for no obvious good reason
