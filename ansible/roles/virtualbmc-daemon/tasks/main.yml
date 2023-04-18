@@ -37,6 +37,9 @@
     url: "{{ vbmcd_python_upper_constraints_url }}"
     dest: "{{ u_c_file.path }}"
     mode: "0644"
+  register: result
+  until: result is success
+  retries: 3
 
 # NOTE(yoctozepto): It is preferable to use the libvirt python binding that
 # is delivered with the distribution as it is guaranteed to work with the
