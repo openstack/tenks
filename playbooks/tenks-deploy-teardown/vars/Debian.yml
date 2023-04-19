@@ -1,2 +1,4 @@
 ---
+openvswitch_package_repo_name:
 openvswitch_package_name: openvswitch-switch
+openvswitch_service_name: openvswitch-switch

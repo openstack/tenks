@@ -1,2 +1,4 @@
 ---
-openvswitch_package_name: openvswitch
+openvswitch_package_repo_name: centos-release-nfv-openvswitch
+openvswitch_package_name: openvswitch3.1
+openvswitch_service_name: openvswitch

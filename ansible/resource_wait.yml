@@ -24,6 +24,7 @@
         loop_var: spec
 
     - name: Include the wait-for-resources role
+      when: tenks_expected_resources | length > 0
       block:
         - name: Check that OpenStack credentials exist in the environment
           fail:
@@ -48,4 +49,3 @@
               {{ python_upper_constraints_url }}
           # Only attempt to wait for resources when the placement service is running
           when: service_list_output.stdout | from_json | selectattr('Type', 'equalto', 'placement') | list | length >= 1
-      when: tenks_expected_resources | length > 0

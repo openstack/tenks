@@ -36,6 +36,7 @@
   get_url:
     url: "{{ vbmcd_python_upper_constraints_url }}"
     dest: "{{ u_c_file.path }}"
+    mode: "0644"
 
 # NOTE(yoctozepto): It is preferable to use the libvirt python binding that
 # is delivered with the distribution as it is guaranteed to work with the
@@ -62,6 +63,9 @@
     state: absent
 
 - name: "[selinux] Allow systemd to start vbmcd from venv"
+  when:
+    - ansible_facts.selinux.status | default('disabled') == 'enabled'
+    - vbmcd_virtualenv_path
   block:
 
     - name: "[selinux] Allow systemd to start vbmcd from venv - sefcontext"
@@ -72,15 +76,11 @@
         state: present
       register: sefcontext
 
-    - name: "[selinux] Allow systemd to start vbmcd from venv - restorecon"
+    - name: "[selinux] Allow systemd to start vbmcd from venv - restorecon"  # noqa no-handler
       become: true
       command: "restorecon -r {{ vbmcd_virtualenv_path }}/bin"
       when: sefcontext.changed
       changed_when: true
-
-  when:
-    - ansible_facts.selinux.status | default('disabled') == 'enabled'
-    - vbmcd_virtualenv_path
 
 - name: Ensure Virtual BMC systemd service is configured
   template:
@@ -88,7 +88,7 @@
     dest: /etc/systemd/system/{{ item }}
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   become: true
   register: service_file
   loop:

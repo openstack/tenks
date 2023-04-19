@@ -27,11 +27,9 @@
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
-        - kayobe-overcloud-centos8s:
-            # FIXME(mgoddard): The master branch of Kolla Ansible currently
-            # does not support CS8/RL8, so Kayobe jobs are failing. Use the
-            # yoga branch for now.
-            override-checkout: stable/yoga
+        - kayobe-overcloud-rocky9:
+            voting: false
+        - kayobe-overcloud-ubuntu-jammy
     gate:
       jobs:
         - openstack-tox-pep8
@@ -54,8 +52,5 @@
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
-        - kayobe-overcloud-centos8s:
-            # FIXME(mgoddard): The master branch of Kolla Ansible currently
-            # does not support CS8/RL8, so Kayobe jobs are failing. Use the
-            # yoga branch for now.
-            override-checkout: stable/yoga
+        # - kayobe-overcloud-rocky9
+        - kayobe-overcloud-ubuntu-jammy

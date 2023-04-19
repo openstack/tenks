@@ -7,6 +7,9 @@
   when: "'resource_class' not in node.ironic_config"
 
 - name: Collect domain NIC MAC addresses
+  # If the node's state is 'absent', the domain will already have been
+  # destroyed.
+  when: (node.state | default('present')) == 'present'
   block:
     - name: Get vNIC MAC addresses
       # The output format of this command gives two lines of header, followed by
@@ -36,10 +39,6 @@
       loop: "{{ iflist_res.stdout_lines[2:] }}"
       when: (node.state | default('present')) == 'present'
 
-  # If the node's state is 'absent', the domain will already have been
-  # destroyed.
-  when: (node.state | default('present')) == 'present'
-
 - name: Configure node in Ironic
   os_ironic:
     auth_type: "{{ 'password' if lookup('env', 'OS_USERNAME') else omit }}"
@@ -58,7 +57,7 @@
         deploy_ramdisk: "{{ ironic_deploy_ramdisk_uuid | default(omit, true) }}"
     name: "{{ node.name }}"
     # The 'nics' list can be empty without a problem if state is 'absent'.
-    nics: "{{ nics | default([]) }}"
+    nics: "{{ nics | default([]) }}"  # noqa args[module]
     state: "{{ node.state | default('present') }}"
   vars:
     # This module requires the openstacksdk package, which is installed within
@@ -68,6 +67,7 @@
   register: node_res
 
 - name: Perform node and port attribute manipulation
+  when: (node.state | default('present')) == 'present'
   block:
     # The os_ironic module automatically brings the node from 'enrol' to
     # 'available' state, but we still need to set more port and node attributes.
@@ -76,6 +76,7 @@
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance set
           '{{ node_res.uuid }}'
+      changed_when: true
 
     - name: Set additional Ironic node attributes
       command: >-
@@ -107,12 +108,14 @@
           # If the capabilities field is provided, the boot_mode should be set
           # explicitly.
           capabilities: "boot_mode:{{ default_boot_mode }}"
+      changed_when: true
 
     - name: Add Ironic node traits
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node add trait
           '{{ node_res.uuid }}'
           {{ " ".join(node.ironic_config.traits) }}
+      changed_when: true
       when: node.ironic_config.traits | default([])
 
     - name: Set additional Ironic port attributes
@@ -129,5 +132,4 @@
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance
           unset '{{ node_res.uuid }}'
-
-  when: (node.state | default('present')) == 'present'
+      changed_when: true

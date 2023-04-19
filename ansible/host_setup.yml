@@ -5,6 +5,7 @@
     - host-setup
   tasks:
     - name: Ensure Tenks venv is properly set up
+      when: virtualenv_path
       block:
 
         - name: Init Tenks venv and upgrade pip
@@ -20,8 +21,6 @@
             name: setuptools
             state: latest  # noqa package-latest
             virtualenv: "{{ virtualenv_path }}"
-
-      when: virtualenv_path
 
 - name: Load current Tenks state
   hosts: localhost
@@ -49,6 +48,7 @@
     - host-setup
   tasks:
     - name: Set up host
+      when: cmd == 'deploy'
       block:
         - name: Configure host for Libvirt
           include_role:
@@ -81,5 +81,3 @@
             vbmcd_virtualenv_path: "{{ virtualenv_path }}"
             vbmcd_python_upper_constraints_url: >-
               {{ python_upper_constraints_url }}
-
-      when: cmd == 'deploy'

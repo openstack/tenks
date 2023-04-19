@@ -28,6 +28,7 @@
   become: true
 
 - name: Plug veth into source bridge
+  when: veth_pair_peer_bridge_type == "linuxbridge"
   block:
     - include_tasks: is-attached.yml
       vars:
@@ -40,10 +41,11 @@
         {{ veth_pair_peer_bridge }}
       when:
         - not veth_pair_is_attached
+      changed_when: true
       become: true
-  when: veth_pair_peer_bridge_type == "linuxbridge"
 
 - name: Plug veth into source bridge
+  when: veth_pair_plug_into_source | bool
   block:
     - include_tasks: is-attached.yml
       vars:
@@ -56,5 +58,5 @@
         {{ veth_pair_source_bridge }}
       when:
         - not veth_pair_is_attached
+      changed_when: true
       become: true
-  when: veth_pair_plug_into_source | bool

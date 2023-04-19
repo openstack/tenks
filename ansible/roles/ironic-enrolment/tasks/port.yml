@@ -47,6 +47,7 @@
       --local-link-connection switch_id='{{ switch_id }}'
       --local-link-connection switch_info='{{ bridge }}'
       --local-link-connection port_id='{{ port_id }}'
+  changed_when: true
   when: >-
     (supports_port_physnet and port_attributes.physical_network != physnet) or
     port_attributes.local_link_connection.get('switch_id') != switch_id or

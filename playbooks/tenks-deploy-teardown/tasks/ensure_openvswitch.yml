@@ -1,11 +1,13 @@
 ---
-- name: Install the Delorean dependencies repository
+- name: Install Open vSwitch package repository
   become: true
-  get_url:
-    url: "https://trunk.rdoproject.org/centos{{ ansible_facts.distribution_major_version }}-master/delorean-deps.repo"
-    dest: /etc/yum.repos.d/
-  when:
-    - ansible_facts.os_family == "RedHat"
+  package:
+    name: "{{ openvswitch_package_repo_name }}"
+    state: present
+  register: result
+  until: result is success
+  retries: 3
+  when: openvswitch_package_repo_name is not none
 
 - name: Install Open vSwitch
   become: true

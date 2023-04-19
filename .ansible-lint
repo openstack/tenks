@@ -4,6 +4,7 @@ skip_list:
   - fqcn[action]
   - name[missing]
   - name[template]
+  - var-naming[no-role-prefix]
 
 warn_list:
   - no-changed-when
