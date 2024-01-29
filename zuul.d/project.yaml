@@ -26,6 +26,8 @@
         - kayobe-overcloud-rocky9:
             voting: false
         - kayobe-overcloud-ubuntu-jammy
+        - tenks-tox-codespell:
+            voting: false
     gate:
       jobs:
         - openstack-tox-pep8

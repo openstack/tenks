@@ -52,3 +52,10 @@
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: ubuntu-jammy
+
+- job:
+    name: tenks-tox-codespell
+    parent: openstack-tox
+    timeout: 7200
+    vars:
+      tox_envlist: codespell
