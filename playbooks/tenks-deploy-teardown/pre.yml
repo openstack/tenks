@@ -74,7 +74,7 @@
         chdir: "{{ tenks_src_dir }}"
 
     - name: Install dependencies for CI
-      # We install roles specifc to CI over the existing ones. This means that we
+      # We install roles specific to CI over the existing ones. This means that we
       # don't have to keep the two requirements files in sync, as we just override
       # some of them.
       vars:

@@ -15,5 +15,5 @@ vbmc_log_directory:
 vbmc_virtualenv_path:
 # Whether the domain should be `present` or `absent` in Virtual BMC.
 vbmc_state: present
-# libvirt connnection URI
+# libvirt connection URI
 vbmc_libvirt_uri:

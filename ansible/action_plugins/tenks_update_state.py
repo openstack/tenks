@@ -105,7 +105,7 @@ class ActionModule(ActionBase):
             used_idxs = list(old_idxs.values())
             for name, dev in specified_mappings.items():
                 try:
-                    # We need to re-use the IDXs of any existing physnets.
+                    # We need to reuse the IDXs of any existing physnets.
                     idx = old_idxs[name]
                 except KeyError:
                     # New physnet requires a new IDX.
