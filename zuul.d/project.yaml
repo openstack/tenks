@@ -8,22 +8,17 @@
     check:
       jobs:
         - openstack-tox-pep8
-        - openstack-tox-py36
-        - openstack-tox-py38
         - openstack-tox-py39
         - openstack-tox-py310
+        - openstack-tox-py311
         - tenks-tox-ansible-lint
-        - tenks-deploy-teardown-ovs-bios-centos8s
         - tenks-deploy-teardown-ovs-bios-centos9s
         - tenks-deploy-teardown-ovs-bios-debian-bullseye
         - tenks-deploy-teardown-ovs-bios-rocky-9
-        - tenks-deploy-teardown-ovs-bios-ubuntu-focal
         - tenks-deploy-teardown-ovs-bios-ubuntu-jammy
-        - tenks-deploy-teardown-linuxbridge-uefi-centos8s
         - tenks-deploy-teardown-linuxbridge-uefi-centos9s
         - tenks-deploy-teardown-linuxbridge-uefi-debian-bullseye
         - tenks-deploy-teardown-linuxbridge-uefi-rocky-9
-        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-focal
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
@@ -33,22 +28,17 @@
     gate:
       jobs:
         - openstack-tox-pep8
-        - openstack-tox-py36
-        - openstack-tox-py38
         - openstack-tox-py39
         - openstack-tox-py310
+        - openstack-tox-py311
         - tenks-tox-ansible-lint
-        - tenks-deploy-teardown-ovs-bios-centos8s
         - tenks-deploy-teardown-ovs-bios-centos9s
         - tenks-deploy-teardown-ovs-bios-debian-bullseye
         - tenks-deploy-teardown-ovs-bios-rocky-9
-        - tenks-deploy-teardown-ovs-bios-ubuntu-focal
         - tenks-deploy-teardown-ovs-bios-ubuntu-jammy
-        - tenks-deploy-teardown-linuxbridge-uefi-centos8s
         - tenks-deploy-teardown-linuxbridge-uefi-centos9s
         - tenks-deploy-teardown-linuxbridge-uefi-debian-bullseye
         - tenks-deploy-teardown-linuxbridge-uefi-rocky-9
-        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-focal
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.

@@ -268,7 +268,9 @@ inventory_resource_class_reserved = chain(
 # scenario - same resource class, different traits - success
 
 # Arbitrary subset
-resource_provider_traits_subset = random.sample(resource_provider_traits, 3)
+resource_provider_traits_subset = random.sample(
+    sorted(resource_provider_traits), 3
+)
 
 resource_provider_traits_subset_out = traits_to_json(
     resource_provider_traits_subset

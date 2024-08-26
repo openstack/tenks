@@ -40,21 +40,18 @@
       when: (node.state | default('present')) == 'present'
 
 - name: Configure node in Ironic
-  os_ironic:
+  openstack.cloud.baremetal_node:
     auth_type: "{{ 'password' if lookup('env', 'OS_USERNAME') else omit }}"
     cloud: "{{ lookup('env', 'OS_CLOUD') | default(omit, true) }}"
-    ironic_url: "{{ ironic_url | default(omit) }}"
     driver: "{{ node.ironic_driver }}"
     driver_info:
-      power:
-        ipmi_address: "{{ hostvars[ironic_hypervisor].ipmi_address }}"
-        # This is passed in from main.yml.
-        ipmi_port: "{{ ipmi_port }}"
-        ipmi_username: "{{ hostvars[ironic_hypervisor].ipmi_username }}"
-        ipmi_password: "{{ hostvars[ironic_hypervisor].ipmi_password }}"
-      deploy:
-        deploy_kernel: "{{ ironic_deploy_kernel_uuid | default(omit, true) }}"
-        deploy_ramdisk: "{{ ironic_deploy_ramdisk_uuid | default(omit, true) }}"
+      ipmi_address: "{{ hostvars[ironic_hypervisor].ipmi_address }}"
+      # This is passed in from main.yml.
+      ipmi_port: "{{ ipmi_port }}"
+      ipmi_username: "{{ hostvars[ironic_hypervisor].ipmi_username }}"
+      ipmi_password: "{{ hostvars[ironic_hypervisor].ipmi_password }}"
+      deploy_kernel: "{{ ironic_deploy_kernel_uuid | default(omit, true) }}"
+      deploy_ramdisk: "{{ ironic_deploy_ramdisk_uuid | default(omit, true) }}"
     name: "{{ node.name }}"
     # The 'nics' list can be empty without a problem if state is 'absent'.
     nics: "{{ nics | default([]) }}"  # noqa args[module]
@@ -75,13 +72,13 @@
     - name: Put Ironic node into maintenance mode
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance set
-          '{{ node_res.uuid }}'
+          '{{ node_res.node.id }}'
       changed_when: true
 
     - name: Set additional Ironic node attributes
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set
-          '{{ node_res.uuid }}'
+          '{{ node_res.node.id }}'
           --resource-class {{ node.ironic_config.resource_class }}
           {% for iface in ironic_interfaces %}
             {% if (iface + '_interface') in node.ironic_config %}
@@ -113,7 +110,7 @@
     - name: Add Ironic node traits
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node add trait
-          '{{ node_res.uuid }}'
+          '{{ node_res.node.id }}'
           {{ " ".join(node.ironic_config.traits) }}
       changed_when: true
       when: node.ironic_config.traits | default([])
@@ -131,5 +128,5 @@
     - name: Bring Ironic node out of maintenance mode
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance
-          unset '{{ node_res.uuid }}'
+          unset '{{ node_res.node.id }}'
       changed_when: true
