@@ -11,6 +11,7 @@
         - openstack-tox-py39
         - openstack-tox-py310
         - openstack-tox-py311
+        - openstack-tox-py312
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos9s
         - tenks-deploy-teardown-ovs-bios-debian-bullseye
@@ -31,6 +32,7 @@
         - openstack-tox-py39
         - openstack-tox-py310
         - openstack-tox-py311
+        - openstack-tox-py312
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos9s
         - tenks-deploy-teardown-ovs-bios-debian-bullseye
