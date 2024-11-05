@@ -68,6 +68,12 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
     return namespace.get(var_name)
 
 
+def _get_fact(context, fact_name):
+    if fact_name not in context['ansible_facts']:
+        raise AnsibleFilterError("Fact '%s' not found" % fact_name)
+    return context['ansible_facts'][fact_name]
+
+
 @pass_context
 def set_libvirt_interfaces(context, node):
     """Set interfaces for a node's specified physical networks.
@@ -76,11 +82,17 @@ def set_libvirt_interfaces(context, node):
     for physnet in node.get('physical_networks', []):
         # Use macvtap 'passthrough' mode, since this does not filter packets
         # based on MAC address of the interface.
-        node['interfaces'].append(
-            {'type': 'direct',
-             'source': {'dev': source_link_name(context, node, physnet),
-                        'mode': 'passthrough'}}
-        )
+        if_name = source_link_name(context, node, physnet)
+        if_data = {'type': 'direct',
+                   'source': {'dev': if_name, 'mode': 'passthrough'}}
+
+        # Check for an existing interface. If found, pull in the existing MAC.
+        if_var = if_name.replace('-', '_')
+        if_fact = _get_fact(context, if_var)
+        if if_fact:
+            if_data['mac'] = if_fact['macaddress']
+
+        node['interfaces'].append(if_data)
     return node
 
 

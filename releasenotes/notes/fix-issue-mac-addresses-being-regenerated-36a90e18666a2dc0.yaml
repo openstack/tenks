@@ -1,0 +1,7 @@
+---
+fixes:
+  - |
+    Fixes an issue where tenks was regenerating the MAC addresses for the
+    network interfaces used by the backing virtual machines on each run. This
+    would lead to a mismatch between the MAC address set on the baremetal port
+    in Ironic and the MAC address of the virtual machine's network interface.
