@@ -9,7 +9,8 @@
       jobs:
         - openstack-tox-pep8
         - openstack-tox-py36
-        - openstack-tox-py38
+        - openstack-tox-py38:
+            override-checkout: stable/2024.1
         - openstack-tox-py39
         - openstack-tox-py310
         - tenks-tox-ansible-lint
@@ -32,7 +33,8 @@
       jobs:
         - openstack-tox-pep8
         - openstack-tox-py36
-        - openstack-tox-py38
+        - openstack-tox-py38:
+            override-checkout: stable/2024.1
         - openstack-tox-py39
         - openstack-tox-py310
         - tenks-tox-ansible-lint
