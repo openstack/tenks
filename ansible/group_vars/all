@@ -5,6 +5,6 @@ virtualenv_path: "{{ '/'.join([ansible_facts.env['HOME'], 'tenks-venv']) }}"
 
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
-# NOTE: Python 3.6 support dropped in Zed.
+# NOTE: The last OpenStack release supporting Python 3.9 is 2025.1 (Epoxy).
 python_upper_constraints_url: >-
-  https://releases.openstack.org/constraints/upper/{% if ansible_facts.python.version.minor <= 6 %}yoga{% else %}master{% endif %}
+  https://releases.openstack.org/constraints/upper/{% if ansible_facts.python.version.minor < 10 %}2025.1{% else %}master{% endif %}
