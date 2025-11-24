@@ -2,51 +2,53 @@
 - project:
     templates:
       - openstack-cover-jobs
+      - openstack-python3-jobs
       - publish-openstack-docs-pti
       - release-notes-jobs-python3
-
     check:
       jobs:
-        - openstack-tox-pep8
         - openstack-tox-py39:
             override-checkout: stable/2025.1
-        - openstack-tox-py310
-        - openstack-tox-py311
-        - openstack-tox-py312
         - tenks-tox-ansible-lint
-        - tenks-deploy-teardown-ovs-bios-centos9s
-        - tenks-deploy-teardown-ovs-bios-debian-bullseye
-        - tenks-deploy-teardown-ovs-bios-rocky-9
-        - tenks-deploy-teardown-ovs-bios-ubuntu-jammy
-        - tenks-deploy-teardown-linuxbridge-uefi-centos9s
-        - tenks-deploy-teardown-linuxbridge-uefi-debian-bullseye
-        - tenks-deploy-teardown-linuxbridge-uefi-rocky-9
-        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
+        - tenks-deploy-teardown-ovs-bios-centos9s:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-ovs-bios-rocky-9:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-linuxbridge-uefi-centos9s:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-linuxbridge-uefi-rocky-9:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-ovs-bios-centos10
+        - tenks-deploy-teardown-linuxbridge-uefi-centos10
+        - tenks-deploy-teardown-ovs-bios-debian-bookworm
+        - tenks-deploy-teardown-linuxbridge-uefi-debian-bookworm
+        - tenks-deploy-teardown-ovs-bios-ubuntu-noble
+        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
         - kayobe-overcloud-rocky9:
             voting: false
-        - kayobe-overcloud-ubuntu-jammy
         - tenks-tox-codespell:
             voting: false
     gate:
       jobs:
-        - openstack-tox-pep8
         - openstack-tox-py39:
             override-checkout: stable/2025.1
-        - openstack-tox-py310
-        - openstack-tox-py311
-        - openstack-tox-py312
         - tenks-tox-ansible-lint
-        - tenks-deploy-teardown-ovs-bios-centos9s
-        - tenks-deploy-teardown-ovs-bios-debian-bullseye
-        - tenks-deploy-teardown-ovs-bios-rocky-9
-        - tenks-deploy-teardown-ovs-bios-ubuntu-jammy
-        - tenks-deploy-teardown-linuxbridge-uefi-centos9s
-        - tenks-deploy-teardown-linuxbridge-uefi-debian-bullseye
-        - tenks-deploy-teardown-linuxbridge-uefi-rocky-9
-        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
+        - tenks-deploy-teardown-ovs-bios-centos9s:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-ovs-bios-rocky-9:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-linuxbridge-uefi-centos9s:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-linuxbridge-uefi-rocky-9:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-ovs-bios-centos10
+        - tenks-deploy-teardown-linuxbridge-uefi-centos10
+        - tenks-deploy-teardown-ovs-bios-debian-bookworm
+        - tenks-deploy-teardown-linuxbridge-uefi-debian-bookworm
+        - tenks-deploy-teardown-ovs-bios-ubuntu-noble
+        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
         # - kayobe-overcloud-rocky9
-        - kayobe-overcloud-ubuntu-jammy

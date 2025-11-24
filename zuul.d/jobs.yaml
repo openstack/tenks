@@ -1,4 +1,10 @@
 ---
+- nodeset:
+    name: tenks-centos-10-stream
+    nodes:
+      - name: primary
+        label: centos-10-stream-8GB
+
 - job:
     name: tenks-tox-ansible-lint
     description: |
@@ -14,14 +20,19 @@
       - ^zuul\.d/
 
 - job:
+    name: tenks-deploy-teardown-ovs-bios-centos10
+    parent: tenks-deploy-teardown-ovs-bios-base
+    nodeset: tenks-centos-10-stream
+
+- job:
     name: tenks-deploy-teardown-ovs-bios-centos9s
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: centos-9-stream
 
 - job:
-    name: tenks-deploy-teardown-ovs-bios-debian-bullseye
+    name: tenks-deploy-teardown-ovs-bios-debian-bookworm
     parent: tenks-deploy-teardown-ovs-bios-base
-    nodeset: debian-bullseye
+    nodeset: debian-bookworm
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-rocky-9
@@ -29,9 +40,14 @@
     nodeset: rockylinux-9
 
 - job:
-    name: tenks-deploy-teardown-ovs-bios-ubuntu-jammy
+    name: tenks-deploy-teardown-ovs-bios-ubuntu-noble
     parent: tenks-deploy-teardown-ovs-bios-base
-    nodeset: ubuntu-jammy
+    nodeset: ubuntu-noble
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-centos10
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: tenks-centos-10-stream
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos9s
@@ -39,9 +55,9 @@
     nodeset: centos-9-stream
 
 - job:
-    name: tenks-deploy-teardown-linuxbridge-uefi-debian-bullseye
+    name: tenks-deploy-teardown-linuxbridge-uefi-debian-bookworm
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: debian-bullseye
+    nodeset: debian-bookworm
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-rocky-9
@@ -49,9 +65,9 @@
     nodeset: rockylinux-9
 
 - job:
-    name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-jammy
+    name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: ubuntu-jammy
+    nodeset: ubuntu-noble
 
 - job:
     name: tenks-tox-codespell
