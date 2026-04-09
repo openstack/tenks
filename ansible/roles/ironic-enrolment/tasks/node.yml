@@ -115,6 +115,22 @@
       changed_when: true
       when: node.ironic_config.traits | default([])
 
+    - name: Set Ironic node conductor group
+      command: >-
+        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set --conductor-group
+          '{{ node_res.node.id }}'
+          {{ node.config.conductor_group }}
+      changed_when: true
+      when: "'conductor_group' in node.ironic_config"
+
+    - name: Set Ironic node shard key
+      command: >-
+        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set --shard
+          '{{ node_res.node.id }}'
+          {{ node.ironic_config.shard }}
+      changed_when: true
+      when: "'shard' in node.ironic_config"
+
     - name: Set additional Ironic port attributes
       include_tasks: port.yml
       vars:

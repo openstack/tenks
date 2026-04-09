@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Optionally support setting the Ironic node shard key and conductor group.

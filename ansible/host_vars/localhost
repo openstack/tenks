@@ -66,12 +66,14 @@ node_types: {}
 #       bios_interface: no-bios
 #       boot_interface: pxe
 #       console_interface: ipmitool-socat
+#       conductor_group: conductor_group_foo
 #       deploy_interface: iscsi
 #       inspect_interface: inspector
 #       management_interface: ipmitool
 #       network_interface: neutron
 #       power_interface: ipmitool
 #       raid_interface: no-raid
+#       shard: hall_bar
 #       storage_interface: noop
 #       vendor_interface: ipmitool
 specs: []
