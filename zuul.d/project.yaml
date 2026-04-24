@@ -26,7 +26,7 @@
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
-        - kayobe-overcloud-rocky9:
+        - kayobe-overcloud-rocky10:
             voting: false
         - tenks-tox-codespell:
             voting: false
@@ -51,4 +51,4 @@
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
-        # - kayobe-overcloud-rocky9
+        # - kayobe-overcloud-rocky10
