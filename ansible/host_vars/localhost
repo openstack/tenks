@@ -124,9 +124,7 @@ bmc_emulators:
   ipmi: virtualbmc
   pxe_ipmitool: virtualbmc
   pxe_ipmitool_socat: virtualbmc
-  pxe_snmp: virtualpdu
   redfish: sushy-tools
-  snmp: virtualpdu
 
 # Whether to wait for nodes' resources to be registered in the Placement
 # service. If the Placement service is not in use, for example in standalone
