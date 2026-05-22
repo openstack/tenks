@@ -27,4 +27,7 @@ physnet_mappings:
 
 bridge_type: {{ bridge_type }}
 
+{% if libvirt_vm_arch is defined %}
+libvirt_vm_arch: {{ libvirt_vm_arch }}
+{% endif %}
 python_upper_constraints_url: file://{{ upper_constraints_path }}

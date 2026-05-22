@@ -5,6 +5,18 @@
       - name: primary
         label: centos-10-stream-8GB
 
+- nodeset:
+    name: tenks-centos-10-stream-arm64
+    nodes:
+      - name: primary
+        label: centos-10-stream-arm64-8GB
+
+- nodeset:
+    name: tenks-rockylinux-9-arm64
+    nodes:
+      - name: primary
+        label: rockylinux-9-arm64-8GB
+
 - job:
     name: tenks-tox-ansible-lint
     description: |
@@ -50,9 +62,23 @@
     nodeset: tenks-centos-10-stream
 
 - job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-centos10-aarch64
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: tenks-centos-10-stream-arm64
+    vars:
+      libvirt_vm_arch: aarch64
+
+- job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos9s
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: centos-9-stream
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-centos9s-aarch64
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: centos-9-stream-arm64
+    vars:
+      libvirt_vm_arch: aarch64
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-debian-trixie
@@ -60,14 +86,35 @@
     nodeset: debian-trixie-8GB
 
 - job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-debian-trixie-aarch64
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: debian-trixie-arm64-8GB
+    vars:
+      libvirt_vm_arch: aarch64
+
+- job:
     name: tenks-deploy-teardown-linuxbridge-uefi-rocky-9
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: rockylinux-9
 
 - job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-rocky-9-aarch64
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: tenks-rockylinux-9-arm64
+    vars:
+      libvirt_vm_arch: aarch64
+
+- job:
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: ubuntu-noble
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble-aarch64
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: ubuntu-noble-arm64
+    vars:
+      libvirt_vm_arch: aarch64
 
 - job:
     name: tenks-tox-codespell
