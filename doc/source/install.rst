@@ -33,7 +33,7 @@ Currently, Tenks supports the following OS distributions on the hypervisor:
 
 * CentOS Stream 9
 * CentOS Stream 10
-* Debian Bookworm (12)
+* Debian Trixie (13)
 * Rocky Linux 9
 * Ubuntu Noble 24.04
 
