@@ -6,5 +6,6 @@ virtualenv_path: "{{ '/'.join([ansible_facts.env['HOME'], 'tenks-venv']) }}"
 # The URL of the upper constraints file to pass to pip when installing Python
 # packages.
 # NOTE: The last OpenStack release supporting Python 3.9 is 2025.1 (Epoxy).
+# NOTE: The last OpenStack release supporting Python 3.10 is 2026.1 (Gazpacho).
 python_upper_constraints_url: >-
-  https://releases.openstack.org/constraints/upper/{% if ansible_facts.python.version.minor < 10 %}2025.1{% else %}master{% endif %}
+  https://releases.openstack.org/constraints/upper/{% if ansible_facts.python.version.minor < 10 %}2025.1{% elif ansible_facts.python.version.minor < 11 %}2026.1{% else %}master{% endif %}
