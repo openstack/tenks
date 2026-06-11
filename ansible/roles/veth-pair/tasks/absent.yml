@@ -15,7 +15,7 @@
       changed_when: true
       become: true
 
-- name: Delete veth pair
+- name: Delete veth pair using ip
   command: >-
     ip link del dev {{ veth_pair_peer_link_name }}
     type veth
@@ -27,3 +27,31 @@
     - not (res.rc == 1 and 'Cannot find device' in res.stderr)
   changed_when: res.rc == 0
   become: true
+  when: network_driver != "NetworkManager"
+
+- name: Delete veth pair using NetworkManager
+  command: >-
+    nmcli connection delete {{ item }}
+  loop:
+    - "{{ veth_pair_peer_link_name }}"
+    - "{{ veth_pair_source_link_name }}"
+  register: res
+  changed_when: res.rc == 0
+  become: true
+  failed_when:
+    - res.rc != 0
+    # Case where veth pair is already absent.
+    - not (res.rc == 10 and 'unknown connection' in res.stderr)
+  when: network_driver == "NetworkManager"
+
+- name: Remove systemd-networkd config files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: "absent"
+  loop:
+    - /etc/systemd/network/{{ veth_pair_source_link_name }}.network
+    - /etc/systemd/network/{{ veth_pair_source_link_name }}.netdev
+    - /etc/systemd/network/{{ veth_pair_peer_link_name }}.network
+    - /etc/systemd/network/{{ veth_pair_peer_link_name }}.netdev
+  become: true
+  when: network_driver == "systemd-networkd"

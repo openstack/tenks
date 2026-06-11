@@ -106,9 +106,18 @@
           --collections-path={{ tenks_src_dir }}/ansible/collections
         chdir: "{{ tenks_src_dir }}"
 
-    - name: Ensure network bridge for physnet1 exists
+    - name: Ensure network bridge for physnet1 exists with ip
       command: "{{ item }}"
       become: true
       with_items:
         - "ip l add breth1 type bridge"
         - "ip l set breth1 up"
+      when: network_driver is not defined or network_driver != "NetworkManager"
+
+    - name: Ensure network bridge for physnet1 exists with NetworkManager
+      command: >-
+        nmcli connection add type bridge con-name breth1 ifname breth1 ipv4.method disabled ipv6.method disabled
+      become: true
+      when:
+      - network_driver is defined
+      - network_driver == "NetworkManager"

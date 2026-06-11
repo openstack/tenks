@@ -1,5 +1,5 @@
 ---
-- name: Create veth pair
+- name: Create veth pair using ip
   command: >-
     ip link add dev {{ veth_pair_peer_link_name }}
     type veth
@@ -9,8 +9,9 @@
   # Return code 2 means the veth pair already exists
   failed_when: res.rc not in [0, 2]
   become: true
+  when: network_driver == "iproute2"
 
-- name: Bring each end of veth up
+- name: Bring each end of veth up using ip
   command: ip link set {{ item }} up
   loop:
     - "{{ veth_pair_peer_link_name }}"
@@ -19,6 +20,48 @@
   # if the interface is already up, this ultimately ends up being a noop, see:
   # https://github.com/torvalds/linux/blob/63bdf4284c38a48af21745ceb148a087b190cd21/net/core/dev.c#L7563
   changed_when: false
+  when: network_driver == "iproute2"
+
+- name: Create veth pair using NetworkManager
+  command: >-
+    nmcli connection add type veth con-name {{ veth_pair_peer_link_name }}
+    ifname {{ veth_pair_peer_link_name }} peer {{ veth_pair_source_link_name }}
+    master {{ veth_pair_peer_bridge }} slave-type bridge ipv4.method disabled ipv6.method disabled
+  changed_when: true
+  become: true
+  when: network_driver == "NetworkManager"
+
+- name: Create veth pair using systemd-networkd
+  import_role:
+    name: stackhpc.linux.systemd_networkd
+  vars:
+    veth_pair_peer_link_name: "{{ veth_pair_peer_link_name }}"
+
+    netdev_value:
+      - NetDev:
+          - Name: "{{ veth_pair_peer_link_name }}"
+          - Kind: "veth"
+      - Peer:
+          - Name: "{{ veth_pair_source_link_name }}"
+
+    network_value:
+      - Match:
+          - Name: "{{ veth_pair_peer_link_name }}"
+      - Network:
+          - Bridge: "{{ veth_pair_peer_bridge }}"
+
+    systemd_networkd_netdev: |-
+      {% set config_netdev = {veth_pair_peer_link_name: netdev_value} %}
+      {{ config_netdev }}
+
+    systemd_networkd_network: |-
+      {% set config_network = {veth_pair_peer_link_name: network_value} %}
+      {{ config_network }}
+
+    systemd_networkd_apply_config: true
+  changed_when: true
+  become: true
+  when: network_driver == "systemd-networkd"
 
 - name: Plug veth into OVS bridge
   openvswitch_port:
@@ -27,7 +70,7 @@
   when: veth_pair_peer_bridge_type == "openvswitch"
   become: true
 
-- name: Plug veth into source bridge
+- name: Plug veth into peer bridge
   when: veth_pair_peer_bridge_type == "linuxbridge"
   block:
     - include_tasks: is-attached.yml
@@ -35,14 +78,21 @@
         bridge: "{{ veth_pair_peer_bridge }}"
         interface: "{{ veth_pair_peer_link_name }}"
 
-    - name: Plug veth into source bridge
+    - name: Plug veth into peer bridge with ip
       command: >-
         ip link set {{ veth_pair_peer_link_name }} master
         {{ veth_pair_peer_bridge }}
-      when:
-        - not veth_pair_is_attached
+      when: network_driver == "iproute2"
       changed_when: true
       become: true
+
+    - name: Bring peer end of veth up using ip
+      command: ip link set {{ veth_pair_peer_link_name }} up
+      when: network_driver == "iproute2"
+      become: true
+      # if the interface is already up, this ultimately ends up being a noop, see:
+      # https://github.com/torvalds/linux/blob/63bdf4284c38a48af21745ceb148a087b190cd21/net/core/dev.c#L7563
+      changed_when: false
 
 - name: Plug veth into source bridge
   when: veth_pair_plug_into_source | bool
@@ -52,11 +102,97 @@
         bridge: "{{ veth_pair_source_bridge }}"
         interface: "{{ veth_pair_source_link_name }}"
 
-    - name: Plug veth into source bridge
+    - name: Plug veth into source bridge with NetworkManager
+      command: >-
+        nmcli connection add type veth con-name {{ veth_pair_source_link_name }}
+        ifname {{ veth_pair_source_link_name }} peer {{ veth_pair_peer_link_name }} master
+        {{ veth_pair_source_bridge }} slave-type bridge ipv4.method disabled ipv6.method disabled
+      changed_when: true
+      become: true
+      when: network_driver == "NetworkManager"
+
+    - name: Plug veth into source bridge with systemd-networkd
+      import_role:
+        name: stackhpc.linux.systemd_networkd
+      vars:
+        veth_pair_source_link_name: "{{ veth_pair_source_link_name }}"
+
+        network_value:
+          - Match:
+              - Name: "{{ veth_pair_source_link_name }}"
+          - Network:
+              - Bridge: "{{ veth_pair_source_bridge }}"
+
+        systemd_networkd_network: |-
+          {% set config_network = {veth_pair_source_link_name: network_value} %}
+          {{ config_network }}
+
+        systemd_networkd_apply_config: true
+      changed_when: true
+      become: true
+      when: network_driver == "systemd-networkd"
+
+    - name: Plug veth into source bridge with ip
       command: >-
         ip link set {{ veth_pair_source_link_name }} master
         {{ veth_pair_source_bridge }}
-      when:
-        - not veth_pair_is_attached
+      when: network_driver == "iproute2"
+      changed_when: true
+      become: true
+
+    - name: Bring source end of veth up using ip
+      command: ip link set {{ veth_pair_source_link_name }} up
+      when: network_driver == "iproute2"
+      become: true
+      # if the interface is already up, this ultimately ends up being a noop, see:
+      # https://github.com/torvalds/linux/blob/63bdf4284c38a48af21745ceb148a087b190cd21/net/core/dev.c#L7563
+      changed_when: false
+
+- name: Bring NetworkManager connections up
+  when:
+    - network_driver == "NetworkManager"
+    - veth_pair_plug_into_source | bool
+  block:
+    - name: Bring up bridges
+      command: >-
+        sudo nmcli connection up {{ item }}
+      loop:
+        - "{{ veth_pair_source_bridge }}"
+        - "{{ veth_pair_peer_bridge }}"
+      become: true
+      changed_when: true
+
+    - name: Bring down veth pair
+      command: >-
+        sudo nmcli connection down {{ item }}
+      loop:
+        - "{{ veth_pair_peer_link_name }}"
+        - "{{ veth_pair_source_link_name }}"
+      become: true
+      changed_when: true
+
+    - name: Bring up veth pair
+      command: >-
+        sudo nmcli connection up {{ item }}
+      loop:
+        - "{{ veth_pair_peer_link_name }}"
+        - "{{ veth_pair_source_link_name }}"
+      become: true
+      changed_when: true
+
+- name: Bring systemd-networkd devices up
+  when: network_driver == "systemd-networkd"
+  block:
+    - name: Restart systemd-networkd
+      ansible.builtin.systemd_service:
+        name: systemd-networkd
+        state: "restarted"
+        daemon_reload: true
+      changed_when: true
+      become: true
+
+    - name: Bring tenks bridge up
+      command: >-
+        ip link set {{ veth_pair_peer_bridge }} up
       changed_when: true
       become: true

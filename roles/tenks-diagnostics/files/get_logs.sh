@@ -20,6 +20,7 @@ copy_logs() {
 
     cp -r /etc/sudoers.d ${LOG_DIR}/system_logs/
     cp /etc/sudoers ${LOG_DIR}/system_logs/sudoers.txt
+    cp /etc/resolv.conf ${LOG_DIR}/system_logs/resolv-conf.txt
 
     df -h > ${LOG_DIR}/system_logs/df.txt
     free  > ${LOG_DIR}/system_logs/free.txt
@@ -28,6 +29,7 @@ copy_logs() {
     env > ${LOG_DIR}/system_logs/env.txt
     ip address > ${LOG_DIR}/system_logs/ip-address.txt
     ip route > ${LOG_DIR}/system_logs/ip-route.txt
+    resolvectl > ${LOG_DIR}/system_logs/resolvectl.txt
 
     iptables-save > ${LOG_DIR}/system_logs/iptables.txt
 

@@ -79,3 +79,11 @@ URL via ``clouds.yaml``. For example:
        endpoint: http://localhost:6385
 
 Then set the ``OS_CLOUD`` environment variable to ``standalone``.
+
+Persistent Networking
+---------------------
+
+By default, ip commands are used to set up the Tenks network. For a networking
+setup that is persistent across reboots, override the network_driver variable
+with either systemd-networkd or NetworkManager, depending on your OS
+distribution.

@@ -41,4 +41,8 @@ bridge_type: {{ bridge_type }}
 {% if libvirt_vm_arch is defined %}
 libvirt_vm_arch: {{ libvirt_vm_arch }}
 {% endif %}
+
+{% if network_driver is defined %}
+network_driver: {{ network_driver }}
+{% endif %}
 python_upper_constraints_url: file://{{ upper_constraints_path }}
