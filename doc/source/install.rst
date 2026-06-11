@@ -70,10 +70,11 @@ Install Tenks and its requirements using the source code checkout::
 
   (tenks) $ pip install .
 
-Tenks has dependencies on Ansible roles that are hosted by Ansible Galaxy.
-These can be installed by a command such as::
+Tenks has dependencies on Ansible roles and collections that are hosted by Ansible Galaxy.
+These can be installed by commands such as::
 
-  (tenks) $ ansible-galaxy install --role-file=requirements.yml --roles-path=ansible/roles/
+  (tenks) $ ansible-galaxy role install -r requirements.yml --roles-path=ansible/roles/
+  (tenks) $ ansible-galaxy collection install -r requirements.yml --collections-path=ansible/collections/
 
 If you now wish to run Tenks (see :ref:`run`), keep your virtualenv active. If
 not, deactivate it::

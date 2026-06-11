@@ -1,3 +1,8 @@
 ---
-- src: stackhpc.libvirt-host
-- src: stackhpc.libvirt-vm
+collections:
+  - name: openstack.cloud
+    version: '>=2.6.0,<3.0.0'
+
+roles:
+  - src: stackhpc.libvirt-host
+  - src: stackhpc.libvirt-vm

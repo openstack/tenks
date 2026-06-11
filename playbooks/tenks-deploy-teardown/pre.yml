@@ -64,16 +64,25 @@
         src: requirements-overrides.yml.j2
         dest: "{{ tenks_requirements_overrides_path }}"
 
-    - name: Install Ansible Galaxy dependencies
+    - name: Install Ansible Galaxy roles
       vars:
         ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
       command:
         cmd: >-
-          {{ ansible_galaxy_bin }} install -r {{ tenks_src_dir }}/requirements.yml
-          -p {{ tenks_src_dir }}/ansible/roles
+          {{ ansible_galaxy_bin }} role install -r {{ tenks_src_dir }}/requirements.yml
+          --roles-path={{ tenks_src_dir }}/ansible/roles
         chdir: "{{ tenks_src_dir }}"
 
-    - name: Install dependencies for CI
+    - name: Install Ansible Galaxy collections
+      vars:
+        ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
+      command:
+        cmd: >-
+          {{ ansible_galaxy_bin }} collection install -r {{ tenks_src_dir }}/requirements.yml
+          --collections-path={{ tenks_src_dir }}/ansible/collections
+        chdir: "{{ tenks_src_dir }}"
+
+    - name: Install CI override roles
       # We install roles specific to CI over the existing ones. This means that we
       # don't have to keep the two requirements files in sync, as we just override
       # some of them.
@@ -81,8 +90,20 @@
         ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
       command:
         cmd: >-
-          {{ ansible_galaxy_bin }} install -f -r "{{ tenks_requirements_overrides_path }}"
-          -p {{ tenks_src_dir }}/ansible/roles
+          {{ ansible_galaxy_bin }} role install -f -r "{{ tenks_requirements_overrides_path }}"
+          --roles-path={{ tenks_src_dir }}/ansible/roles
+        chdir: "{{ tenks_src_dir }}"
+
+    - name: Install CI override collections
+      # We install collections specific to CI over the existing ones. This means that we
+      # don't have to keep the two requirements files in sync, as we just override
+      # some of them.
+      vars:
+        ansible_galaxy_bin: "{{ tenks_venv }}/bin/ansible-galaxy"
+      command:
+        cmd: >-
+          {{ ansible_galaxy_bin }} collection install -f -r "{{ tenks_requirements_overrides_path }}"
+          --collections-path={{ tenks_src_dir }}/ansible/collections
         chdir: "{{ tenks_src_dir }}"
 
     - name: Ensure network bridge for physnet1 exists
