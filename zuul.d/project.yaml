@@ -20,22 +20,10 @@
             override-checkout: stable/2025.1
         - tenks-deploy-teardown-ovs-bios-centos10
         - tenks-deploy-teardown-linuxbridge-uefi-centos10
-        - tenks-deploy-teardown-linuxbridge-uefi-centos10-aarch64:
-            voting: false
-        - tenks-deploy-teardown-linuxbridge-uefi-centos9s-aarch64:
-            voting: false
-            override-checkout: stable/2025.1
         - tenks-deploy-teardown-ovs-bios-debian-trixie
         - tenks-deploy-teardown-linuxbridge-uefi-debian-trixie
-        - tenks-deploy-teardown-linuxbridge-uefi-debian-trixie-aarch64:
-            voting: false
-        - tenks-deploy-teardown-linuxbridge-uefi-rocky-9-aarch64:
-            voting: false
-            override-checkout: stable/2025.1
         - tenks-deploy-teardown-ovs-bios-ubuntu-noble
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
-        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble-aarch64:
-            voting: false
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
         - kayobe-overcloud-rocky10:
@@ -64,3 +52,12 @@
         # Until we have ironic jobs using tenks, gate on the kayobe overcloud
         # deploy job, which uses tenks to test bare metal compute provisioning.
         # - kayobe-overcloud-rocky10
+    experimental:
+      jobs:
+        - tenks-deploy-teardown-linuxbridge-uefi-centos10-aarch64
+        - tenks-deploy-teardown-linuxbridge-uefi-centos9s-aarch64:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-linuxbridge-uefi-debian-trixie-aarch64
+        - tenks-deploy-teardown-linuxbridge-uefi-rocky-9-aarch64:
+            override-checkout: stable/2025.1
+        - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble-aarch64
