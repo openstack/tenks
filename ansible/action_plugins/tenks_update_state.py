@@ -16,6 +16,7 @@
 import abc
 from copy import deepcopy
 import itertools
+import uuid
 
 from ansible.errors import AnsibleActionFail
 from ansible.module_utils._text import to_text
@@ -172,7 +173,8 @@ class ActionModule(ActionBase):
         for spec in self.args['specs']:
             for _ in range(spec['count']):
                 node = self._gen_node(spec['type'], spec.get('ironic_config'))
-                hostname, ipmi_port = scheduler.choose_host(node)
+                uses_ipmi = self._uses_ipmi(node)
+                hostname, ipmi_port = scheduler.choose_host(node, uses_ipmi)
                 node_name_prefix = spec.get('node_name_prefix',
                                             self.args['node_name_prefix'])
                 node['name'] = namer.get_name(node_name_prefix)
@@ -183,6 +185,7 @@ class ActionModule(ActionBase):
                     vol['name'] = ("%s%s%d"
                                    % (node['name'], vol_name_prefix, vol_idx))
                 node['ipmi_port'] = ipmi_port
+                node['uuid'] = str(uuid.uuid4())
                 self.args['state'][hostname]['nodes'].append(node)
 
     def _gen_node(self, type_name, ironic_config=None):
@@ -205,6 +208,14 @@ class ActionModule(ActionBase):
         if ironic_config:
             node['ironic_config'] = ironic_config
         return node
+
+    def _uses_ipmi(self, node):
+        """
+        Check whether a node uses an ipmi driver.
+        """
+        driver = node['ironic_driver']
+        emulator = self.localhost_vars['bmc_emulators'][driver]
+        return emulator == "virtualbmc"
 
     def _validate_args(self):
         if self.args is None:
@@ -294,12 +305,12 @@ class Host(object):
         """
         return self.free_ipmi_ports.pop(0)
 
-    def host_passes(self, node):
+    def host_passes(self, node, uses_ipmi=True):
         """
         Perform checks to ascertain whether this host can support this node.
         """
         # Is there a free IPMI port?
-        if not self.free_ipmi_ports:
+        if uses_ipmi and not self.free_ipmi_ports:
             return False
         # Check that the host is connected to all physical networks that the
         # node requires.
@@ -335,7 +346,7 @@ class RoundRobinScheduler(Scheduler):
         super(RoundRobinScheduler, self).__init__(hostvars, state)
         self._host_cycle = itertools.cycle(self.hosts.keys())
 
-    def choose_host(self, node):
+    def choose_host(self, node, uses_ipmi=True):
         count = 0
         while True:
             # Ensure we don't get into an infinite loop if no hosts are
@@ -347,6 +358,8 @@ class RoundRobinScheduler(Scheduler):
             count += 1
             hostname = next(self._host_cycle)
             host = self.hosts[hostname]
-            if host.host_passes(node):
-                ipmi_port = host.reserve()
+            if host.host_passes(node, uses_ipmi):
+                ipmi_port = 0
+                if uses_ipmi:
+                    ipmi_port = host.reserve()
                 return hostname, ipmi_port

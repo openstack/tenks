@@ -110,6 +110,11 @@ deploy_ramdisk:
 state_file_path: >-
     {{ '/'.join([(playbook_dir | dirname), 'state.yml']) }}
 
+# The path to the file which contains the configuration for the Sushy Redfish
+# emulator.
+sushy_emulator_conf_path: >-
+    {{ '/'.join([(playbook_dir | dirname), 'sushy_emulator.conf']) }}
+
 # The default Ironic driver of a node. Can be overridden per-node.
 default_ironic_driver: ipmi
 

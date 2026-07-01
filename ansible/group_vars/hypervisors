@@ -42,3 +42,7 @@ ipmi_port_range_end: 6240
 ipmi_username: username
 # The password to use for node IPMI communication.
 ipmi_password: password
+
+redfish_address: 0.0.0.0
+redfish_username: username
+redfish_password: password

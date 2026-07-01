@@ -39,7 +39,8 @@
       loop: "{{ iflist_res.stdout_lines[2:] }}"
       when: (node.state | default('present')) == 'present'
 
-- name: Configure node in Ironic
+- name: Configure ipmi node in Ironic
+  when: node.ironic_driver != 'redfish'
   openstack.cloud.baremetal_node:
     auth_type: "{{ 'password' if lookup('env', 'OS_USERNAME') else omit }}"
     cloud: "{{ lookup('env', 'OS_CLOUD') | default(omit, true) }}"
@@ -61,10 +62,36 @@
     # our virtualenv.
     ansible_python_interpreter: >-
       {{ '/'.join([ironic_virtualenv_path, 'bin', 'python']) }}
-  register: node_res
+  register: ipmi_node_res
+
+- name: Configure Redfish node in Ironic
+  when: node.ironic_driver == 'redfish'
+  openstack.cloud.baremetal_node:
+    auth_type: "{{ 'password' if lookup('env', 'OS_USERNAME') else omit }}"
+    cloud: "{{ lookup('env', 'OS_CLOUD') | default(omit, true) }}"
+    driver: "{{ node.ironic_driver }}"
+    driver_info:
+      redfish_address: 'http://{{ hostvars[ironic_hypervisor].redfish_address }}:8000'
+      redfish_system_id: '/redfish/v1/Systems/{{ node.uuid }}'
+      redfish_username: "{{ hostvars[ironic_hypervisor].redfish_username }}"
+      redfish_password: "{{ hostvars[ironic_hypervisor].redfish_password }}"
+      deploy_kernel: "{{ ironic_deploy_kernel_uuid | default(omit, true) }}"
+      deploy_ramdisk: "{{ ironic_deploy_ramdisk_uuid | default(omit, true) }}"
+    name: "{{ node.name }}"
+    # The 'nics' list can be empty without a problem if state is 'absent'.
+    nics: "{{ nics | default([]) }}"  # noqa args[module]
+    state: "{{ node.state | default('present') }}"
+  vars:
+    # This module requires the openstacksdk package, which is installed within
+    # our virtualenv.
+    ansible_python_interpreter: >-
+      {{ '/'.join([ironic_virtualenv_path, 'bin', 'python']) }}
+  register: redfish_node_res
 
 - name: Perform node and port attribute manipulation
   when: (node.state | default('present')) == 'present'
+  vars:
+    node_res: "{{ redfish_node_res if node.ironic_driver == 'redfish' else ipmi_node_res }}"
   block:
     # The os_ironic module automatically brings the node from 'enrol' to
     # 'available' state, but we still need to set more port and node attributes.

@@ -1,0 +1,14 @@
+SUSHY_EMULATOR_LISTEN_IP = '{{ sushy_redfish_address }}'
+
+SUSHY_EMULATOR_FEATURE_SET = 'full'
+
+{% if sushy_libvirt_uri %}
+SUSHY_EMULATOR_LIBVIRT_URI = u'{{ sushy_libvirt_uri }}'
+
+{% endif -%}
+
+SUSHY_EMULATOR_ALLOWED_INSTANCES = [
+{% for node in sushy_allowed_nodes %}
+    "{{ node.uuid }}"{{ "," if not loop.last }}
+{% endfor %}
+]

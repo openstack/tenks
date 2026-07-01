@@ -19,6 +19,9 @@ node_types:
     # vars.
     physical_networks:
       - physnet0
+    # The Ironic driver to use for the node's BMC. An appropriate BMC emulator
+    # will be configured based on this. Optional.
+    ironic_driver: ipmi
 
 # specs is a list of configurations of nodes to be created. Each configuration
 # can specify the number of nodes to be created, the type (from `node_types`)

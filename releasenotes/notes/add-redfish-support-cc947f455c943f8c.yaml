@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Add support for emulating Redfish BMCs using the sushy-tools
+    sushy-emulator.

@@ -52,3 +52,34 @@
       loop: "{{ vbmc_nodes | sort(attribute='name') | list }}"
       loop_control:
         loop_var: domain
+
+- name: Set up Sushy Tools
+  hosts: libvirt
+  tags:
+    - node-bmc
+  vars:
+    # List of ironic drivers that require sushy-tools.
+    sushy_drivers: >-
+      {{ bmc_emulators.items() |
+         selectattr('1', 'eq', 'sushy-tools') |
+         map(attribute='0') |
+         list }}
+    # List of ironic nodes using drivers that require sushy-tools.
+    sushy_nodes: >-
+      {{ hostvars.localhost.tenks_state[inventory_hostname].nodes |
+         default([]) |
+         selectattr('ironic_driver', 'in', sushy_drivers) |
+         list }}
+  tasks:
+    - name: Set up Sushy Redfish emulator
+      when: cmd == 'deploy'
+      include_role:
+        name: sushy-redfish
+      vars:
+        sushy_tools_virtualenv_path: "{{ virtualenv_path }}"
+        sushy_python_upper_constraints_url: >-
+              {{ python_upper_constraints_url }}
+        sushy_allowed_nodes: "{{ sushy_nodes }}"
+        sushy_redfish_address: "{{ redfish_address }}"
+        sushy_log_directory: "{{ log_directory }}"
+        sushy_libvirt_uri: "{{ libvirt_local_uri }}"

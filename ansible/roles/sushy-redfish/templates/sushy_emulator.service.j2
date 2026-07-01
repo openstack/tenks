@@ -1,0 +1,14 @@
+[Unit]
+Description=Sushy Libvirt emulator
+After=syslog.target
+
+[Service]
+Type=simple
+ExecStart={{ sushy_tools_virtualenv_path }}/bin/sushy-emulator --config {{ sushy_emulator_conf_path }}
+{% if sushy_log_directory %}
+StandardOutput=append:{{ sushy_log_directory }}/sushy.log
+StandardError=inherit
+{% else %}
+StandardOutput=null
+StandardError=null
+{% endif %}

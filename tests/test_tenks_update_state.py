@@ -44,6 +44,10 @@ class TestTenksUpdateState(unittest.TestCase):
         self.mod.localhost_vars = {
             'cmd': 'deploy',
             'default_ironic_driver': 'def_ir_driv',
+            'bmc_emulators': {
+                'def_ir_driv': 'virtualbmc',
+                'red_ir_driv': 'sushy-tools'
+            }
         }
 
         # Minimal inputs required.
@@ -250,6 +254,17 @@ class TestTenksUpdateState(unittest.TestCase):
         self.mod.hypervisor_vars['foo']['ipmi_port_range_start'] = 123
         self.mod.hypervisor_vars['foo']['ipmi_port_range_end'] = 123
         self.assertRaises(AnsibleActionFail, self.mod._process_specs)
+
+    def test__process_specs_redfish_not_enough_ipmi_ports(self):
+        # Give 'foo' only a single IPMI port to allocate.
+        self.mod.hypervisor_vars['foo']['ipmi_port_range_start'] = 123
+        self.mod.hypervisor_vars['foo']['ipmi_port_range_end'] = 123
+        self.mod.args['node_types']['type0'].update({
+            'ironic_driver': 'red_ir_driv'
+        })
+        nodes = self._test__process_specs_no_state_create_nodes()
+        for node in nodes:
+            self.assertEqual(node['ipmi_port'], 0)
 
     def test__process_specs_node_name_prefix(self):
         self.specs[0]['node_name_prefix'] = 'foo-prefix'

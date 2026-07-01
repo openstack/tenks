@@ -23,7 +23,8 @@
         name: stackhpc.libvirt-vm
       vars:
         libvirt_vm_uri: "{{ libvirt_local_uri }}"
-        libvirt_vm_default_console_log_dir: "{{ log_directory }}"
+        # Can't be the main log directory, as it changes the permissions.
+        libvirt_vm_default_console_log_dir: "{{ log_directory }}/libvirt"
         # Configure VM definitions for the Libvirt provider.
         # FIXME(w-miller): Set absent/present in tenks_schedule on a per-node
         # basis to account for existing state, rather than for all nodes

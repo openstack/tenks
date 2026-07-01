@@ -13,10 +13,21 @@ node_types:
     physical_networks:
       - physnet1
     console_log_enabled: true
+  type1:
+    memory_mb: 1024
+    vcpus: 1
+    volumes:
+      - capacity: 4GiB
+    physical_networks:
+      - physnet1
+    console_log_enabled: true
+    ironic_driver: redfish
 
 specs:
   - type: type0
-    count: 2
+    count: 1
+  - type: type1
+    count: 1
 
 default_boot_mode: {{ boot_mode }}
 

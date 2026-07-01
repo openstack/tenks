@@ -31,10 +31,12 @@
       - ^tests/
       - ^zuul\.d/
 
+# CentOS 10 jobs are slow
 - job:
     name: tenks-deploy-teardown-ovs-bios-centos10
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: tenks-centos-10-stream
+    timeout: 3600
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-centos9s
@@ -56,15 +58,18 @@
     parent: tenks-deploy-teardown-ovs-bios-base
     nodeset: ubuntu-noble
 
+# CentOS 10 jobs are slow
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos10
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: tenks-centos-10-stream
+    timeout: 3600
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos10-aarch64
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: tenks-centos-10-stream-arm64
+    timeout: 3600
     vars:
       libvirt_vm_arch: aarch64
 

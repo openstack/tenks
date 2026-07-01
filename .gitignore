@@ -2,6 +2,8 @@
 *.retry
 # Tenks state file
 state.yml
+# Sushy emulator config file
+sushy_emulator.conf
 # Tenks Galaxy roles
 ansible/roles/stackhpc.*
 
