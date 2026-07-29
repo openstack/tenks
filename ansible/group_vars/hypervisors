@@ -44,5 +44,6 @@ ipmi_username: username
 ipmi_password: password
 
 redfish_address: 0.0.0.0
+redfish_port: 8100
 redfish_username: username
 redfish_password: password

@@ -18,6 +18,7 @@ Role Variables
 - `sushy_allowed_nodes`: The identities of the nodes that the sushy-emulator
   is allowed to manage.
 - `sushy_redfish_address`: The IP address that the sushy-emulator listens on.
+- `sushy_redfish_port`: The port that the sushy-emulator listens on.
 - `sushy_log_directory`: The directory in which to store sushy-emulator logs.
   Optional.
 - `sushy_libvirt_uri`: The URI used to connect to libvirt. Optional.

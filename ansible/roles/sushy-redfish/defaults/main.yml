@@ -9,6 +9,8 @@ sushy_python_upper_constraints_url:
 sushy_allowed_nodes: []
 # The IP address that the sushy-emulator listens on.
 sushy_redfish_address:
+# The port that the sushy-emulator listens on.
+sushy_redfish_port:
 # The directory in which to store sushy-emulator logs.
 sushy_log_directory:
 # The URI used to connect to libvirt.

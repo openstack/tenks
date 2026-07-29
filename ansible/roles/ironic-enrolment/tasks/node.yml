@@ -71,7 +71,7 @@
     cloud: "{{ lookup('env', 'OS_CLOUD') | default(omit, true) }}"
     driver: "{{ node.ironic_driver }}"
     driver_info:
-      redfish_address: 'http://{{ hostvars[ironic_hypervisor].redfish_address }}:8000'
+      redfish_address: 'http://{{ hostvars[ironic_hypervisor].redfish_address }}:{{ hostvars[ironic_hypervisor].redfish_port }}'
       redfish_system_id: '/redfish/v1/Systems/{{ node.uuid }}'
       redfish_username: "{{ hostvars[ironic_hypervisor].redfish_username }}"
       redfish_password: "{{ hostvars[ironic_hypervisor].redfish_password }}"
