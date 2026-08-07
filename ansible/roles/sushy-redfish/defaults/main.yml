@@ -15,3 +15,5 @@ sushy_redfish_port:
 sushy_log_directory:
 # The URI used to connect to libvirt.
 sushy_libvirt_uri:
+# The storage pool to use with libvirt.
+sushy_libvirt_pool:

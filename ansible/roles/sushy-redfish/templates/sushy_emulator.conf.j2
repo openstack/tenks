@@ -8,6 +8,11 @@ SUSHY_EMULATOR_LIBVIRT_URI = u'{{ sushy_libvirt_uri }}'
 
 {% endif -%}
 
+{% if sushy_libvirt_pool %}
+SUSHY_EMULATOR_STORAGE_POOL = '{{ sushy_libvirt_pool }}'
+
+{% endif -%}
+
 SUSHY_EMULATOR_ALLOWED_INSTANCES = [
 {% for node in sushy_allowed_nodes %}
     "{{ node.uuid }}"{{ "," if not loop.last }}

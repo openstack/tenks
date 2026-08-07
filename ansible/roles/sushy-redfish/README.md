@@ -22,3 +22,4 @@ Role Variables
 - `sushy_log_directory`: The directory in which to store sushy-emulator logs.
   Optional.
 - `sushy_libvirt_uri`: The URI used to connect to libvirt. Optional.
+- `sushy_libvirt_pool`: The storage pool to use with libvirt. Optional.

@@ -84,3 +84,4 @@
         sushy_redfish_port: "{{ redfish_port }}"
         sushy_log_directory: "{{ log_directory }}"
         sushy_libvirt_uri: "{{ libvirt_local_uri }}"
+        sushy_libvirt_pool: "{{ libvirt_pool_name }}"
