@@ -11,6 +11,7 @@
 
     - name: Prune absent nodes from state
       tenks_update_state:
+        finished_instantiating: true
         prune_only: true
         state: "{{ tenks_state }}"
       register: new_state
