@@ -253,7 +253,9 @@ def are_resources_available(module, specifiers, expected):
         uuid = provider["uuid"]
         traits = get_traits(module, uuid)
         # Don't include traits assigned by the nova compute driver.
-        traits = {t for t in traits if not t.startswith('COMPUTE_')}
+        traits = {t for t in traits if
+                  not t.startswith('COMPUTE_') and
+                  not t.startswith('OWNER_')}
         inventory = get_inventory(module, uuid)
         provider = Provider(
             uuid=uuid,
