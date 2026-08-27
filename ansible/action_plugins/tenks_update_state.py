@@ -63,6 +63,9 @@ class ActionModule(ActionBase):
         }
         self._validate_args()
 
+        if self.args['finished_instantiating']:
+            self._remove_instantiating()
+
         if self.args['prune_only']:
             self._prune_absent_nodes()
         else:
@@ -81,6 +84,15 @@ class ActionModule(ActionBase):
         for hyp in self.args['state'].values():
             hyp['nodes'] = [n for n in hyp['nodes']
                             if n.get('state') != 'absent']
+
+    def _remove_instantiating(self):
+        """
+        Remove state='instantiating' from all nodes.
+        """
+        for hyp in self.args['state'].values():
+            for node in hyp.get('nodes', []):
+                if node.get('instantiating'):
+                    node.pop('instantiating')
 
     def _set_physnet_idxs(self):
         """
@@ -186,6 +198,7 @@ class ActionModule(ActionBase):
                                    % (node['name'], vol_name_prefix, vol_idx))
                 node['ipmi_port'] = ipmi_port
                 node['uuid'] = str(uuid.uuid4())
+                node['instantiating'] = True
                 self.args['state'][hostname]['nodes'].append(node)
 
     def _gen_node(self, type_name, ironic_config=None):
@@ -230,6 +243,7 @@ class ActionModule(ActionBase):
             ('state', {}),
             ('vol_name_prefix', 'vol'),
             ('prune_only', False),
+            ('finished_instantiating', False),
         ]
         for arg in OPTIONAL_ARGS:
             if arg[0] not in self.args:

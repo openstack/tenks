@@ -26,11 +26,9 @@
         # Can't be the main log directory, as it changes the permissions.
         libvirt_vm_default_console_log_dir: "{{ log_directory }}/libvirt"
         # Configure VM definitions for the Libvirt provider.
-        # FIXME(w-miller): Set absent/present in tenks_schedule on a per-node
-        # basis to account for existing state, rather than for all nodes
-        # here.
         libvirt_vms: >-
-          {{ nodes | map('set_libvirt_interfaces')
+          {{ nodes | select('requires_libvirt_configuration')
+                   | map('set_libvirt_interfaces')
                    | map('set_libvirt_volume_pool')
                    | map('set_libvirt_start_params')
                    | map('set_libvirt_boot_firmware')
