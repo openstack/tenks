@@ -101,6 +101,8 @@
     name: tenks-deploy-teardown-linuxbridge-uefi-rocky-9
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: rockylinux-9
+    vars:
+      network_driver: "NetworkManager"
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-rocky-9-aarch64
@@ -113,6 +115,8 @@
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
     nodeset: ubuntu-noble
+    vars:
+      network_driver: "systemd-networkd"
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble-aarch64

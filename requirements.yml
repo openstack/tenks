@@ -1,7 +1,9 @@
 ---
 collections:
   - name: openstack.cloud
-    version: '>=2.6.0,<3.0.0'
+    version: ">=2.6.0,<3.0.0"
+  - name: stackhpc.linux
+    version: ">=1.6.4"
 
 roles:
   - src: stackhpc.libvirt-host

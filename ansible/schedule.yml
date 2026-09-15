@@ -10,6 +10,25 @@
   tags:
     - schedule
   tasks:
+    - name: Check the network driver specified is valid
+      fail:
+        msg: >
+          Invalid network driver specified. Please set network_driver
+          to either iproute2, NetworkManager or systemd-networkd.
+      when:
+        - network_driver != "iproute2"
+        - network_driver != "NetworkManager"
+        - network_driver != "systemd-networkd"
+
+    - name: Check the network driver specified is valid for direct mode
+      fail:
+        msg: >
+          Invalid network driver "{{ network_driver }}" specified. Direct mode and OVS only support
+          iproute2.
+      when:
+        - network_driver == "NetworkManager" or network_driver == "systemd-networkd"
+        - bridge_type == "direct" or bridge_type == "openvswitch"
+
     - name: Check that all specified node types exist
       fail:
         msg: >

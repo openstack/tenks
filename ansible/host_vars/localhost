@@ -135,3 +135,8 @@ bmc_emulators:
 # service. If the Placement service is not in use, for example in standalone
 # ironic installations, this flag should be set to 'false'.
 wait_for_placement: true
+
+# The network driver to use. Default is iproute2, so ip commands will be
+# used to set up networking (non persistent). This can be one of iproute2,
+# systemd-networkd (persistent), or NetworkManager (persistent).
+network_driver: "iproute2"

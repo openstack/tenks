@@ -3,3 +3,5 @@
 veth_pair_plug_into_source: false
 # Whether the veth pair should be present or absent.
 veth_pair_state: present
+# The network driver to use (default is none, ip will be used)
+network_driver: ""

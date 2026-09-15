@@ -1,0 +1,9 @@
+---
+features:
+  - |
+    Adds support for changing the network driver to either systemd-networkd
+    (Debian-based systems) or NetworkManager (RHL-based systems). Changing
+    to either of these will result in a persistent networking setup.
+
+    NOTE: persistent networking is not yet supported for bridge types "direct"
+    or "openvswitch".

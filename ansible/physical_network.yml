@@ -1,5 +1,4 @@
 ---
-
 - name: Gather os specific variables
   include_vars: "{{ item }}"
   with_first_found:
@@ -49,7 +48,6 @@
         source_type: openvswitch
       when: source_interface in ovs_bridges.stdout_lines
 
-
 ### Actual configuration starts here.
 - name: Ensure Open vSwitch bridge is in the correct state
   openvswitch_bridge:
@@ -66,18 +64,51 @@
         path: /sys/class/net/{{ tenks_bridge }}
       register: stat_result
 
-    - name: Ensure Tenks bridge exists
+    - name: Ensure Tenks bridge exists with ip
       vars:
         link_operation: "{{ 'add' if state == 'present' else 'del' }}"
       command: >-
         {{ tenks_ip_path }} link {{ link_operation }} {{ tenks_bridge }} type bridge
       changed_when: true
       become: true
-      when: >-
-        state == 'present' and not stat_result.stat.exists or
-        state == 'absent' and stat_result.stat.exists
+      when:
+        - network_driver == "iproute2"
+        - state == 'present' and not stat_result.stat.exists or state == 'absent' and stat_result.stat.exists
 
-    - name: Ensure Tenks bridge is up
+    - name: Ensure Tenks bridge exists with NetworkManager
+      community.general.nmcli:
+        type: "bridge"
+        conn_name: "{{ tenks_bridge }}"
+        ifname: "{{ tenks_bridge }}"
+        method4: "disabled"
+        method6: "disabled"
+        state: "present"
+      changed_when: true
+      become: true
+      when:
+        - network_driver == "NetworkManager"
+        - not stat_result.stat.exists
+
+    - name: Ensure Tenks bridge exists with systemd-networkd
+      import_role:
+        name: stackhpc.linux.systemd_networkd
+      vars:
+        tenks_bridge: "{{ tenks_bridge }}"
+        value:
+          - NetDev:
+              - Name: "{{ tenks_bridge }}"
+              - Kind: "bridge"
+        systemd_networkd_netdev: |-
+          {% set config = {tenks_bridge: value} %}
+          {{ config }}
+        systemd_networkd_apply_config: true
+      changed_when: true
+      become: true
+      when:
+        - network_driver == "systemd-networkd"
+        - not stat_result.stat.exists
+
+    - name: Ensure Tenks bridge is up using ip
       command: >-
         {{ tenks_ip_path }} link set {{ tenks_bridge }} up
       changed_when: true
@@ -85,6 +116,7 @@
       when:
         - state == 'present'
         - not stat_result.stat.exists
+        - network_driver == "iproute2"
 
 - name: Configure existing Linux bridge
   when: source_type == 'linuxbridge'
@@ -161,8 +193,49 @@
       failed_when: false
       changed_when: false
 
-    - name: Plug source interface into Tenks Linux bridge
+    - name: Plug source interface into Tenks Linux bridge using ip
       command: >-
         {{ tenks_ip_path }} link set dev {{ source_interface }} master {{ tenks_bridge }}
       changed_when: true
-      when: master_result.rc != 0
+      when:
+        - master_result.rc != 0
+
+- name: Delete Tenks bridge using NetworkManager
+  command: >-
+    nmcli connection delete {{ tenks_bridge }}
+  register: res
+  changed_when: res.rc == 0
+  become: true
+  failed_when:
+    - res.rc != 0
+    # Case where bridge is already absent.
+    - not (res.rc == 10 and 'unknown connection' in res.stderr)
+  when:
+    - network_driver == "NetworkManager"
+    - cmd == "teardown"
+
+- name: Delete tenks bridge using ip
+  command: >-
+    ip link del {{ tenks_bridge }}
+  register: res
+  failed_when:
+    - res.rc != 0
+    # Case where veth pair is already absent.
+    - not (res.rc == 1 and 'Cannot find device' in res.stderr)
+  changed_when: res.rc == 0
+  become: true
+  when:
+    - network_driver != "NetworkManager"
+    - cmd == "teardown"
+
+- name: Remove systemd-networkd config files
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: "absent"
+  loop:
+    - /etc/systemd/network/{{ tenks_bridge }}.network
+    - /etc/systemd/network/{{ tenks_bridge }}.netdev
+  become: true
+  when:
+    - network_driver == "systemd-networkd"
+    - cmd == "teardown"
