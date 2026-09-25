@@ -1,0 +1,26 @@
+---
+fixes:
+  - |
+    Fixes an issue where node network interfaces could be assigned a MAC
+    address beginning with ``fa:``, inherited from the randomly assigned MAC
+    address of the veth pair. Ironic Python Agent ignores interfaces with such
+    MAC addresses, causing inspection to fail. Tenks now assigns a
+    deterministic MAC address using the ``52:54:00`` QEMU/KVM prefix, derived
+    from the node and physical network names.
+upgrade:
+  - |
+    Existing VMs are not redefined when Tenks is re-run, so their MAC
+    addresses are unchanged. If an existing VM has an interface with a MAC
+    address beginning with ``fa:``, it must be recovered manually. Such
+    interfaces can be identified with ``virsh domiflist <node>``. For each
+    affected node:
+
+    #. Put the Ironic node into maintenance mode:
+       ``openstack baremetal node maintenance set <node>``.
+    #. Change the MAC address of the VM interface using ``virsh edit <node>``,
+       for example to an address beginning with ``52:54:00``, then restart the
+       VM with ``virsh destroy <node>`` and ``virsh start <node>``.
+    #. Update the address of the corresponding Ironic port:
+       ``openstack baremetal port set --address <new MAC> <port UUID>``.
+    #. Take the Ironic node out of maintenance mode:
+       ``openstack baremetal node maintenance unset <node>``.

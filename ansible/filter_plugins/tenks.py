@@ -11,6 +11,7 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
+import hashlib
 import math
 import re
 
@@ -68,10 +69,16 @@ def _get_hostvar(context, var_name, inventory_hostname=None):
     return namespace.get(var_name)
 
 
-def _get_fact(context, fact_name):
-    if fact_name not in context['ansible_facts']:
-        raise AnsibleFilterError("Fact '%s' not found" % fact_name)
-    return context['ansible_facts'][fact_name]
+def _node_mac(node, physnet):
+    """Get a deterministic MAC address for a node's physical network.
+
+    The address uses the QEMU/KVM OUI 52:54:00, with the remaining octets
+    derived from the node and physical network names. This ensures the MAC
+    address is stable across invocations.
+    """
+    digest = hashlib.sha256(
+        ('%s/%s' % (node['name'], physnet)).encode()).hexdigest()
+    return '52:54:00:%s:%s:%s' % (digest[0:2], digest[2:4], digest[4:6])
 
 
 @pass_context
@@ -82,16 +89,14 @@ def set_libvirt_interfaces(context, node):
     for physnet in node.get('physical_networks', []):
         # Use macvtap 'passthrough' mode, since this does not filter packets
         # based on MAC address of the interface.
-        if_name = source_link_name(context, node, physnet)
+        # NOTE: Don't use the MAC of the veth, since it is randomly assigned
+        # by the kernel, and may begin with fa:. IPA ignores interfaces with
+        # such MAC addresses, see:
+        # https://review.opendev.org/c/openstack/ironic-python-agent/+/993999
         if_data = {'type': 'direct',
-                   'source': {'dev': if_name, 'mode': 'passthrough'}}
-
-        # Check for an existing interface. If found, pull in the existing MAC.
-        if_var = if_name.replace('-', '_')
-        if_fact = _get_fact(context, if_var)
-        if if_fact:
-            if_data['mac'] = if_fact['macaddress']
-
+                   'source': {'dev': source_link_name(context, node, physnet),
+                              'mode': 'passthrough'},
+                   'mac': _node_mac(node, physnet)}
         node['interfaces'].append(if_data)
     return node
 
