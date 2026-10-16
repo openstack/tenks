@@ -57,6 +57,7 @@
     # The 'nics' list can be empty without a problem if state is 'absent'.
     nics: "{{ nics | default([]) }}"  # noqa args[module]
     state: "{{ node.state | default('present') }}"
+    target_provision_state: 'manageable'
   vars:
     # This module requires the openstacksdk package, which is installed within
     # our virtualenv.
@@ -81,6 +82,7 @@
     # The 'nics' list can be empty without a problem if state is 'absent'.
     nics: "{{ nics | default([]) }}"  # noqa args[module]
     state: "{{ node.state | default('present') }}"
+    target_provision_state: 'manageable'
   vars:
     # This module requires the openstacksdk package, which is installed within
     # our virtualenv.
@@ -93,15 +95,6 @@
   vars:
     node_res: "{{ redfish_node_res if node.ironic_driver == 'redfish' else ipmi_node_res }}"
   block:
-    # The os_ironic module automatically brings the node from 'enrol' to
-    # 'available' state, but we still need to set more port and node attributes.
-    # Use maintenance mode to do this.
-    - name: Put Ironic node into maintenance mode
-      command: >-
-        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance set
-          '{{ node_res.node.id }}'
-      changed_when: true
-
     - name: Set additional Ironic node attributes
       command: >-
         '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node set
@@ -168,8 +161,8 @@
       loop_control:
         loop_var: vnic
 
-    - name: Bring Ironic node out of maintenance mode
+    - name: Provide Ironic node
       command: >-
-        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node maintenance
-          unset '{{ node_res.node.id }}'
+        '{{ ironic_virtualenv_path }}/bin/openstack' baremetal node provide
+          '{{ node_res.node.id }}'
       changed_when: true
