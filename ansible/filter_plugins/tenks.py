@@ -54,6 +54,7 @@ class FilterModule(object):
 
             # Miscellaneous filters.
             'size_string_to_gb': size_string_to_gb,
+            'size_string_to_bytes': size_string_to_bytes,
         }
 
 
@@ -231,6 +232,13 @@ def size_string_to_gb(size):
     Parse a size string, and convert to the integer number of GB it represents.
     """
     return int(math.ceil(_parse_size_string(size) / 10**9))
+
+
+def size_string_to_bytes(size):
+    """
+    Convert a size string to the integer number of bytes it represents.
+    """
+    return int(_parse_size_string(size))
 
 
 def _parse_size_string(size):
