@@ -13,6 +13,61 @@ SUSHY_EMULATOR_STORAGE_POOL = '{{ sushy_libvirt_pool }}'
 
 {% endif -%}
 
+SUSHY_EMULATOR_STORAGE = {
+{% for node in sushy_allowed_nodes %}
+    "{{ node.uuid }}": [
+        {
+            "Id": "1",
+            "Name": "Storage Controller",
+            "StorageControllers": [
+                {
+                    "MemberId": "0",
+                    "Name": "Integrated Storage",
+                    "SpeedGbps": 36
+                }
+            ],
+            "Drives": [
+{% for volume in node.volumes %}
+                "{{ node.name }}Drive{{ loop.index0 }}"{{ "," if not loop.last }}
+{% endfor %}
+            ]
+        }
+    ]{{ "," if not loop.last }}
+{% endfor %}
+}
+
+SUSHY_EMULATOR_DRIVES = {
+{% for node in sushy_allowed_nodes %}
+    ("{{ node.uuid }}", "1"): [
+{% for volume in node.volumes %}
+        {
+            "Id": "{{ node.name }}Drive{{ loop.index0 }}",
+            "Name": "{{ volume.name }}",
+            "CapacityBytes": {{ volume.capacity | size_string_to_bytes }},
+            "Protocol": "PCIe"
+        }{{ "," if not loop.last }}
+{% endfor %}
+    ]{{ "," if not loop.last }}
+{% endfor %}
+}
+
+SUSHY_EMULATOR_VOLUMES = {
+{% for node in sushy_allowed_nodes %}
+    ("{{ node.uuid }}", "1"): [
+{% for volume in node.volumes %}
+        {
+            "libvirtPoolName": "{{ sushy_libvirt_pool }}",
+            "libvirtVolName": "{{ volume.name }}",
+            "Id": "{{ loop.index }}",
+            "Name": "{{ volume.name }}",
+            "CapacityBytes": {{ volume.capacity | size_string_to_bytes }},
+            "VolumeType": "RawDevice"
+        }{{ "," if not loop.last }}
+{% endfor %}
+    ]{{ "," if not loop.last }}
+{% endfor %}
+}
+
 SUSHY_EMULATOR_ALLOWED_INSTANCES = [
 {% for node in sushy_allowed_nodes %}
     "{{ node.uuid }}"{{ "," if not loop.last }}
