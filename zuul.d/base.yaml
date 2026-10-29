@@ -13,7 +13,6 @@
       - name: openstack/requirements
       - name: stackhpc/ansible-role-libvirt-vm
       - name: stackhpc/ansible-role-libvirt-host
-    attempts: 1
     timeout: 1800
     irrelevant-files:
       - ^.*\.rst$

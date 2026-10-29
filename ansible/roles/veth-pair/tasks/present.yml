@@ -59,6 +59,10 @@
       {{ config_network }}
 
     systemd_networkd_apply_config: true
+    # Tenks only manages bridges and veth pairs, so leave host DNS
+    # configuration (including /etc/resolv.conf) alone.
+    systemd_resolved_enable_resolved: false
+    systemd_resolved_symlink_resolv_conf: false
   changed_when: true
   become: true
   when: network_driver == "systemd-networkd"
@@ -128,6 +132,10 @@
           {{ config_network }}
 
         systemd_networkd_apply_config: true
+        # Tenks only manages bridges and veth pairs, so leave host DNS
+        # configuration (including /etc/resolv.conf) alone.
+        systemd_resolved_enable_resolved: false
+        systemd_resolved_symlink_resolv_conf: false
       changed_when: true
       become: true
       when: network_driver == "systemd-networkd"

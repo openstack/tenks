@@ -1,0 +1,8 @@
+---
+fixes:
+  - |
+    Fixes an issue where using ``network_driver: systemd-networkd`` would
+    enable ``systemd-resolved`` and replace ``/etc/resolv.conf`` with a symlink
+    to its stub resolver. This could break DNS resolution on hosts whose DNS is
+    not managed by ``systemd-resolved``. Tenks now leaves host DNS
+    configuration untouched.
