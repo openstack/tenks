@@ -1,22 +1,4 @@
 ---
-- nodeset:
-    name: tenks-centos-10-stream
-    nodes:
-      - name: primary
-        label: centos-10-stream-8GB
-
-- nodeset:
-    name: tenks-centos-10-stream-arm64
-    nodes:
-      - name: primary
-        label: centos-10-stream-arm64-8GB
-
-- nodeset:
-    name: tenks-rockylinux-9-arm64
-    nodes:
-      - name: primary
-        label: rockylinux-9-arm64-8GB
-
 - job:
     name: tenks-tox-ansible-lint
     description: |
@@ -46,17 +28,22 @@
 - job:
     name: tenks-deploy-teardown-ovs-bios-debian-trixie
     parent: tenks-deploy-teardown-ovs-bios-base
-    nodeset: debian-trixie-8GB
+    nodeset: tenks-debian-trixie
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-rocky-9
     parent: tenks-deploy-teardown-ovs-bios-base
-    nodeset: rockylinux-9
+    nodeset: tenks-rockylinux-9
+
+- job:
+    name: tenks-deploy-teardown-ovs-bios-rocky-10
+    parent: tenks-deploy-teardown-ovs-bios-base
+    nodeset: tenks-rockylinux-10
 
 - job:
     name: tenks-deploy-teardown-ovs-bios-ubuntu-noble
     parent: tenks-deploy-teardown-ovs-bios-base
-    nodeset: ubuntu-noble
+    nodeset: tenks-ubuntu-noble
 
 # CentOS 10 jobs are slow
 - job:
@@ -76,31 +63,31 @@
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos9s
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: centos-9-stream
+    nodeset: tenks-centos-9-stream
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-centos9s-aarch64
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: centos-9-stream-arm64
+    nodeset: tenks-centos-9-stream-arm64
     vars:
       libvirt_vm_arch: aarch64
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-debian-trixie
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: debian-trixie-8GB
+    nodeset: tenks-debian-trixie
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-debian-trixie-aarch64
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: debian-trixie-arm64-8GB
+    nodeset: tenks-debian-trixie-arm64
     vars:
       libvirt_vm_arch: aarch64
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-rocky-9
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: rockylinux-9
+    nodeset: tenks-rockylinux-9
     vars:
       network_driver: "NetworkManager"
 
@@ -112,16 +99,30 @@
       libvirt_vm_arch: aarch64
 
 - job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-rocky-10
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: tenks-rockylinux-10
+    vars:
+      network_driver: "NetworkManager"
+
+- job:
+    name: tenks-deploy-teardown-linuxbridge-uefi-rocky-10-aarch64
+    parent: tenks-deploy-teardown-linuxbridge-uefi-base
+    nodeset: tenks-rockylinux-10-arm64
+    vars:
+      libvirt_vm_arch: aarch64
+
+- job:
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: ubuntu-noble
+    nodeset: tenks-ubuntu-noble
     vars:
       network_driver: "systemd-networkd"
 
 - job:
     name: tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble-aarch64
     parent: tenks-deploy-teardown-linuxbridge-uefi-base
-    nodeset: ubuntu-noble-arm64
+    nodeset: tenks-ubuntu-noble-arm64
     vars:
       libvirt_vm_arch: aarch64
 

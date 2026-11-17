@@ -1,0 +1,72 @@
+---
+- nodeset:
+    name: tenks-centos-9-stream
+    nodes:
+      - name: primary
+        label: centos-9-stream-8GB
+
+- nodeset:
+    name: tenks-centos-9-stream-arm64
+    nodes:
+      - name: primary
+        label: centos-9-stream-arm64-8GB
+
+- nodeset:
+    name: tenks-centos-10-stream
+    nodes:
+      - name: primary
+        label: centos-10-stream-8GB
+
+- nodeset:
+    name: tenks-centos-10-stream-arm64
+    nodes:
+      - name: primary
+        label: centos-10-stream-arm64-8GB
+
+- nodeset:
+    name: tenks-debian-trixie
+    nodes:
+      - name: primary
+        label: debian-trixie-8GB
+
+- nodeset:
+    name: tenks-debian-trixie-arm64
+    nodes:
+      - name: primary
+        label: debian-trixie-arm64-8GB
+
+- nodeset:
+    name: tenks-rockylinux-9
+    nodes:
+      - name: primary
+        label: rockylinux-9-8GB
+
+- nodeset:
+    name: tenks-rockylinux-9-arm64
+    nodes:
+      - name: primary
+        label: rockylinux-9-arm64-8GB
+
+- nodeset:
+    name: tenks-rockylinux-10
+    nodes:
+      - name: primary
+        label: rockylinux-10-8GB
+
+- nodeset:
+    name: tenks-rockylinux-10-arm64
+    nodes:
+      - name: primary
+        label: rockylinux-10-arm64-8GB
+
+- nodeset:
+    name: tenks-ubuntu-noble
+    nodes:
+      - name: primary
+        label: ubuntu-noble
+
+- nodeset:
+    name: tenks-ubuntu-noble-arm64
+    nodes:
+      - name: primary
+        label: ubuntu-noble-arm64
