@@ -8,18 +8,18 @@
     check:
       jobs:
         - openstack-tox-py39:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos9s:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
             voting: false
         - tenks-deploy-teardown-ovs-bios-rocky-9:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-linuxbridge-uefi-centos9s:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
             voting: false
         - tenks-deploy-teardown-linuxbridge-uefi-rocky-9:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-ovs-bios-centos10
         - tenks-deploy-teardown-linuxbridge-uefi-centos10
         - tenks-deploy-teardown-ovs-bios-debian-trixie
@@ -35,16 +35,16 @@
     gate:
       jobs:
         - openstack-tox-py39:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-tox-ansible-lint
         - tenks-deploy-teardown-ovs-bios-centos9s:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-ovs-bios-rocky-9:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-linuxbridge-uefi-centos9s:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-linuxbridge-uefi-rocky-9:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-ovs-bios-centos10
         - tenks-deploy-teardown-linuxbridge-uefi-centos10
         - tenks-deploy-teardown-ovs-bios-debian-trixie
@@ -58,8 +58,8 @@
       jobs:
         - tenks-deploy-teardown-linuxbridge-uefi-centos10-aarch64
         - tenks-deploy-teardown-linuxbridge-uefi-centos9s-aarch64:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-linuxbridge-uefi-debian-trixie-aarch64
         - tenks-deploy-teardown-linuxbridge-uefi-rocky-9-aarch64:
-            override-checkout: stable/2025.1
+            override-checkout: unmaintained/2025.1
         - tenks-deploy-teardown-linuxbridge-uefi-ubuntu-noble-aarch64
