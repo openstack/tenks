@@ -93,3 +93,47 @@
   # If no ironic_config options were set, this means that enrolment should not
   # be performed.
   when: "'ironic_config' in ironic_node"
+
+- name: Wait for node to finish cleaning
+  openstack.cloud.baremetal_node_info:
+    auth_type: "{{ 'password' if lookup('env', 'OS_USERNAME') else omit }}"
+    cloud: "{{ lookup('env', 'OS_CLOUD') | default(omit, true) }}"
+    node: "{{ ironic_node.name }}"
+  register: node_info
+  vars:
+    # This module requires the openstacksdk package, which is installed within
+    # our virtualenv.
+    ansible_python_interpreter: >-
+      {{ '/'.join([ironic_virtualenv_path, 'bin', 'python']) }}
+  loop: "{{ ironic_nodes | sort(attribute='name') }}"
+  loop_control:
+    loop_var: ironic_node
+  retries: 200
+  delay: 10
+  until: node_info.nodes[0].provision_state not in ['manageable', 'cleaning', 'clean wait']
+  # If no ironic_config options were set, this means that enrolment should not
+  # be performed.
+  when:
+    - "'ironic_config' in ironic_node"
+    - (ironic_node.state | default('present')) == 'present'
+
+- name: Fail if any nodes are not available
+  openstack.cloud.baremetal_node_info:
+    auth_type: "{{ 'password' if lookup('env', 'OS_USERNAME') else omit }}"
+    cloud: "{{ lookup('env', 'OS_CLOUD') | default(omit, true) }}"
+    node: "{{ ironic_node.name }}"
+  register: node_info
+  vars:
+    # This module requires the openstacksdk package, which is installed within
+    # our virtualenv.
+    ansible_python_interpreter: >-
+      {{ '/'.join([ironic_virtualenv_path, 'bin', 'python']) }}
+  loop: "{{ ironic_nodes | sort(attribute='name') }}"
+  loop_control:
+    loop_var: ironic_node
+  # If no ironic_config options were set, this means that enrolment should not
+  # be performed.
+  when:
+    - "'ironic_config' in ironic_node"
+    - (ironic_node.state | default('present')) == 'present'
+  failed_when: node_info.nodes[0].provision_state != 'available'
